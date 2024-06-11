@@ -5,7 +5,7 @@ import AddMoneyForm from "./add-money-form";
 
 import { UsePhpPesoWSign } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Loader2, Plus } from "lucide-react";
+import { ListFilter, Loader2, Plus } from "lucide-react";
 import { useState } from "react";
 
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
@@ -13,8 +13,18 @@ import Money from "./money";
 import { Database } from "@/database.types";
 import EditMoneyForm from "./edit-money-form";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useListState } from "@/store";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 export default function List() {
   var _ = require("lodash");
+  const listState = useListState();
   const [showAddMoneyForm, setShowAddMoneyForm] = useState(false);
   const [showEditMoneyForm, setEditMoneyForm] = useState<{
     open: boolean;
@@ -24,8 +34,8 @@ export default function List() {
     money: null,
   });
   const { data, error, isLoading, refetch } = useQuery({
-    queryKey: ["moneys"],
-    queryFn: async () => await getMoneys(),
+    queryKey: ["moneys", listState.sort],
+    queryFn: async () => await getMoneys(listState.sort),
   });
   const moneys = data?.data?.map((money) => money);
   const total = _.sum(moneys?.map((money) => money.amount));
@@ -102,8 +112,48 @@ export default function List() {
           </DrawerContent>
         </Drawer>
 
+        <DropdownMenu>
+          <DropdownMenuTrigger className="text-xs text-muted-foreground mt-8 ml-auto mr-0">
+            <ListFilter size={20} />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuGroup>
+              <DropdownMenuItem
+                onClick={() => {
+                  listState.setSort(listState.sort.asc, "amount");
+                }}
+              >
+                Amount
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  listState.setSort(listState.sort.asc, "created_at");
+                }}
+              >
+                Date created
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem
+                onClick={() => {
+                  listState.setSort(true, listState.sort.by);
+                }}
+              >
+                Ascending
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  listState.setSort(false, listState.sort.by);
+                }}
+              >
+                Descending
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
         {/* moneys list */}
-        <div className="w-full flex flex-col gap-2 mt-8 mb-2">
+        <div className="w-full flex flex-col gap-2 my-2">
           {moneys?.map((money) => {
             return (
               <Money

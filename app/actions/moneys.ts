@@ -4,11 +4,15 @@ import { createClient } from "@/utils/supabase/server";
 
 type money = Database["public"]["Tables"]["moneys"]["Row"];
 
-export async function getMoneys() {
+export async function getMoneys(sort: {
+  asc: boolean;
+  by: "created_at" | "amount";
+}) {
   const supabase = createClient();
   const moneys = await supabase
     .from("moneys")
-    .select("id,amount,name,created_at,color,updated_at");
+    .select("id,amount,name,created_at,color,updated_at")
+    .order(sort.by, { ascending: sort.asc });
   return moneys;
 }
 
