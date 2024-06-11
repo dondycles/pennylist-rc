@@ -62,29 +62,71 @@ export default function List() {
     <main className="w-full h-full px-2">
       <ScrollArea className="w-full h-full">
         {/* total money and add money form */}
-        <div className="mt-2 border rounded-lg p-4 shadow-lg flex flex-row gap-4 items-center justify-between">
-          <div className="flex flex-col">
-            <p className="text-muted-foreground text-xs">Total Money</p>
-            <p className="text-2xl sm:text-4xl font-anton">
-              {UsePhpPesoWSign(total)}
-            </p>
+        <div className="flex flex-col">
+          <div className="mt-2 border rounded-lg p-4 shadow-lg flex flex-row gap-4 items-center justify-between">
+            <div className="flex flex-col">
+              <p className="text-muted-foreground text-xs">Total Money</p>
+              <p className="text-2xl sm:text-4xl font-anton">
+                {UsePhpPesoWSign(total)}
+              </p>
+            </div>
+            <Drawer open={showAddMoneyForm} onOpenChange={setShowAddMoneyForm}>
+              <DrawerTrigger asChild>
+                <Button size={"icon"} className="rounded-full">
+                  <Plus />
+                </Button>
+              </DrawerTrigger>
+              <DrawerContent className=" p-2 gap-2">
+                <p className="font-bold text-sm text-center">Add money</p>
+                <AddMoneyForm
+                  close={() => {
+                    setShowAddMoneyForm(false);
+                    refetch();
+                  }}
+                />
+              </DrawerContent>
+            </Drawer>
           </div>
-          <Drawer open={showAddMoneyForm} onOpenChange={setShowAddMoneyForm}>
-            <DrawerTrigger asChild>
-              <Button size={"icon"} className="rounded-full">
-                <Plus />
-              </Button>
-            </DrawerTrigger>
-            <DrawerContent className=" p-2 gap-2">
-              <p className="font-bold text-sm text-center">Add money</p>
-              <AddMoneyForm
-                close={() => {
-                  setShowAddMoneyForm(false);
-                  refetch();
-                }}
-              />
-            </DrawerContent>
-          </Drawer>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="text-xs text-muted-foreground mt-8 ml-auto mr-0 flex items-center gap-1">
+              <p>sort</p> <ListFilter size={20} />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuGroup>
+                <DropdownMenuItem
+                  onClick={() => {
+                    listState.setSort(listState.sort.asc, "amount");
+                  }}
+                >
+                  Amount
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    listState.setSort(listState.sort.asc, "created_at");
+                  }}
+                >
+                  Date created
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuItem
+                  onClick={() => {
+                    listState.setSort(true, listState.sort.by);
+                  }}
+                >
+                  Ascending
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    listState.setSort(false, listState.sort.by);
+                  }}
+                >
+                  Descending
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* edit money form */}
@@ -112,46 +154,6 @@ export default function List() {
           </DrawerContent>
         </Drawer>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger className="text-xs text-muted-foreground mt-8 ml-auto mr-0">
-            <ListFilter size={20} />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuGroup>
-              <DropdownMenuItem
-                onClick={() => {
-                  listState.setSort(listState.sort.asc, "amount");
-                }}
-              >
-                Amount
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  listState.setSort(listState.sort.asc, "created_at");
-                }}
-              >
-                Date created
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem
-                onClick={() => {
-                  listState.setSort(true, listState.sort.by);
-                }}
-              >
-                Ascending
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  listState.setSort(false, listState.sort.by);
-                }}
-              >
-                Descending
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
         {/* moneys list */}
         <div className="w-full flex flex-col gap-2 my-2">
           {moneys?.map((money) => {
