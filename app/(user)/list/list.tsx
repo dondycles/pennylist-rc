@@ -2,7 +2,8 @@
 import { getMoneys } from "@/app/actions/moneys";
 import { useQuery } from "@tanstack/react-query";
 import AddMoneyForm from "./add-money-form";
-import React from "react";
+
+import React, { useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -65,7 +66,9 @@ type changes = {
   to: { name: string; amount: string; total: string };
 };
 export default function List({ user }: { user: User }) {
+  const [mounted, setMounted] = useState(false);
   var _ = require("lodash");
+  const { isLastDayOfMonth } = require("date-fns");
   const listState = useListState();
 
   const [showAddMoneyForm, setShowAddMoneyForm] = useState(false);
@@ -172,6 +175,8 @@ export default function List({ user }: { user: User }) {
   const getDailyTotal = (
     days: number = listState.dailyTotalDays
   ): { date: string; total: number }[] => {
+    if (!mounted) return [];
+
     const groupedByDate: {
       [key: string]: {
         total: number;
@@ -180,7 +185,7 @@ export default function List({ user }: { user: User }) {
     } = {};
 
     // Group by date and keep the most recent total for each day
-    logs?.data?.reverse().forEach((entry) => {
+    logs?.data?.toReversed().forEach((entry) => {
       const date = new Date(entry.created_at).toDateString();
       const total = Number((entry.changes as changes).to.total);
       groupedByDate[date] = { total: total, date: entry.created_at }; // This will overwrite with the most recent total
@@ -205,6 +210,24 @@ export default function List({ user }: { user: User }) {
 
     return eachDayTotal;
   };
+
+  const getMonthlyTotal = () => {
+    if (!mounted) return;
+    const year = new Date().getFullYear();
+    const groupedByMonth: { [key: string]: number } = {};
+
+    for (let i = 0; i < 12; i++) {
+      const thisMonthsTotal = dailyTotal.findLast(
+        (day) => new Date(day.date).getMonth() === i
+      );
+
+      groupedByMonth[`${i}-${year}`] = thisMonthsTotal?.total ?? 0;
+    }
+  };
+
+  const dailyTotal = getDailyTotal();
+  const monthlyTotal = getMonthlyTotal();
+
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
@@ -217,6 +240,12 @@ export default function List({ user }: { user: User }) {
 
     return null;
   };
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return;
 
   if (moneys?.error || moneysError || logsError || logs?.error)
     return (
@@ -544,7 +573,7 @@ export default function List({ user }: { user: User }) {
           </CardHeader>
           <CardContent className="p-2 max-h-[300px] h-screen w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={getDailyTotal()} className="h-12">
+              <BarChart data={dailyTotal} className="h-12">
                 <XAxis
                   stroke="hsl(var(--muted-foreground))"
                   fontSize={10}
@@ -581,7 +610,7 @@ export default function List({ user }: { user: User }) {
                   radius={[4, 4, 0, 0]}
                   className="bg-red-500"
                 >
-                  {getDailyTotal().map((e) => (
+                  {dailyTotal.map((e) => (
                     <Cell
                       key={e.date}
                       style={{
