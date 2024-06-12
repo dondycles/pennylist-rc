@@ -25,6 +25,7 @@ import {
   Tooltip,
   Legend,
   Brush,
+  YAxis,
 } from "recharts";
 import {
   AsteriskNumber,
@@ -197,7 +198,7 @@ export default function List({ user }: { user: User }) {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="rounded-[--radius]  p-2  text-sm backdrop-blur bg-foreground/75 text-background">
+        <div className="rounded-lg  p-2  text-sm backdrop-blur bg-foreground/75 text-background">
           <p> {payload[0].payload.date}</p>
           <p>{UsePhpPesoWSign(payload[0]?.value)}</p>
         </div>
@@ -481,9 +482,9 @@ export default function List({ user }: { user: User }) {
           <CardHeader className="py-4 px-2">
             <CardTitle>Daily Total</CardTitle>
           </CardHeader>
-          <CardContent className="p-2 max-h-[30vh] h-screen w-full">
+          <CardContent className="p-2 max-h-[300px] h-screen w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={getDailyTotal()}>
+              <BarChart data={getDailyTotal()} className="h-12">
                 <XAxis
                   stroke="hsl(var(--muted-foreground))"
                   fontSize={10}
@@ -501,6 +502,13 @@ export default function List({ user }: { user: User }) {
                       : new Date(value).getDate().toString()
                   }
                 />
+                <YAxis
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={10}
+                  tickLine={false}
+                  tickFormatter={(value) => UsePhpPesoWSign(value, 0)}
+                  axisLine={false}
+                />
                 <Tooltip content={CustomTooltip} />
                 <Brush
                   dataKey="total"
@@ -511,6 +519,7 @@ export default function List({ user }: { user: User }) {
                   dataKey="total"
                   fill="hsl(var(--foreground))"
                   radius={[4, 4, 0, 0]}
+                  className="bg-red-500"
                 >
                   {getDailyTotal().map((e) => (
                     <Cell
