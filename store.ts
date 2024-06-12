@@ -7,6 +7,8 @@ type listPage = {
     by: "created_at" | "amount";
   };
   setSort: (asc: boolean, by: "created_at" | "amount") => void;
+  hideAmounts: boolean;
+  toggleHideAmounts: () => void;
 };
 
 export const useListState = create<listPage>()(
@@ -17,6 +19,8 @@ export const useListState = create<listPage>()(
         by: "created_at",
       },
       setSort: (asc, by) => set(() => ({ sort: { asc, by } })),
+      hideAmounts: false,
+      toggleHideAmounts: () => set({ hideAmounts: !get().hideAmounts }),
     }),
     { name: "list-page" }
   )

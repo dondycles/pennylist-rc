@@ -3,6 +3,7 @@ import { Raleway, Anton, Readex_Pro } from "next/font/google";
 import "./globals.css";
 import QueryProvider from "@/components/query-provider";
 import { UseDefaultURL } from "@/lib/utils";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const raleway = Raleway({ subsets: ["latin"], weight: ["500", "700", "900"] });
 const anton = Readex_Pro({
@@ -65,7 +66,16 @@ export default function RootLayout({
       <body
         className={`${raleway.className} ${anton.variable} antialiased h-screen w-full bg-background`}
       >
-        <QueryProvider>{children}</QueryProvider>
+        <QueryProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </QueryProvider>
       </body>
     </html>
   );

@@ -3,11 +3,11 @@ import { getMoneys } from "@/app/actions/moneys";
 import { useQuery } from "@tanstack/react-query";
 import AddMoneyForm from "./add-money-form";
 
-import { UsePhpPesoWSign } from "@/lib/utils";
+import { AsteriskNumber, UsePhpPeso } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { ListFilter, Loader2, Plus } from "lucide-react";
+import { Eye, EyeOff, ListFilter, Loader2, Plus } from "lucide-react";
 import { useState } from "react";
-
+import { TbCurrencyPeso } from "react-icons/tb";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import Money from "./money";
 import { Database } from "@/database.types";
@@ -16,6 +16,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useListState } from "@/store";
 import {
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
@@ -64,15 +65,29 @@ export default function List() {
         {/* total money and add money form */}
         <div className="flex flex-col">
           <div className="mt-2 border rounded-lg p-4 shadow-lg flex flex-row gap-4 items-center justify-between">
-            <div className="flex flex-col">
-              <p className="text-muted-foreground text-xs">Total Money</p>
-              <p className="text-2xl sm:text-4xl font-anton">
-                {UsePhpPesoWSign(total)}
-              </p>
+            <div className="flex flex-col min-w-0">
+              <div className="text-muted-foreground text-xs flex items-center gap-1 w-fit">
+                Total Money{" "}
+                <button onClick={() => listState.toggleHideAmounts()}>
+                  {!listState.hideAmounts ? (
+                    <EyeOff size={18} />
+                  ) : (
+                    <Eye size={18} />
+                  )}
+                </button>
+              </div>
+              <div className="text-2xl sm:text-4xl font-anton flex flex-row items-center truncate">
+                <TbCurrencyPeso className="shrink-0" />
+                <p className="truncate">
+                  {listState.hideAmounts
+                    ? AsteriskNumber(total)
+                    : UsePhpPeso(total)}
+                </p>
+              </div>
             </div>
             <Drawer open={showAddMoneyForm} onOpenChange={setShowAddMoneyForm}>
               <DrawerTrigger asChild>
-                <Button size={"icon"} className="rounded-full">
+                <Button size={"icon"} className="rounded-full shrink-0">
                   <Plus />
                 </Button>
               </DrawerTrigger>
@@ -92,39 +107,39 @@ export default function List() {
               <p>sort</p> <ListFilter size={20} />
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuGroup>
-                <DropdownMenuItem
-                  onClick={() => {
-                    listState.setSort(listState.sort.asc, "amount");
-                  }}
-                >
-                  Amount
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => {
-                    listState.setSort(listState.sort.asc, "created_at");
-                  }}
-                >
-                  Date created
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
+              <DropdownMenuCheckboxItem
+                checked={listState.sort.by === "amount"}
+                onClick={() => {
+                  listState.setSort(listState.sort.asc, "amount");
+                }}
+              >
+                Amount
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={listState.sort.by === "created_at"}
+                onClick={() => {
+                  listState.setSort(listState.sort.asc, "created_at");
+                }}
+              >
+                Date created
+              </DropdownMenuCheckboxItem>
               <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem
-                  onClick={() => {
-                    listState.setSort(true, listState.sort.by);
-                  }}
-                >
-                  Ascending
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => {
-                    listState.setSort(false, listState.sort.by);
-                  }}
-                >
-                  Descending
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
+              <DropdownMenuCheckboxItem
+                checked={listState.sort.asc}
+                onClick={() => {
+                  listState.setSort(true, listState.sort.by);
+                }}
+              >
+                Ascending
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={!listState.sort.asc}
+                onClick={() => {
+                  listState.setSort(false, listState.sort.by);
+                }}
+              >
+                Descending
+              </DropdownMenuCheckboxItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -163,6 +178,7 @@ export default function List() {
                 done={() => refetch()}
                 money={money}
                 key={money.id}
+                hideAmounts={listState.hideAmounts}
               />
             );
           })}

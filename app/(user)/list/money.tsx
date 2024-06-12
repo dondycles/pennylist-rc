@@ -1,5 +1,5 @@
 import { Database } from "@/database.types";
-import { UsePhpPesoWSign } from "@/lib/utils";
+import { AsteriskNumber, UsePhpPeso, UsePhpPesoWSign } from "@/lib/utils";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -8,15 +8,18 @@ import {
 } from "@/components/ui/context-menu";
 import { deleteMoney } from "@/app/actions/moneys";
 import { useState } from "react";
+import { TbCurrencyPeso } from "react-icons/tb";
 
 export default function Money({
   money,
   done,
   edit,
+  hideAmounts,
 }: {
   money: Omit<Database["public"]["Tables"]["moneys"]["Row"], "user">;
   done: () => void;
   edit: () => void;
+  hideAmounts: boolean;
 }) {
   const [isPending, setIsPending] = useState(false);
 
@@ -36,10 +39,13 @@ export default function Money({
             isPending && "opacity-50 pointer-events-none "
           }`}
         >
-          <p className="truncate  ">{money.name}</p>
-          <p className="font-anton font-semibold">
-            {UsePhpPesoWSign(money.amount ?? 0)}
-          </p>
+          <p className="truncate">{money.name}</p>
+          <div className="font-semibold font-anton flex items-center">
+            <TbCurrencyPeso />
+            {hideAmounts
+              ? AsteriskNumber(money.amount ?? 0)
+              : UsePhpPeso(money.amount ?? 0)}
+          </div>
         </div>
       </ContextMenuTrigger>
       <ContextMenuContent>

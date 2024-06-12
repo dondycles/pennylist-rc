@@ -27,3 +27,10 @@ export const UseDefaultURL = () => {
 
   return defaultUrl;
 };
+
+export const AsteriskNumber = (number: number) => {
+  const numberString = number.toString();
+  const asteriskString = "*".repeat(numberString.length);
+
+  return asteriskString;
+};
