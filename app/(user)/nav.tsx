@@ -13,12 +13,8 @@ export default function Nav() {
         onClick={async (e) => {
           e.currentTarget.classList.add(`opacity-50`);
           e.currentTarget.classList.add(`pointer-events-none`);
-          const { error } = await logout();
-          if (error) {
-            e.currentTarget.classList.remove(`opacity-50`);
-            e.currentTarget.classList.remove(`pointer-events-none`);
-          }
           queryClient.clear();
+          await logout();
         }}
         size={"icon"}
       >

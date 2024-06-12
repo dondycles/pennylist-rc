@@ -1,8 +1,20 @@
 import Logo from "@/components/logo";
 import { Button } from "@/components/ui/button";
+import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
-export default function Home() {
+export default async function Home() {
+  const supabase = createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    return redirect("/list");
+  }
+
   return (
     <div className="w-full pt-32 space-y-32 screen-x-padding">
       <div className="flex flex-col items-center justify-center w-full gap-4 text-center max-w-[800px] mx-auto">
