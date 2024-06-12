@@ -397,9 +397,9 @@ export default function List({ user }: { user: User }) {
           <CardHeader className="py-4 px-2">
             <CardTitle>Logs</CardTitle>
           </CardHeader>
-          <CardContent className="w-full p-0 ">
-            <ScrollArea className="max-h-[512px] w-full">
-              <Table className="w-full h-fit">
+          <CardContent className="w-full p-0 overflow-auto">
+            <ScrollArea className="h-[512px]  w-full">
+              <Table className="w-full h-full">
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-fit">Action</TableHead>
