@@ -51,7 +51,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { type User } from "@supabase/supabase-js";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { getLogs } from "@/app/actions/logs";
 
 type changes = {
@@ -164,15 +170,20 @@ export default function List({ user }: { user: User }) {
   };
 
   const getDailyTotal = (
-    days: number = 30
+    days: number = listState.dailyTotalDays
   ): { date: string; total: number }[] => {
-    const groupedByDate: { [key: string]: number } = {};
+    const groupedByDate: {
+      [key: string]: {
+        total: number;
+        date: string;
+      };
+    } = {};
 
     // Group by date and keep the most recent total for each day
     logs?.data?.reverse().forEach((entry) => {
-      const date = entry.created_at.split("T")[0];
+      const date = new Date(entry.created_at).toDateString();
       const total = Number((entry.changes as changes).to.total);
-      groupedByDate[date] = total; // This will overwrite with the most recent total
+      groupedByDate[date] = { total: total, date: entry.created_at }; // This will overwrite with the most recent total
     });
 
     const eachDayTotal: { date: string; total: number }[] = [];
@@ -181,10 +192,10 @@ export default function List({ user }: { user: User }) {
 
     currentDate.setDate(currentDate.getDate() - days);
     for (let i = 0; i <= days; i++) {
-      const day = currentDate.toISOString().split("T")[0];
+      const day = currentDate.toDateString();
 
       if (groupedByDate[day] !== undefined) {
-        lastTotal = groupedByDate[day];
+        lastTotal = groupedByDate[day].total;
       }
 
       eachDayTotal.push({ date: day, total: lastTotal });
@@ -192,7 +203,6 @@ export default function List({ user }: { user: User }) {
       currentDate.setDate(currentDate.getDate() + 1);
     }
 
-    console.log(eachDayTotal);
     return eachDayTotal;
   };
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -479,8 +489,59 @@ export default function List({ user }: { user: User }) {
         </Card>
 
         <Card className="mt-2 mb-24 overflow-x-hidden rounded-lg shadow-none">
-          <CardHeader className="py-4 px-2">
-            <CardTitle>Daily Total</CardTitle>
+          <CardHeader className="p-2">
+            <div className="flex  flex-row justify-between">
+              <CardTitle className="pt-2">Daily Total</CardTitle>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant={"outline"}>
+                    Showing {listState.dailyTotalDays} days
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuCheckboxItem
+                    checked={listState.dailyTotalDays === 7}
+                    onClick={() => {
+                      listState.setDailyTotalDays(7);
+                    }}
+                  >
+                    7 days
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    checked={listState.dailyTotalDays === 14}
+                    onClick={() => {
+                      listState.setDailyTotalDays(14);
+                    }}
+                  >
+                    14 days
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    checked={listState.dailyTotalDays === 21}
+                    onClick={() => {
+                      listState.setDailyTotalDays(21);
+                    }}
+                  >
+                    21 days
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    checked={listState.dailyTotalDays === 28}
+                    onClick={() => {
+                      listState.setDailyTotalDays(28);
+                    }}
+                  >
+                    28 days
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    checked={listState.dailyTotalDays === 365}
+                    onClick={() => {
+                      listState.setDailyTotalDays(365);
+                    }}
+                  >
+                    365 days
+                  </DropdownMenuCheckboxItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </CardHeader>
           <CardContent className="p-2 max-h-[300px] h-screen w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -496,9 +557,9 @@ export default function List({ user }: { user: User }) {
                     new Date().toISOString().split("T")[0]
                       ? "Today"
                       : new Date(value).getDate() === 1
-                      ? `${toMonthWord(
-                          new Date(value).getMonth()
-                        )} 1, ${new Date(value).getFullYear()}`
+                      ? `${toMonthWord(new Date(value).getMonth())} ${new Date(
+                          value
+                        ).getFullYear()}`
                       : new Date(value).getDate().toString()
                   }
                 />
@@ -509,11 +570,11 @@ export default function List({ user }: { user: User }) {
                   tickFormatter={(value) => UsePhpPesoWSign(value, 0)}
                   axisLine={false}
                 />
-                <Tooltip content={CustomTooltip} />
+                <Tooltip contentStyle={{}} content={CustomTooltip} />
                 <Brush
                   dataKey="total"
                   height={30}
-                  stroke="hsl(var(--foreground))"
+                  stroke="hsl(var(--muted-foreground))"
                 />
                 <Bar
                   dataKey="total"
