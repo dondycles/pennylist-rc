@@ -4,6 +4,16 @@ import { useQuery } from "@tanstack/react-query";
 import AddMoneyForm from "./add-money-form";
 import React, { PureComponent } from "react";
 import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from "recharts";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 import { AsteriskNumber, UsePhpPeso, UsePhpPesoWSign } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -14,7 +24,7 @@ import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import Money from "./money";
 import { Database } from "@/database.types";
 import EditMoneyForm from "./edit-money-form";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useListState } from "@/store";
 import {
   DropdownMenu,
@@ -23,11 +33,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { type User } from "@supabase/supabase-js";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-export default function List() {
+import { getLogs } from "@/app/actions/logs";
+
+type changes = {
+  from: { name: string; amount: string; total: string };
+  to: { name: string; amount: string; total: string };
+};
+export default function List({ user }: { user: User }) {
   var _ = require("lodash");
   const listState = useListState();
-  const [activeIndex, setActiveIndex] = useState(0);
   const [showAddMoneyForm, setShowAddMoneyForm] = useState(false);
   const [showEditMoneyForm, setEditMoneyForm] = useState<{
     open: boolean;
@@ -36,13 +52,29 @@ export default function List() {
     open: false,
     money: null,
   });
-  const { data, error, isLoading, refetch } = useQuery({
-    queryKey: ["moneys", listState.sort],
+  const {
+    data: moneys,
+    error: moneysError,
+    isLoading,
+    refetch: refetchMoneys,
+  } = useQuery({
+    queryKey: ["moneys", listState.sort, user.id],
     queryFn: async () => await getMoneys(listState.sort),
   });
-  const moneys = data?.data?.map((money) => money);
-  const total = _.sum(moneys?.map((money) => money.amount));
 
+  const total = _.sum(moneys?.data?.map((money) => money.amount));
+
+  const {
+    data: logs,
+    error: logsError,
+    isLoading: logsLoading,
+    refetch: refetchLogs,
+  } = useQuery({
+    queryKey: ["logs", user.id],
+    queryFn: async () => await getLogs(),
+  });
+
+  const [activeIndex, setActiveIndex] = useState(0);
   const renderActiveShape = (props: any) => {
     const {
       cx,
@@ -113,16 +145,18 @@ export default function List() {
     );
   };
 
-  if (data?.error || error)
+  if (moneys?.error || moneysError || logsError || logs?.error)
     return (
       <main className="w-full h-full p-2 ">
         <div className="flex items-center text-sm text-destructive gap-2 justify-center">
-          {data?.error && data?.error.message}
-          {error && error.message}
+          {moneys?.error && moneys.error.message}
+          {moneysError && moneysError.message}
+          {logs?.error && logs.error}
+          {logsError && logsError.message}
         </div>
       </main>
     );
-  if (isLoading)
+  if (isLoading || logsLoading)
     return (
       <main className="w-full h-full p-2 ">
         <div className="flex items-center text-sm text-muted-foreground gap-2 justify-center">
@@ -166,9 +200,11 @@ export default function List() {
               <DrawerContent className=" p-2 gap-2">
                 <p className="font-bold text-sm text-center">Add money</p>
                 <AddMoneyForm
+                  currentTotal={total}
                   close={() => {
                     setShowAddMoneyForm(false);
-                    refetch();
+                    refetchMoneys();
+                    refetchLogs();
                   }}
                 />
               </DrawerContent>
@@ -228,34 +264,40 @@ export default function List() {
           <DrawerContent className=" p-2 gap-2">
             <p className="font-bold text-sm text-center">Edit money</p>
             <EditMoneyForm
+              currentTotal={total}
               money={showEditMoneyForm.money!}
               close={() => {
                 setEditMoneyForm((prev) => ({
                   ...prev,
                   open: false,
                 }));
-                refetch();
+                refetchMoneys();
+                refetchLogs();
               }}
             />
           </DrawerContent>
         </Drawer>
         {/* moneys list */}
         <div className="w-full flex flex-col gap-2 mt-2">
-          {moneys?.map((money) => {
+          {moneys?.data?.map((money) => {
             return (
               <Money
                 edit={() => setEditMoneyForm({ money: money, open: true })}
-                done={() => refetch()}
+                done={() => {
+                  refetchLogs();
+                  refetchMoneys();
+                }}
                 money={money}
                 key={money.id}
                 hideAmounts={listState.hideAmounts}
+                currentTotal={total}
               />
             );
           })}
         </div>
         {/* charts */}
-        {moneys?.length ? (
-          <Card className="w-full mt-2 mb-24 rounded-lg shadow-none">
+        {moneys?.data?.length ? (
+          <Card className="w-full mt-2  rounded-lg shadow-none">
             <CardHeader className="px-2 py-4">
               <CardTitle>Total Breakdown </CardTitle>
             </CardHeader>
@@ -265,7 +307,7 @@ export default function List() {
                   <Pie
                     activeIndex={activeIndex}
                     activeShape={renderActiveShape}
-                    data={moneys}
+                    data={moneys.data}
                     cx="50%"
                     cy="50%"
                     innerRadius="60%"
@@ -275,7 +317,7 @@ export default function List() {
                       setActiveIndex(i);
                     }}
                   >
-                    {moneys?.map((entry, index) => (
+                    {moneys?.data?.map((entry, index) => (
                       <Cell
                         className="fill-background stroke-foreground stroke-2"
                         key={`cell-${index}`}
@@ -287,6 +329,90 @@ export default function List() {
             </CardContent>
           </Card>
         ) : null}
+        {/* table */}
+        <Card className="mt-2 mb-24 overflow-x-hidden">
+          <CardHeader className="py-4 px-2">
+            <CardTitle>Logs</CardTitle>
+          </CardHeader>
+          <CardContent className="w-full p-0 ">
+            <ScrollArea className="max-h-[512px] w-full">
+              <Table className="w-full h-fit">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-fit">Action</TableHead>
+                    <TableHead>Changes</TableHead>
+                    <TableHead>Total</TableHead>
+                    <TableHead>Date</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {logs?.data?.map((log) => {
+                    return (
+                      <TableRow key={log.id}>
+                        <TableCell
+                          className={`${log.type === "add" && "text-green-500"}
+                          ${log.type === "update" && "text-yellow-500"}
+                          ${log.type === "delete" && "text-red-500"}
+                          `}
+                        >
+                          {log.type}
+                        </TableCell>
+                        <TableCell>
+                          {log.type === "add" ? (
+                            <>
+                              {(log.changes as changes).to.name} -{" "}
+                              {UsePhpPesoWSign(
+                                (log.changes as changes).to.amount
+                              )}
+                            </>
+                          ) : (
+                            <div className="flex flex-col gap-2  w-fit">
+                              {(log.changes as changes).from.name !==
+                                (log.changes as changes).to.name && (
+                                <div className="flex flex-row ">
+                                  <p className="flex-1">
+                                    {(log.changes as changes).from.name} to{" "}
+                                    {(log.changes as changes).to.name}
+                                  </p>
+                                </div>
+                              )}
+                              {(log.changes as changes).from.amount !==
+                                (log.changes as changes).to.amount && (
+                                <div className="flex flex-row  ">
+                                  <p className="flex-1 w-fit ">
+                                    {UsePhpPesoWSign(
+                                      (log.changes as changes).from.amount
+                                    )}{" "}
+                                    to{" "}
+                                    {UsePhpPesoWSign(
+                                      (log.changes as changes).to.amount
+                                    )}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {UsePhpPesoWSign((log.changes as changes).to.total)}
+                        </TableCell>
+                        <TableCell>
+                          {new Date(log.created_at).toLocaleString()}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+                {/* <TableFooter>
+            <TableRow>
+              <TableCell colSpan={3}>Total</TableCell>
+              <TableCell className="text-right">$2,500.00</TableCell>
+            </TableRow>
+          </TableFooter> */}
+              </Table>
+            </ScrollArea>
+          </CardContent>
+        </Card>
       </ScrollArea>
     </main>
   );

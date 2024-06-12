@@ -19,7 +19,13 @@ const moneySchema = z.object({
   amount: z.string(),
 });
 
-export default function AddMoneyForm({ close }: { close: () => void }) {
+export default function AddMoneyForm({
+  close,
+  currentTotal,
+}: {
+  close: () => void;
+  currentTotal: string;
+}) {
   const form = useForm<z.infer<typeof moneySchema>>({
     resolver: zodResolver(moneySchema),
     defaultValues: {
@@ -34,7 +40,7 @@ export default function AddMoneyForm({ close }: { close: () => void }) {
         name: values.name,
         amount: Number(values.amount),
       };
-      const { error, success } = await addMoney(newMoneyData);
+      const { error, success } = await addMoney(newMoneyData, currentTotal);
       if (error) {
         return error;
       }

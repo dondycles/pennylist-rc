@@ -15,17 +15,19 @@ export default function Money({
   done,
   edit,
   hideAmounts,
+  currentTotal,
 }: {
   money: Omit<Database["public"]["Tables"]["moneys"]["Row"], "user">;
   done: () => void;
   edit: () => void;
   hideAmounts: boolean;
+  currentTotal: string;
 }) {
   const [isPending, setIsPending] = useState(false);
 
   const handleDelete = async () => {
     setIsPending(true);
-    const { error } = await deleteMoney(money);
+    const { error } = await deleteMoney(money, currentTotal);
     if (error) return setIsPending(false);
     done();
   };

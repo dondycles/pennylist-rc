@@ -27,9 +27,11 @@ const moneySchema = z.object({
 export default function EditMoneyForm({
   close,
   money,
+  currentTotal,
 }: {
   close: () => void;
   money: Omit<Database["public"]["Tables"]["moneys"]["Row"], "user">;
+  currentTotal: string;
 }) {
   const form = useForm<z.infer<typeof moneySchema>>({
     resolver: zodResolver(moneySchema),
@@ -53,7 +55,11 @@ export default function EditMoneyForm({
         color: money.color,
         updated_at: money.updated_at,
       };
-      const { error, success } = await editMoney(newMoneyData);
+      const { error, success } = await editMoney(
+        newMoneyData,
+        money,
+        currentTotal
+      );
       console.log(error);
       if (error) {
         return error;

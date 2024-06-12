@@ -12,5 +12,5 @@ export default async function ListPage() {
   if (!user) {
     return redirect("/login");
   }
-  if (user) return <List />;
+  if (user) return <List user={user} />;
 }
