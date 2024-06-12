@@ -9,6 +9,11 @@ type listPage = {
   setSort: (asc: boolean, by: "created_at" | "amount") => void;
   hideAmounts: boolean;
   toggleHideAmounts: () => void;
+  barChartBrush: {
+    start: number;
+    end: number;
+  };
+  setBarChartBrush: (indexes: { start: number; end: number }) => void;
 };
 
 export const useListState = create<listPage>()(
@@ -21,6 +26,14 @@ export const useListState = create<listPage>()(
       setSort: (asc, by) => set(() => ({ sort: { asc, by } })),
       hideAmounts: false,
       toggleHideAmounts: () => set({ hideAmounts: !get().hideAmounts }),
+      barChartBrush: {
+        start: 0,
+        end: 30,
+      },
+      setBarChartBrush: (indexes) =>
+        set(() => ({
+          barChartBrush: indexes,
+        })),
     }),
     { name: "list-page" }
   )

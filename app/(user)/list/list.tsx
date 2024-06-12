@@ -2,8 +2,7 @@
 import { getMoneys } from "@/app/actions/moneys";
 import { useQuery } from "@tanstack/react-query";
 import AddMoneyForm from "./add-money-form";
-import React, { PureComponent } from "react";
-import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from "recharts";
+import React from "react";
 import {
   Table,
   TableBody,
@@ -14,8 +13,25 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-import { AsteriskNumber, UsePhpPeso, UsePhpPesoWSign } from "@/lib/utils";
+import {
+  BarChart,
+  Bar,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Sector,
+  Cell,
+  XAxis,
+  Tooltip,
+  Legend,
+  Brush,
+} from "recharts";
+import {
+  AsteriskNumber,
+  UsePhpPeso,
+  UsePhpPesoWSign,
+  toMonthWord,
+} from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff, ListFilter, Loader2, Plus } from "lucide-react";
 import { useState } from "react";
@@ -44,6 +60,7 @@ type changes = {
 export default function List({ user }: { user: User }) {
   var _ = require("lodash");
   const listState = useListState();
+
   const [showAddMoneyForm, setShowAddMoneyForm] = useState(false);
   const [showEditMoneyForm, setEditMoneyForm] = useState<{
     open: boolean;
@@ -52,6 +69,7 @@ export default function List({ user }: { user: User }) {
     open: false,
     money: null,
   });
+
   const {
     data: moneys,
     error: moneysError,
@@ -61,7 +79,6 @@ export default function List({ user }: { user: User }) {
     queryKey: ["moneys", listState.sort, user.id],
     queryFn: async () => await getMoneys(listState.sort),
   });
-
   const total = _.sum(moneys?.data?.map((money) => money.amount));
 
   const {
@@ -145,6 +162,51 @@ export default function List({ user }: { user: User }) {
     );
   };
 
+  const getDailyTotal = (
+    days: number = 30
+  ): { date: string; total: number }[] => {
+    const groupedByDate: { [key: string]: number } = {};
+
+    logs?.data?.forEach((entry) => {
+      const date = new Date(entry.created_at).toLocaleDateString();
+      const total = Number((entry.changes as changes).to.total);
+      if (!groupedByDate[date] || total > groupedByDate[date]) {
+        groupedByDate[date] = total;
+      }
+    });
+
+    const eachDayTotal: { date: string; total: number }[] = [];
+    const currentDate = new Date();
+    let lastTotal = 0;
+
+    currentDate.setDate(currentDate.getDate() - days);
+    for (let i = days; i >= 0; i--) {
+      const day = currentDate.toLocaleDateString();
+
+      if (groupedByDate[day] !== undefined) {
+        lastTotal = groupedByDate[day];
+      }
+
+      eachDayTotal.push({ date: day, total: lastTotal });
+
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    console.log(eachDayTotal);
+    return eachDayTotal;
+  };
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="rounded-[--radius]  p-2  text-sm backdrop-blur bg-foreground/75 text-background">
+          <p> {payload[0].payload.date}</p>
+          <p>{UsePhpPesoWSign(payload[0]?.value)}</p>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
   if (moneys?.error || moneysError || logsError || logs?.error)
     return (
       <main className="w-full h-full p-2 ">
@@ -156,14 +218,14 @@ export default function List({ user }: { user: User }) {
         </div>
       </main>
     );
-  if (isLoading || logsLoading)
-    return (
-      <main className="w-full h-full p-2 ">
-        <div className="flex items-center text-sm text-muted-foreground gap-2 justify-center">
-          Loading... <Loader2 className="animate-spin" />
-        </div>
-      </main>
-    );
+  // if (isLoading || logsLoading)
+  //   return (
+  //     <main className="w-full h-full p-2 ">
+  //       <div className="flex items-center text-sm text-muted-foreground gap-2 justify-center">
+  //         Loading... <Loader2 className="animate-spin" />
+  //       </div>
+  //     </main>
+  //   );
 
   return (
     <main className="w-full h-full px-2">
@@ -329,8 +391,9 @@ export default function List({ user }: { user: User }) {
             </CardContent>
           </Card>
         ) : null}
+
         {/* table */}
-        <Card className="mt-2 mb-24 overflow-x-hidden">
+        <Card className="mt-2 mb-24 overflow-x-hidden rounded-lg">
           <CardHeader className="py-4 px-2">
             <CardTitle>Logs</CardTitle>
           </CardHeader>
@@ -411,6 +474,55 @@ export default function List({ user }: { user: User }) {
           </TableFooter> */}
               </Table>
             </ScrollArea>
+          </CardContent>
+        </Card>
+
+        <Card className="mt-2 mb-24 overflow-x-hidden rounded-lg">
+          <CardHeader className="py-4 px-2">
+            <CardTitle>Daily Total</CardTitle>
+          </CardHeader>
+          <CardContent className="p-2 max-h-[30vh] h-screen w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={getDailyTotal()}>
+                <XAxis
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={10}
+                  tickLine={false}
+                  axisLine={false}
+                  dataKey="date"
+                  tickFormatter={(value) =>
+                    new Date(value).toLocaleDateString() ===
+                    new Date().toLocaleDateString()
+                      ? "Today"
+                      : new Date(value).getDate() === 1
+                      ? `${toMonthWord(
+                          new Date(value).getMonth()
+                        )} 1, ${new Date(value).getFullYear()}`
+                      : new Date(value).getDate().toString()
+                  }
+                />
+                <Tooltip content={CustomTooltip} />
+                <Brush
+                  dataKey="total"
+                  height={30}
+                  stroke="hsl(var(--foreground))"
+                />
+                <Bar
+                  dataKey="total"
+                  fill="hsl(var(--foreground))"
+                  radius={[4, 4, 0, 0]}
+                >
+                  {getDailyTotal().map((e) => (
+                    <Cell
+                      key={e.date}
+                      style={{
+                        fill: "hsl(var(--foreground))",
+                      }}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
       </ScrollArea>

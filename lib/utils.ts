@@ -34,3 +34,26 @@ export const AsteriskNumber = (number: number) => {
 
   return asteriskString;
 };
+
+export const toMonthWord = (month: number): string => {
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  if (month >= 0 && month < 12) {
+    return monthNames[month];
+  } else {
+    throw new Error("Invalid month number");
+  }
+};
