@@ -403,7 +403,7 @@ export default function List({ user }: { user: User }) {
           </Card>
         ) : null}
 
-        {/* table */}
+        {/* tables */}
         <Card className="mt-2 overflow-x-hidden rounded-lg shadow-none">
           <CardHeader className="py-4 px-2">
             <CardTitle>Logs</CardTitle>
@@ -487,7 +487,6 @@ export default function List({ user }: { user: User }) {
             </ScrollArea>
           </CardContent>
         </Card>
-
         <Card className="mt-2 mb-24 overflow-x-hidden rounded-lg shadow-none">
           <CardHeader className="p-2">
             <div className="flex  flex-row justify-between">
@@ -495,7 +494,7 @@ export default function List({ user }: { user: User }) {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant={"outline"}>
-                    Showing {listState.dailyTotalDays} days
+                    Last {listState.dailyTotalDays} days
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
