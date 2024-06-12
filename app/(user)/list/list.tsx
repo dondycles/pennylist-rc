@@ -2,8 +2,10 @@
 import { getMoneys } from "@/app/actions/moneys";
 import { useQuery } from "@tanstack/react-query";
 import AddMoneyForm from "./add-money-form";
+import React, { PureComponent } from "react";
+import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from "recharts";
 
-import { AsteriskNumber, UsePhpPeso } from "@/lib/utils";
+import { AsteriskNumber, UsePhpPeso, UsePhpPesoWSign } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff, ListFilter, Loader2, Plus } from "lucide-react";
 import { useState } from "react";
@@ -21,9 +23,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export default function List() {
   var _ = require("lodash");
   const listState = useListState();
+  const [activeIndex, setActiveIndex] = useState(0);
   const [showAddMoneyForm, setShowAddMoneyForm] = useState(false);
   const [showEditMoneyForm, setEditMoneyForm] = useState<{
     open: boolean;
@@ -38,6 +42,76 @@ export default function List() {
   });
   const moneys = data?.data?.map((money) => money);
   const total = _.sum(moneys?.map((money) => money.amount));
+
+  const renderActiveShape = (props: any) => {
+    const {
+      cx,
+      cy,
+      innerRadius,
+      outerRadius,
+      startAngle,
+      endAngle,
+      fill,
+      payload,
+      percent,
+      value,
+    } = props;
+
+    return (
+      <g>
+        <text
+          x={cx}
+          y={cy}
+          dy={-18}
+          textAnchor="middle"
+          fill={fill}
+          style={{ fontWeight: "bold" }}
+        >
+          {payload.name}
+        </text>
+        <text
+          x={cx}
+          y={cy}
+          dy={0}
+          textAnchor="middle"
+          fill={fill}
+          style={{ fontSize: "0.8rem" }}
+        >
+          {UsePhpPesoWSign(value)}
+        </text>
+        <text
+          x={cx}
+          y={cy}
+          dy={16}
+          textAnchor="middle"
+          fill={fill}
+          style={{ fontSize: "0.8rem" }}
+        >
+          {`(${(percent * 100).toFixed(2)}%)`}
+        </text>
+        <Sector
+          cx={cx}
+          cy={cy}
+          innerRadius={innerRadius}
+          outerRadius={outerRadius}
+          startAngle={startAngle}
+          endAngle={endAngle}
+          fill={fill}
+          stroke={fill}
+          strokeWidth={2}
+        />
+        <Sector
+          cx={cx}
+          cy={cy}
+          startAngle={startAngle}
+          endAngle={endAngle}
+          innerRadius={outerRadius + 8}
+          outerRadius={outerRadius + 14}
+          fill={fill}
+        />
+      </g>
+    );
+  };
 
   if (data?.error || error)
     return (
@@ -59,7 +133,7 @@ export default function List() {
 
   return (
     <main className="w-full h-full px-2">
-      <ScrollArea className="w-full h-full">
+      <ScrollArea className="max-w-[800px] mx-auto h-full">
         {/* total money and add money form */}
         <div className="flex flex-col">
           <div className="mt-2 border rounded-lg p-4 shadow-lg flex flex-row gap-4 items-center justify-between">
@@ -141,7 +215,6 @@ export default function List() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-
         {/* edit money form */}
         <Drawer
           open={showEditMoneyForm.open}
@@ -166,9 +239,8 @@ export default function List() {
             />
           </DrawerContent>
         </Drawer>
-
         {/* moneys list */}
-        <div className="w-full flex flex-col gap-2 mt-2 mb-24">
+        <div className="w-full flex flex-col gap-2 mt-2">
           {moneys?.map((money) => {
             return (
               <Money
@@ -181,6 +253,40 @@ export default function List() {
             );
           })}
         </div>
+        {/* charts */}
+        {moneys?.length ? (
+          <Card className="w-full mt-2 mb-24 rounded-lg shadow-none">
+            <CardHeader className="px-2 py-4">
+              <CardTitle>Total Breakdown </CardTitle>
+            </CardHeader>
+            <CardContent className="aspect-square p-2 max-h-[60vh] mx-auto">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    activeIndex={activeIndex}
+                    activeShape={renderActiveShape}
+                    data={moneys}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius="60%"
+                    fill="hsl(var(--foreground))"
+                    dataKey="amount"
+                    onMouseEnter={(_, i) => {
+                      setActiveIndex(i);
+                    }}
+                  >
+                    {moneys?.map((entry, index) => (
+                      <Cell
+                        className="fill-background stroke-foreground stroke-2"
+                        key={`cell-${index}`}
+                      />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        ) : null}
       </ScrollArea>
     </main>
   );
