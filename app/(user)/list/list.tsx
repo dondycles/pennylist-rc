@@ -168,7 +168,7 @@ export default function List({ user }: { user: User }) {
     const groupedByDate: { [key: string]: number } = {};
 
     logs?.data?.forEach((entry) => {
-      const date = new Date(entry.created_at).toLocaleDateString();
+      const date = entry.created_at.split("T")[0];
       const total = Number((entry.changes as changes).to.total);
       if (!groupedByDate[date] || total > groupedByDate[date]) {
         groupedByDate[date] = total;
@@ -181,7 +181,7 @@ export default function List({ user }: { user: User }) {
 
     currentDate.setDate(currentDate.getDate() - days);
     for (let i = days; i >= 0; i--) {
-      const day = currentDate.toLocaleDateString();
+      const day = currentDate.toISOString().split("T")[0];
 
       if (groupedByDate[day] !== undefined) {
         lastTotal = groupedByDate[day];
@@ -218,14 +218,14 @@ export default function List({ user }: { user: User }) {
         </div>
       </main>
     );
-  // if (isLoading || logsLoading)
-  //   return (
-  //     <main className="w-full h-full p-2 ">
-  //       <div className="flex items-center text-sm text-muted-foreground gap-2 justify-center">
-  //         Loading... <Loader2 className="animate-spin" />
-  //       </div>
-  //     </main>
-  //   );
+  if (isLoading || logsLoading)
+    return (
+      <main className="w-full h-full p-2 ">
+        <div className="flex items-center text-sm text-muted-foreground gap-2 justify-center">
+          Loading... <Loader2 className="animate-spin" />
+        </div>
+      </main>
+    );
 
   return (
     <main className="w-full h-full px-2">
@@ -491,8 +491,8 @@ export default function List({ user }: { user: User }) {
                   axisLine={false}
                   dataKey="date"
                   tickFormatter={(value) =>
-                    new Date(value).toLocaleDateString() ===
-                    new Date().toLocaleDateString()
+                    new Date(value).toISOString().split("T")[0] ===
+                    new Date().toISOString().split("T")[0]
                       ? "Today"
                       : new Date(value).getDate() === 1
                       ? `${toMonthWord(
