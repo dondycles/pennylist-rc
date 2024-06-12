@@ -167,12 +167,11 @@ export default function List({ user }: { user: User }) {
   ): { date: string; total: number }[] => {
     const groupedByDate: { [key: string]: number } = {};
 
-    logs?.data?.forEach((entry) => {
+    // Group by date and keep the most recent total for each day
+    logs?.data?.reverse().forEach((entry) => {
       const date = entry.created_at.split("T")[0];
       const total = Number((entry.changes as changes).to.total);
-      if (!groupedByDate[date] || total > groupedByDate[date]) {
-        groupedByDate[date] = total;
-      }
+      groupedByDate[date] = total; // This will overwrite with the most recent total
     });
 
     const eachDayTotal: { date: string; total: number }[] = [];
@@ -180,7 +179,7 @@ export default function List({ user }: { user: User }) {
     let lastTotal = 0;
 
     currentDate.setDate(currentDate.getDate() - days);
-    for (let i = days; i >= 0; i--) {
+    for (let i = 0; i <= days; i++) {
       const day = currentDate.toISOString().split("T")[0];
 
       if (groupedByDate[day] !== undefined) {
@@ -191,6 +190,7 @@ export default function List({ user }: { user: User }) {
 
       currentDate.setDate(currentDate.getDate() + 1);
     }
+
     console.log(eachDayTotal);
     return eachDayTotal;
   };
