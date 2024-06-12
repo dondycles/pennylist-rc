@@ -393,7 +393,7 @@ export default function List({ user }: { user: User }) {
         ) : null}
 
         {/* table */}
-        <Card className="mt-2 mb-24 overflow-x-hidden rounded-lg">
+        <Card className="mt-2 overflow-x-hidden rounded-lg shadow-none">
           <CardHeader className="py-4 px-2">
             <CardTitle>Logs</CardTitle>
           </CardHeader>
@@ -477,7 +477,7 @@ export default function List({ user }: { user: User }) {
           </CardContent>
         </Card>
 
-        <Card className="mt-2 mb-24 overflow-x-hidden rounded-lg">
+        <Card className="mt-2 mb-24 overflow-x-hidden rounded-lg shadow-none">
           <CardHeader className="py-4 px-2">
             <CardTitle>Daily Total</CardTitle>
           </CardHeader>
