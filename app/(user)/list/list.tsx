@@ -1,21 +1,22 @@
 "use client";
-import { getMoneys } from "@/app/actions/moneys";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import AddMoneyForm from "./add-money-form";
 
-import React, { useEffect } from "react";
-
-import { AsteriskNumber, UsePhpPeso } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+// Icons
 import { Eye, EyeOff, ListFilter, Loader2, Plus } from "lucide-react";
-import { useState } from "react";
 import { TbCurrencyPeso } from "react-icons/tb";
+
+// Importing utility functions
+import { AsteriskNumber, UsePhpPeso } from "@/lib/utils";
+
+// Importing actions
+import { getMoneys } from "@/app/actions/moneys";
+import { getLogs } from "@/app/actions/logs";
+
+// Importing UI components
+import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
-import Money from "./money";
-import { Database } from "@/database.types";
-import EditMoneyForm from "./edit-money-form";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useListState } from "@/store";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -23,12 +24,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { type User } from "@supabase/supabase-js";
-import { getLogs } from "@/app/actions/logs";
+
+// Importing state management
+import { useListState } from "@/store";
+
+// Importing custom components
+import AddMoneyForm from "./add-money-form";
+import EditMoneyForm from "./edit-money-form";
+import Money from "./money";
 import TotalBreakdownPieChart from "./total-breakdown-pie-chart";
 import LogsTable from "./logs-table";
 import DailyTotalBarChart from "./daily-total-bar-chart";
 import MonthlyTotalBarChart from "./monthly-total-bar-chart";
+
+// Importing types
+import { type Database } from "@/database.types";
+import { type User } from "@supabase/supabase-js";
 
 type changes = {
   from: { name: string; amount: string; total: string };
@@ -69,7 +80,7 @@ export default function List({ user }: { user: User }) {
     queryFn: async () => await getLogs(),
   });
 
-  const getDailyTotal = (days: number = listState.dailyTotalDays) => {
+  const getDailyTotal = (days: number = 365) => {
     if (!mounted) return [];
     if (logsLoading) return [];
 
@@ -296,7 +307,12 @@ export default function List({ user }: { user: User }) {
           <TotalBreakdownPieChart moneys={moneys.data} />
         ) : null}
         {/* bars */}
-        <DailyTotalBarChart dailyTotal={dailyTotal} />
+        <DailyTotalBarChart
+          dailyTotal={dailyTotal.slice(
+            dailyTotal.length - listState.dailyTotalDays,
+            dailyTotal.length
+          )}
+        />
         <MonthlyTotalBarChart monthlyTotal={monthlyTotal} />
       </ScrollArea>
     </main>

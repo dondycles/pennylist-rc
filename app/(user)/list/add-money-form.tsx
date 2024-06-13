@@ -1,4 +1,12 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+
+// Actions
 import { addMoney } from "@/app/actions/moneys";
+
+// Components
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -8,11 +16,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+
+// Icons
 import { Plus, X } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 const moneySchema = z.object({
   name: z.string().min(1),
@@ -40,7 +46,7 @@ export default function AddMoneyForm({
         name: values.name,
         amount: Number(values.amount),
       };
-      const { error, success } = await addMoney(newMoneyData, currentTotal);
+      const { error } = await addMoney(newMoneyData, currentTotal);
       if (error) {
         return error;
       }
