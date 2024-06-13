@@ -4,36 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import AddMoneyForm from "./add-money-form";
 
 import React, { useEffect } from "react";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  BarChart,
-  Bar,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Sector,
-  Cell,
-  XAxis,
-  Tooltip,
-  Legend,
-  Brush,
-  YAxis,
-} from "recharts";
-import {
-  AsteriskNumber,
-  UsePhpPeso,
-  UsePhpPesoWSign,
-  toMonthWord,
-} from "@/lib/utils";
+
+import { AsteriskNumber, UsePhpPeso } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff, ListFilter, Loader2, Plus } from "lucide-react";
 import { useState } from "react";
@@ -42,7 +14,7 @@ import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import Money from "./money";
 import { Database } from "@/database.types";
 import EditMoneyForm from "./edit-money-form";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useListState } from "@/store";
 import {
   DropdownMenu,
@@ -52,14 +24,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { type User } from "@supabase/supabase-js";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { getLogs } from "@/app/actions/logs";
+import TotalBreakdownPieChart from "./total-breakdown-pie-chart";
+import LogsTable from "./logs-table";
+import DailyTotalBarChart from "./daily-total-bar-chart";
+import MonthlyTotalBarChart from "./monthly-total-bar-chart";
 
 type changes = {
   from: { name: string; amount: string; total: string };
@@ -68,7 +37,6 @@ type changes = {
 export default function List({ user }: { user: User }) {
   const [mounted, setMounted] = useState(false);
   var _ = require("lodash");
-  const { isLastDayOfMonth } = require("date-fns");
   const listState = useListState();
 
   const [showAddMoneyForm, setShowAddMoneyForm] = useState(false);
@@ -101,110 +69,40 @@ export default function List({ user }: { user: User }) {
     queryFn: async () => await getLogs(),
   });
 
-  const [activeIndex, setActiveIndex] = useState(0);
-  const renderActiveShape = (props: any) => {
-    const {
-      cx,
-      cy,
-      innerRadius,
-      outerRadius,
-      startAngle,
-      endAngle,
-      fill,
-      payload,
-      percent,
-      value,
-    } = props;
-
-    return (
-      <g>
-        <text
-          x={cx}
-          y={cy}
-          dy={-18}
-          textAnchor="middle"
-          fill={fill}
-          style={{ fontWeight: "bold" }}
-        >
-          {payload.name}
-        </text>
-        <text
-          x={cx}
-          y={cy}
-          dy={0}
-          textAnchor="middle"
-          fill={fill}
-          style={{ fontSize: "0.8rem" }}
-        >
-          {UsePhpPesoWSign(value)}
-        </text>
-        <text
-          x={cx}
-          y={cy}
-          dy={16}
-          textAnchor="middle"
-          fill={fill}
-          style={{ fontSize: "0.8rem" }}
-        >
-          {`(${(percent * 100).toFixed(2)}%)`}
-        </text>
-        <Sector
-          cx={cx}
-          cy={cy}
-          innerRadius={innerRadius}
-          outerRadius={outerRadius}
-          startAngle={startAngle}
-          endAngle={endAngle}
-          fill={fill}
-          stroke={fill}
-          strokeWidth={2}
-        />
-        <Sector
-          cx={cx}
-          cy={cy}
-          startAngle={startAngle}
-          endAngle={endAngle}
-          innerRadius={outerRadius + 8}
-          outerRadius={outerRadius + 14}
-          fill={fill}
-        />
-      </g>
-    );
-  };
-
-  const getDailyTotal = (
-    days: number = listState.dailyTotalDays
-  ): { date: string; total: number }[] => {
+  const getDailyTotal = (days: number = listState.dailyTotalDays) => {
     if (!mounted) return [];
+    if (logsLoading) return [];
 
     const groupedByDate: {
-      [key: string]: {
-        total: number;
-        date: string;
-      };
+      [key: string]: number;
     } = {};
 
-    // Group by date and keep the most recent total for each day
-    logs?.data?.toReversed().forEach((entry) => {
-      const date = new Date(entry.created_at).toDateString();
-      const total = Number((entry.changes as changes).to.total);
-      groupedByDate[date] = { total: total, date: entry.created_at }; // This will overwrite with the most recent total
+    logs?.data?.toReversed().forEach((log) => {
+      const date = new Date(log.created_at).toDateString();
+      const total = Number((log.changes as changes).to.total);
+
+      // sets the log's date as the key, and overwrites its total to most recent reocrd if there are many records in that date
+      groupedByDate[date] = total;
     });
 
     const eachDayTotal: { date: string; total: number }[] = [];
     const currentDate = new Date();
     let lastTotal = 0;
 
+    // sets the current date back based on the days parameter
     currentDate.setDate(currentDate.getDate() - days);
+
     for (let i = 0; i <= days; i++) {
       const day = currentDate.toDateString();
 
       if (groupedByDate[day] !== undefined) {
-        lastTotal = groupedByDate[day].total;
+        // if this date has total, set it to lastTotal so the next dates that does not have total will get that total as well to fill up the bars
+        lastTotal = groupedByDate[day];
       }
 
       eachDayTotal.push({ date: day, total: lastTotal });
 
+      // sets the date to the next day
       currentDate.setDate(currentDate.getDate() + 1);
     }
 
@@ -212,34 +110,28 @@ export default function List({ user }: { user: User }) {
   };
 
   const getMonthlyTotal = () => {
-    if (!mounted) return;
+    if (!mounted) return [];
+    if (logsLoading) return [];
     const year = new Date().getFullYear();
-    const groupedByMonth: { [key: string]: number } = {};
+    const groupedByMonth: { total: number; date: string }[] = [];
 
     for (let i = 0; i < 12; i++) {
-      const thisMonthsTotal = dailyTotal.findLast(
-        (day) => new Date(day.date).getMonth() === i
+      const thisMonthsTotal = getDailyTotal(365).findLast(
+        (day) =>
+          new Date(day.date).getMonth() === i &&
+          new Date(day.date).getFullYear() === year
       );
 
-      groupedByMonth[`${i}-${year}`] = thisMonthsTotal?.total ?? 0;
+      groupedByMonth[i] = {
+        total: thisMonthsTotal?.total ?? 0,
+        date: `${i}-${year}`,
+      };
     }
+    return groupedByMonth;
   };
 
   const dailyTotal = getDailyTotal();
   const monthlyTotal = getMonthlyTotal();
-
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="rounded-lg  p-2  text-sm backdrop-blur bg-foreground/75 text-background">
-          <p> {payload[0].payload.date}</p>
-          <p>{UsePhpPesoWSign(payload[0]?.value)}</p>
-        </div>
-      );
-    }
-
-    return null;
-  };
 
   useEffect(() => {
     setMounted(true);
@@ -397,232 +289,15 @@ export default function List({ user }: { user: User }) {
             );
           })}
         </div>
-        {/* charts */}
-        {moneys?.data?.length ? (
-          <Card className="w-full mt-2  rounded-lg shadow-none">
-            <CardHeader className="px-2 py-4">
-              <CardTitle>Total Breakdown </CardTitle>
-            </CardHeader>
-            <CardContent className="aspect-square p-2 max-h-[60vh] mx-auto">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    activeIndex={activeIndex}
-                    activeShape={renderActiveShape}
-                    data={moneys.data}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius="60%"
-                    fill="hsl(var(--foreground))"
-                    dataKey="amount"
-                    onMouseEnter={(_, i) => {
-                      setActiveIndex(i);
-                    }}
-                  >
-                    {moneys?.data?.map((entry, index) => (
-                      <Cell
-                        className="fill-background stroke-foreground stroke-2"
-                        key={`cell-${index}`}
-                      />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        ) : null}
-
         {/* tables */}
-        <Card className="mt-2 overflow-x-hidden rounded-lg shadow-none">
-          <CardHeader className="py-4 px-2">
-            <CardTitle>Logs</CardTitle>
-          </CardHeader>
-          <CardContent className="w-full p-0 overflow-auto">
-            <ScrollArea className="h-[512px]  w-full">
-              <Table className="w-full h-full">
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-fit">Action</TableHead>
-                    <TableHead>Changes</TableHead>
-                    <TableHead>Total</TableHead>
-                    <TableHead>Date</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {logs?.data?.map((log) => {
-                    return (
-                      <TableRow key={log.id}>
-                        <TableCell
-                          className={`${log.type === "add" && "text-green-500"}
-                          ${log.type === "update" && "text-yellow-500"}
-                          ${log.type === "delete" && "text-red-500"}
-                          `}
-                        >
-                          {log.type}
-                        </TableCell>
-                        <TableCell>
-                          {log.type === "add" ? (
-                            <>
-                              {(log.changes as changes).to.name} -{" "}
-                              {UsePhpPesoWSign(
-                                (log.changes as changes).to.amount
-                              )}
-                            </>
-                          ) : (
-                            <div className="flex flex-col gap-2  w-fit">
-                              {(log.changes as changes).from.name !==
-                                (log.changes as changes).to.name && (
-                                <div className="flex flex-row ">
-                                  <p className="flex-1">
-                                    {(log.changes as changes).from.name} to{" "}
-                                    {(log.changes as changes).to.name}
-                                  </p>
-                                </div>
-                              )}
-                              {(log.changes as changes).from.amount !==
-                                (log.changes as changes).to.amount && (
-                                <div className="flex flex-row  ">
-                                  <p className="flex-1 w-fit ">
-                                    {UsePhpPesoWSign(
-                                      (log.changes as changes).from.amount
-                                    )}{" "}
-                                    to{" "}
-                                    {UsePhpPesoWSign(
-                                      (log.changes as changes).to.amount
-                                    )}
-                                  </p>
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {UsePhpPesoWSign((log.changes as changes).to.total)}
-                        </TableCell>
-                        <TableCell>
-                          {new Date(log.created_at).toLocaleString()}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-                {/* <TableFooter>
-            <TableRow>
-              <TableCell colSpan={3}>Total</TableCell>
-              <TableCell className="text-right">$2,500.00</TableCell>
-            </TableRow>
-          </TableFooter> */}
-              </Table>
-            </ScrollArea>
-          </CardContent>
-        </Card>
-        <Card className="mt-2 mb-24 overflow-x-hidden rounded-lg shadow-none">
-          <CardHeader className="p-2">
-            <div className="flex  flex-row justify-between">
-              <CardTitle className="pt-2">Daily Total</CardTitle>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant={"outline"}>
-                    Last {listState.dailyTotalDays} days
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuCheckboxItem
-                    checked={listState.dailyTotalDays === 7}
-                    onClick={() => {
-                      listState.setDailyTotalDays(7);
-                    }}
-                  >
-                    7 days
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={listState.dailyTotalDays === 14}
-                    onClick={() => {
-                      listState.setDailyTotalDays(14);
-                    }}
-                  >
-                    14 days
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={listState.dailyTotalDays === 21}
-                    onClick={() => {
-                      listState.setDailyTotalDays(21);
-                    }}
-                  >
-                    21 days
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={listState.dailyTotalDays === 28}
-                    onClick={() => {
-                      listState.setDailyTotalDays(28);
-                    }}
-                  >
-                    28 days
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={listState.dailyTotalDays === 365}
-                    onClick={() => {
-                      listState.setDailyTotalDays(365);
-                    }}
-                  >
-                    365 days
-                  </DropdownMenuCheckboxItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </CardHeader>
-          <CardContent className="p-2 max-h-[300px] h-screen w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={dailyTotal} className="h-12">
-                <XAxis
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={10}
-                  tickLine={false}
-                  axisLine={false}
-                  dataKey="date"
-                  tickFormatter={(value) =>
-                    new Date(value).toISOString().split("T")[0] ===
-                    new Date().toISOString().split("T")[0]
-                      ? "Today"
-                      : new Date(value).getDate() === 1
-                      ? `${toMonthWord(new Date(value).getMonth())} ${new Date(
-                          value
-                        ).getFullYear()}`
-                      : new Date(value).getDate().toString()
-                  }
-                />
-                <YAxis
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={10}
-                  tickLine={false}
-                  tickFormatter={(value) => UsePhpPesoWSign(value, 0)}
-                  axisLine={false}
-                />
-                <Tooltip contentStyle={{}} content={CustomTooltip} />
-                <Brush
-                  dataKey="total"
-                  height={30}
-                  stroke="hsl(var(--muted-foreground))"
-                />
-                <Bar
-                  dataKey="total"
-                  fill="hsl(var(--foreground))"
-                  radius={[4, 4, 0, 0]}
-                  className="bg-red-500"
-                >
-                  {dailyTotal.map((e) => (
-                    <Cell
-                      key={e.date}
-                      style={{
-                        fill: "hsl(var(--foreground))",
-                      }}
-                    />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+        {logs?.data && <LogsTable logs={logs?.data} />}
+        {/* pie */}
+        {moneys?.data && moneys.data.length ? (
+          <TotalBreakdownPieChart moneys={moneys.data} />
+        ) : null}
+        {/* bars */}
+        <DailyTotalBarChart dailyTotal={dailyTotal} />
+        <MonthlyTotalBarChart monthlyTotal={monthlyTotal} />
       </ScrollArea>
     </main>
   );

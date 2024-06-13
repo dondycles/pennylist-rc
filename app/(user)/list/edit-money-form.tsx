@@ -60,7 +60,6 @@ export default function EditMoneyForm({
         money,
         currentTotal
       );
-      console.log(error);
       if (error) {
         return error;
       }
