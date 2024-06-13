@@ -32,7 +32,7 @@ export default function TotalBreakdownPieChart({
           dy={-18}
           textAnchor="middle"
           fill={fill}
-          style={{ fontWeight: "bold" }}
+          style={{ fontWeight: "bold", fontSize: "0.8rem" }}
         >
           {payload.name}
         </text>
@@ -80,7 +80,7 @@ export default function TotalBreakdownPieChart({
     );
   };
   return (
-    <Card className="w-full mt-2  rounded-lg shadow-none">
+    <Card className="w-full rounded-lg shadow-none">
       <CardHeader className="px-2 py-4">
         <CardTitle>Total Breakdown </CardTitle>
       </CardHeader>

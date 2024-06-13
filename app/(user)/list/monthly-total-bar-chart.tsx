@@ -37,7 +37,7 @@ export default function MonthlyTotalBarChart({
     return null;
   };
   return (
-    <Card className="mt-2 mb-24 overflow-x-hidden rounded-lg shadow-none">
+    <Card className="overflow-x-hidden rounded-lg shadow-none">
       <CardHeader className="p-2">
         <CardTitle className="pt-2">Monthly Total</CardTitle>
       </CardHeader>

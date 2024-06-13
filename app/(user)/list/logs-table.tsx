@@ -21,7 +21,7 @@ export default function LogsTable({
   logs: Database["public"]["Tables"]["logs"]["Row"][];
 }) {
   return (
-    <Card className="mt-2 overflow-x-hidden rounded-lg shadow-none">
+    <Card className="overflow-x-hidden rounded-lg shadow-none">
       <CardHeader className="py-4 px-2">
         <CardTitle>Logs</CardTitle>
       </CardHeader>

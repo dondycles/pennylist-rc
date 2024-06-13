@@ -24,6 +24,7 @@ export default function Money({
   currentTotal: string;
 }) {
   const [isPending, setIsPending] = useState(false);
+  const [elevate, setElevate] = useState(false);
 
   const handleDelete = async () => {
     setIsPending(true);
@@ -33,13 +34,15 @@ export default function Money({
   };
 
   return (
-    <ContextMenu>
+    <ContextMenu onOpenChange={setElevate}>
       <ContextMenuTrigger>
         <div
           key={money.id}
-          className={`p-2 border rounded-lg flex flex-row justify-between items-center font-bold ${
+          className={` p-2 border rounded-lg flex flex-row justify-between items-center font-bold ${
             isPending && "opacity-50 pointer-events-none "
-          }`}
+          } ${
+            elevate ? "shadow-lg scale-[100.5%]" : "shadow-none"
+          } ease-in-out transition-all`}
         >
           <p className="truncate">{money.name}</p>
           <div className="font-semibold font-anton flex items-center">

@@ -42,7 +42,7 @@ export default function DailyTotalBarChart({
   };
 
   return (
-    <Card className="mt-2 overflow-x-hidden rounded-lg shadow-none">
+    <Card className="overflow-x-hidden rounded-lg shadow-none">
       <CardHeader className="p-2">
         <div className="flex  flex-row justify-between">
           <CardTitle className="pt-2">Daily Total</CardTitle>
