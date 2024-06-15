@@ -4,11 +4,16 @@ import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
+  ContextMenuSubTrigger,
   ContextMenuTrigger,
+  ContextMenuSubContent,
+  ContextMenuSub,
 } from "@/components/ui/context-menu";
 import { deleteMoney } from "@/app/actions/moneys";
 import { useState } from "react";
 import { TbCurrencyPeso } from "react-icons/tb";
+import { Pencil, Trash } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function Money({
   money,
@@ -23,6 +28,7 @@ export default function Money({
   hideAmounts: boolean;
   currentTotal: string;
 }) {
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [isPending, setIsPending] = useState(false);
   const [elevate, setElevate] = useState(false);
 
@@ -54,8 +60,14 @@ export default function Money({
         </div>
       </ContextMenuTrigger>
       <ContextMenuContent>
-        <ContextMenuItem onClick={handleDelete}>Delete</ContextMenuItem>
-        <ContextMenuItem onClick={() => edit()}>Edit</ContextMenuItem>
+        <ContextMenuItem onClick={() => edit()} className="text-xs">
+          <Pencil className="size-4 mr-1" />
+          Edit
+        </ContextMenuItem>
+        <ContextMenuItem className="text-xs">
+          <Trash className="size-4 mr-1 text-destructive" />
+          <span className="text-destructive">Delete</span>
+        </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>
   );

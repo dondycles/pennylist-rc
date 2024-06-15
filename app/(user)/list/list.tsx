@@ -3,7 +3,17 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 // Icons
-import { Eye, EyeOff, ListFilter, Loader2, Plus } from "lucide-react";
+import {
+  ArrowDownNarrowWide,
+  ArrowUpNarrowWide,
+  CalendarCheck,
+  Eye,
+  EyeOff,
+  Gem,
+  ListFilter,
+  Loader2,
+  Plus,
+} from "lucide-react";
 import { TbCurrencyPeso } from "react-icons/tb";
 
 // Importing utility functions
@@ -221,24 +231,28 @@ export default function List({ user }: { user: User }) {
               </Drawer>
             </div>
             <DropdownMenu>
-              <DropdownMenuTrigger className="text-xs text-muted-foreground ml-auto mr-0 flex items-center gap-1">
+              <DropdownMenuTrigger className="text-xs text-muted-foreground ml-auto mr-0 flex items-center gap-1 ">
                 <p>sort</p> <ListFilter size={20} />
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
+              <DropdownMenuContent align="end">
                 <DropdownMenuCheckboxItem
                   checked={listState.sort.by === "amount"}
                   onClick={() => {
                     listState.setSort(listState.sort.asc, "amount");
                   }}
+                  className="text-xs"
                 >
-                  Amount
+                  <Gem className="size-4 mr-1" />
+                  Value
                 </DropdownMenuCheckboxItem>
                 <DropdownMenuCheckboxItem
                   checked={listState.sort.by === "created_at"}
                   onClick={() => {
                     listState.setSort(listState.sort.asc, "created_at");
                   }}
+                  className="text-xs"
                 >
+                  <CalendarCheck className="size-4 mr-1" />
                   Date created
                 </DropdownMenuCheckboxItem>
                 <DropdownMenuSeparator />
@@ -247,7 +261,9 @@ export default function List({ user }: { user: User }) {
                   onClick={() => {
                     listState.setSort(true, listState.sort.by);
                   }}
+                  className="text-xs"
                 >
+                  <ArrowUpNarrowWide className="size-4 mr-1" />
                   Ascending
                 </DropdownMenuCheckboxItem>
                 <DropdownMenuCheckboxItem
@@ -255,7 +271,9 @@ export default function List({ user }: { user: User }) {
                   onClick={() => {
                     listState.setSort(false, listState.sort.by);
                   }}
+                  className="text-xs"
                 >
+                  <ArrowDownNarrowWide className="size-4 mr-1" />
                   Descending
                 </DropdownMenuCheckboxItem>
               </DropdownMenuContent>
@@ -287,6 +305,7 @@ export default function List({ user }: { user: User }) {
               />
             </DrawerContent>
           </Drawer>
+
           {/* moneys list */}
           <div className="w-full flex flex-col gap-2">
             {moneys?.data?.map((money) => {
