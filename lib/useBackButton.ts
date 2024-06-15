@@ -21,11 +21,8 @@ export const useBackButtonHandler = () => {
     };
 
     window.addEventListener("popstate", handleBackButton);
-
     return () => {
       window.removeEventListener("popstate", handleBackButton);
     };
   }, [exitApp, router]);
-
-  return null;
 };
