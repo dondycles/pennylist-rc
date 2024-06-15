@@ -1,6 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { Database } from "@/database.types";
 import { UsePhpPesoWSign } from "@/lib/utils";
+import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Sector } from "recharts";
 
@@ -9,6 +15,7 @@ export default function TotalBreakdownPieChart({
 }: {
   moneys: Omit<Database["public"]["Tables"]["moneys"]["Row"], "user">[];
 }) {
+  const [collapse, setCollapse] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const renderActiveShape = (props: any) => {
     const {
@@ -80,36 +87,48 @@ export default function TotalBreakdownPieChart({
     );
   };
   return (
-    <Card className="w-full rounded-lg shadow-none">
-      <CardHeader className="px-2 py-4">
-        <CardTitle>Total Breakdown </CardTitle>
-      </CardHeader>
-      <CardContent className="aspect-square p-2 max-h-[60vh] mx-auto">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              activeIndex={activeIndex}
-              activeShape={renderActiveShape}
-              data={moneys}
-              cx="50%"
-              cy="50%"
-              innerRadius="60%"
-              fill="hsl(var(--foreground))"
-              dataKey="amount"
-              onMouseEnter={(_, i) => {
-                setActiveIndex(i);
-              }}
-            >
-              {moneys?.map((_, index) => (
-                <Cell
-                  className="fill-background stroke-foreground stroke-2"
-                  key={`cell-${index}`}
-                />
-              ))}
-            </Pie>
-          </PieChart>
-        </ResponsiveContainer>
-      </CardContent>
-    </Card>
+    <Collapsible onOpenChange={setCollapse}>
+      <Card className="w-full rounded-lg shadow-none">
+        <CollapsibleTrigger>
+          <CardHeader className="px-2 py-3">
+            <CardTitle className="flex items-center gap-1">
+              <p>Total Breakdown</p>
+
+              <ChevronDown
+                className={`size-4 ${collapse && "rotate-180"} transition-all`}
+              />
+            </CardTitle>
+          </CardHeader>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <CardContent className="aspect-square p-2 max-h-[60vh] mx-auto">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  activeIndex={activeIndex}
+                  activeShape={renderActiveShape}
+                  data={moneys}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius="60%"
+                  fill="hsl(var(--foreground))"
+                  dataKey="amount"
+                  onMouseEnter={(_, i) => {
+                    setActiveIndex(i);
+                  }}
+                >
+                  {moneys?.map((_, index) => (
+                    <Cell
+                      className="fill-background stroke-foreground stroke-2"
+                      key={`cell-${index}`}
+                    />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </CollapsibleContent>
+      </Card>
+    </Collapsible>
   );
 }

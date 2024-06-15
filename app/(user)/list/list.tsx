@@ -40,6 +40,7 @@ import MonthlyTotalBarChart from "./monthly-total-bar-chart";
 // Importing types
 import { type Database } from "@/database.types";
 import { type User } from "@supabase/supabase-js";
+import { Separator } from "@/components/ui/separator";
 
 type changes = {
   from: { name: string; amount: string; total: string };
@@ -304,6 +305,9 @@ export default function List({ user }: { user: User }) {
               );
             })}
           </div>
+          <br />
+          <Separator />
+          <br />
           {/* tables */}
           {logs?.data && <LogsTable logs={logs?.data} />}
           {/* pie */}
