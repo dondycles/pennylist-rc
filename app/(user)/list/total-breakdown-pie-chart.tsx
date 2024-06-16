@@ -101,32 +101,38 @@ export default function TotalBreakdownPieChart({
           </CardHeader>
         </CollapsibleTrigger>
         <CollapsibleContent>
-          <CardContent className="aspect-square p-2 max-h-[60vh] mx-auto">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  activeIndex={activeIndex}
-                  activeShape={renderActiveShape}
-                  data={moneys}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius="60%"
-                  fill="hsl(var(--foreground))"
-                  dataKey="amount"
-                  onMouseEnter={(_, i) => {
-                    setActiveIndex(i);
-                  }}
-                >
-                  {moneys?.map((_, index) => (
-                    <Cell
-                      className="fill-background stroke-foreground stroke-2"
-                      key={`cell-${index}`}
-                    />
-                  ))}
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
+          {moneys.length ? (
+            <CardContent className="aspect-square p-2 max-h-[60vh] mx-auto">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    activeIndex={activeIndex}
+                    activeShape={renderActiveShape}
+                    data={moneys}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius="60%"
+                    fill="hsl(var(--foreground))"
+                    dataKey="amount"
+                    onMouseEnter={(_, i) => {
+                      setActiveIndex(i);
+                    }}
+                  >
+                    {moneys?.map((_, index) => (
+                      <Cell
+                        className="fill-background stroke-foreground stroke-2"
+                        key={`cell-${index}`}
+                      />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+            </CardContent>
+          ) : (
+            <CardContent className="p-2 w-full text-center text-sm text-muted-foreground">
+              <p>No records</p>
+            </CardContent>
+          )}
         </CollapsibleContent>
       </Card>
     </Collapsible>

@@ -307,40 +307,49 @@ export default function List({ user }: { user: User }) {
           </Drawer>
 
           {/* moneys list */}
-          <div className="w-full flex flex-col gap-2">
-            {moneys?.data?.map((money) => {
-              return (
-                <Money
-                  edit={() => setEditMoneyForm({ money: money, open: true })}
-                  done={() => {
-                    refetchLogs();
-                    refetchMoneys();
-                  }}
-                  money={money}
-                  key={money.id}
-                  hideAmounts={listState.hideAmounts}
-                  currentTotal={total}
-                />
-              );
-            })}
-          </div>
-          <br />
+          {total === 0 ? (
+            <p className="text-sm text-center text-muted-foreground">
+              You are currently pennyless
+            </p>
+          ) : (
+            <div className="w-full flex flex-col gap-2">
+              {moneys?.data?.map((money) => {
+                return (
+                  <Money
+                    edit={() => setEditMoneyForm({ money: money, open: true })}
+                    done={() => {
+                      refetchLogs();
+                      refetchMoneys();
+                    }}
+                    money={money}
+                    key={money.id}
+                    hideAmounts={listState.hideAmounts}
+                    currentTotal={total}
+                  />
+                );
+              })}
+            </div>
+          )}
+
           <Separator />
-          <br />
-          {/* tables */}
-          {logs?.data && <LogsTable logs={logs?.data} />}
-          {/* pie */}
-          {moneys?.data && moneys.data.length ? (
-            <TotalBreakdownPieChart moneys={moneys.data} />
+          {logs?.data?.length ? (
+            <>
+              {/* tables */}
+              {logs?.data && <LogsTable logs={logs?.data} />}
+              {/* pie */}
+              {moneys?.data ? (
+                <TotalBreakdownPieChart moneys={moneys.data} />
+              ) : null}
+              {/* bars */}
+              <DailyTotalBarChart
+                dailyTotal={dailyTotal.slice(
+                  dailyTotal.length - listState.dailyTotalDays,
+                  dailyTotal.length
+                )}
+              />
+              <MonthlyTotalBarChart monthlyTotal={monthlyTotal} />
+            </>
           ) : null}
-          {/* bars */}
-          <DailyTotalBarChart
-            dailyTotal={dailyTotal.slice(
-              dailyTotal.length - listState.dailyTotalDays,
-              dailyTotal.length
-            )}
-          />
-          <MonthlyTotalBarChart monthlyTotal={monthlyTotal} />
         </div>
       </ScrollArea>
     </main>

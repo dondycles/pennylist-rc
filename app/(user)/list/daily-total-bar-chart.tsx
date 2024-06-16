@@ -52,69 +52,72 @@ export default function DailyTotalBarChart({
   return (
     <Collapsible onOpenChange={setCollapse}>
       <Card className="overflow-x-hidden rounded-lg shadow-none">
-        <CollapsibleTrigger className="w-full">
-          <CardHeader className="py-2 px-2">
-            <div className="flex  flex-row justify-between items-center">
-              <CardTitle className="flex items-center gap-1">
-                <p>Daily Total</p>
-                <ChevronDown
-                  className={`size-4 ${
-                    collapse && "rotate-180"
-                  } transition-all`}
-                />
-              </CardTitle>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant={"outline"}>
-                    Last {listState.dailyTotalDays} days
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuCheckboxItem
-                    checked={listState.dailyTotalDays === 7}
-                    onClick={() => {
-                      listState.setDailyTotalDays(7);
-                    }}
-                  >
-                    7 days
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={listState.dailyTotalDays === 14}
-                    onClick={() => {
-                      listState.setDailyTotalDays(14);
-                    }}
-                  >
-                    14 days
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={listState.dailyTotalDays === 21}
-                    onClick={() => {
-                      listState.setDailyTotalDays(21);
-                    }}
-                  >
-                    21 days
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={listState.dailyTotalDays === 28}
-                    onClick={() => {
-                      listState.setDailyTotalDays(28);
-                    }}
-                  >
-                    28 days
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={listState.dailyTotalDays === 365}
-                    onClick={() => {
-                      listState.setDailyTotalDays(365);
-                    }}
-                  >
-                    365 days
-                  </DropdownMenuCheckboxItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </CardHeader>
-        </CollapsibleTrigger>
+        <CardHeader className="p-0">
+          <div className="flex p-2">
+            <CollapsibleTrigger className="w-full">
+              <div className="flex  flex-row justify-between items-center">
+                <CardTitle className="flex items-center gap-1">
+                  <p>Daily Total</p>
+                  <ChevronDown
+                    className={`size-4 ${
+                      collapse && "rotate-180"
+                    } transition-all`}
+                  />
+                </CardTitle>
+              </div>
+            </CollapsibleTrigger>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant={"outline"}>
+                  Last {listState.dailyTotalDays} days
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuCheckboxItem
+                  checked={listState.dailyTotalDays === 7}
+                  onClick={() => {
+                    listState.setDailyTotalDays(7);
+                  }}
+                >
+                  7 days
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  checked={listState.dailyTotalDays === 14}
+                  onClick={() => {
+                    listState.setDailyTotalDays(14);
+                  }}
+                >
+                  14 days
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  checked={listState.dailyTotalDays === 21}
+                  onClick={() => {
+                    listState.setDailyTotalDays(21);
+                  }}
+                >
+                  21 days
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  checked={listState.dailyTotalDays === 28}
+                  onClick={() => {
+                    listState.setDailyTotalDays(28);
+                  }}
+                >
+                  28 days
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  checked={listState.dailyTotalDays === 365}
+                  onClick={() => {
+                    listState.setDailyTotalDays(365);
+                  }}
+                >
+                  365 days
+                </DropdownMenuCheckboxItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </CardHeader>
+
         <CollapsibleContent>
           <CardContent className="p-2 max-h-[300px] h-screen w-full">
             <ResponsiveContainer width="100%" height="100%">

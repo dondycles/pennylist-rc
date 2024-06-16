@@ -50,7 +50,7 @@ export default function MonthlyTotalBarChart({
         <CollapsibleTrigger>
           <CardHeader className="px-2 py-3">
             <CardTitle className="flex items-center gap-1">
-              <p>Daily Total</p>
+              <p>Monthly Total</p>
               <ChevronDown
                 className={`size-4 ${collapse && "rotate-180"} transition-all`}
               />
