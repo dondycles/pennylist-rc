@@ -22,6 +22,7 @@ const moneySchema = z.object({
   created_at: z.string(),
   color: z.string().nullable(),
   updated_at: z.string().nullable(),
+  reason: z.string().min(1).max(55),
 });
 
 export default function EditMoneyForm({
@@ -42,6 +43,7 @@ export default function EditMoneyForm({
       created_at: money.created_at,
       color: money.color,
       updated_at: money.updated_at,
+      reason: "",
     },
   });
 
@@ -58,7 +60,8 @@ export default function EditMoneyForm({
       const { error, success } = await editMoney(
         newMoneyData,
         money,
-        currentTotal
+        currentTotal,
+        values.reason
       );
       if (error) {
         return error;
@@ -104,6 +107,18 @@ export default function EditMoneyForm({
                   type="number"
                   {...field}
                 />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="reason"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Input data-vaul-no-drag placeholder="reason" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

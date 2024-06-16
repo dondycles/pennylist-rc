@@ -50,6 +50,7 @@ export default function LogsTable({
                   <TableRow>
                     <TableHead className="w-fit">Action</TableHead>
                     <TableHead>Changes</TableHead>
+                    <TableHead>Reason</TableHead>
                     <TableHead>Total</TableHead>
                     <TableHead>Date</TableHead>
                   </TableRow>
@@ -102,6 +103,7 @@ export default function LogsTable({
                             </div>
                           )}
                         </TableCell>
+                        <TableCell>{log.reason}</TableCell>
                         <TableCell>
                           {UsePhpPesoWSign((log.changes as changes).to.total)}
                         </TableCell>

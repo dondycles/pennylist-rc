@@ -26,7 +26,7 @@ export async function addMoney(
   const { error } = await supabase.from("moneys").insert(money);
   if (error) return { error };
 
-  const { error: logError } = await log("add", {
+  const { error: logError } = await log("add", "add", {
     from: {
       amount: "",
       name: "",
@@ -47,8 +47,15 @@ export async function addMoney(
 export async function editMoney(
   updatedMoney: Omit<money, "user">,
   lastMoney: Omit<money, "user">,
-  currentTotal: string
+  currentTotal: string,
+  reason: string
 ) {
+  if (
+    updatedMoney.amount === lastMoney.amount &&
+    updatedMoney.name === lastMoney.name
+  )
+    return { success: "edited!" };
+
   const supabase = createClient();
 
   const { error } = await supabase
@@ -57,7 +64,7 @@ export async function editMoney(
     .eq("id", updatedMoney.id);
   if (error) return { error };
 
-  const { error: logError } = await log("update", {
+  const { error: logError } = await log("update", reason, {
     from: {
       amount: String(lastMoney.amount),
       name: lastMoney.name,
@@ -87,7 +94,7 @@ export async function deleteMoney(
   const { error } = await supabase.from("moneys").delete().eq("id", money.id);
   if (error) return { error };
 
-  const { error: logError } = await log("delete", {
+  const { error: logError } = await log("delete", "delete", {
     from: {
       amount: String(money.amount),
       name: money.name,
