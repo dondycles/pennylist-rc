@@ -43,19 +43,23 @@ export default function SignupForm() {
     },
   });
   async function onSubmit(values: z.infer<typeof signUpSchema>) {
-    setSigningUp(true);
-    const { authError, dbError } = await signup(values);
-    if (authError) {
-      setSigningUp(false);
-      return form.setError("cpassword", {
-        message: authError,
-      });
-    }
-    if (dbError) {
-      setSigningUp(false);
-      return form.setError("cpassword", {
-        message: dbError,
-      });
+    try {
+      setSigningUp(true);
+      const res = await signup(values);
+      if (res.authError) {
+        setSigningUp(false);
+        return form.setError("cpassword", {
+          message: res.authError,
+        });
+      }
+      if (res.dbError) {
+        setSigningUp(false);
+        return form.setError("cpassword", {
+          message: res.dbError,
+        });
+      }
+    } catch (error) {
+      console.log(error);
     }
   }
 

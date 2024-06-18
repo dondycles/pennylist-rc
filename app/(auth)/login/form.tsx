@@ -33,19 +33,23 @@ export default function LoginForm() {
   });
 
   async function onSubmit(values: z.infer<typeof logInSchema>) {
-    setLoggingIn(true);
-    const { authError, dbError } = await login(values);
-    if (authError) {
-      setLoggingIn(false);
-      return form.setError("password", {
-        message: authError,
-      });
-    }
-    if (dbError) {
-      setLoggingIn(false);
-      return form.setError("password", {
-        message: dbError,
-      });
+    try {
+      setLoggingIn(true);
+      const res = await login(values);
+      if (res.authError) {
+        setLoggingIn(false);
+        return form.setError("password", {
+          message: res.authError,
+        });
+      }
+      if (res.dbError) {
+        setLoggingIn(false);
+        return form.setError("password", {
+          message: res.dbError,
+        });
+      }
+    } catch (error) {
+      console.log(error);
     }
   }
 
