@@ -12,14 +12,14 @@ export const login = async (data: z.infer<typeof logInSchema>) => {
       email,
       password,
     });
-  if (authError) return { authError };
+  if (authError) return { authError: authError.message };
 
   const { error: dbError } = await supabase
     .from("users")
     .select("*")
     .eq("id", authUser.user.id)
     .single();
-  if (dbError) return { dbError };
+  if (dbError) return { dbError: dbError.message };
 
   redirect("/list");
 };

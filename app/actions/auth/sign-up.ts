@@ -12,13 +12,13 @@ export const signup = async (data: z.infer<typeof signUpSchema>) => {
     email,
     password,
   });
-  if (authError) return { authError };
+  if (authError) return { authError: authError.message };
 
   const { error: dbError } = await supabase
     .from("users")
     .insert({ username: data.email });
 
-  if (dbError) return { dbError };
+  if (dbError) return { dbError: dbError.message };
 
   redirect("/list");
 };

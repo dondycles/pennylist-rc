@@ -20,7 +20,7 @@ export const changePassword = async (password: string, id: string) => {
     })
     .eq("id", userId);
 
-  if (dbError) return { error: dbError };
+  if (dbError) return { error: dbError.message };
 
   return { success: "Password changed" };
 };

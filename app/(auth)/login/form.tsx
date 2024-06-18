@@ -34,17 +34,17 @@ export default function LoginForm() {
 
   async function onSubmit(values: z.infer<typeof logInSchema>) {
     setLoggingIn(true);
-    const response = await login(values);
-    if (response?.authError) {
+    const { authError, dbError } = await login(values);
+    if (authError) {
       setLoggingIn(false);
       return form.setError("password", {
-        message: response?.authError.message,
+        message: authError,
       });
     }
-    if (response?.dbError) {
+    if (dbError) {
       setLoggingIn(false);
       return form.setError("password", {
-        message: response?.dbError.message,
+        message: dbError,
       });
     }
   }
