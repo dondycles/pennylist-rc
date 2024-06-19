@@ -11,6 +11,14 @@ type listPage = {
   toggleHideAmounts: () => void;
   dailyTotalDays: number;
   setDailyTotalDays: (days: number) => void;
+  showLogs: boolean;
+  showBreakdown: boolean;
+  showDailyTotal: boolean;
+  showMonthlyTotal: boolean;
+  setShowLogs: () => void;
+  setShowBreakdown: () => void;
+  setShowDailyTotal: () => void;
+  setShowMonthlyTotal: () => void;
 };
 
 export const useListState = create<listPage>()(
@@ -25,6 +33,15 @@ export const useListState = create<listPage>()(
       toggleHideAmounts: () => set({ hideAmounts: !get().hideAmounts }),
       dailyTotalDays: 28,
       setDailyTotalDays: (days) => set(() => ({ dailyTotalDays: days })),
+      showBreakdown: true,
+      showDailyTotal: true,
+      showLogs: true,
+      showMonthlyTotal: true,
+      setShowLogs: () => set({ showLogs: !get().showLogs }),
+      setShowBreakdown: () => set({ showBreakdown: !get().showBreakdown }),
+      setShowDailyTotal: () => set({ showDailyTotal: !get().showDailyTotal }),
+      setShowMonthlyTotal: () =>
+        set({ showMonthlyTotal: !get().showMonthlyTotal }),
     }),
     { name: "list-page" }
   )

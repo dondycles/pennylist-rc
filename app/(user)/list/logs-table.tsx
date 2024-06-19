@@ -15,8 +15,7 @@ import {
 } from "@/components/ui/table";
 import { Database } from "@/database.types";
 import { UsePhpPesoWSign } from "@/lib/utils";
-import { ChevronDown, ChevronUp } from "lucide-react";
-import { useState } from "react";
+import { ChevronDown } from "lucide-react";
 type changes = {
   from: { name: string; amount: string; total: string };
   to: { name: string; amount: string; total: string };
@@ -24,12 +23,15 @@ type changes = {
 
 export default function LogsTable({
   logs,
+  open,
+  toggleOpen,
 }: {
   logs: Database["public"]["Tables"]["logs"]["Row"][];
+  open: boolean;
+  toggleOpen: () => void;
 }) {
-  const [collapse, setCollapse] = useState(false);
   return (
-    <Collapsible onOpenChange={setCollapse}>
+    <Collapsible onOpenChange={toggleOpen} open={open}>
       <Card className="overflow-x-hidden rounded-lg shadow-none">
         <CollapsibleTrigger>
           <CardHeader className="px-2 py-3 m-0">
@@ -37,7 +39,7 @@ export default function LogsTable({
               <p>Logs</p>
 
               <ChevronDown
-                className={`size-4 ${collapse && "rotate-180"} transition-all`}
+                className={`size-4 ${open && "rotate-180"} transition-all`}
               />
             </CardTitle>
           </CardHeader>

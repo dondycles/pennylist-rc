@@ -14,7 +14,6 @@ import {
 import { UsePhpPesoWSign, toMonthWord } from "@/lib/utils";
 import { useListState } from "@/store";
 import { ChevronDown } from "lucide-react";
-import { useState } from "react";
 import {
   Bar,
   BarChart,
@@ -28,13 +27,16 @@ import {
 
 export default function DailyTotalBarChart({
   dailyTotal,
+  open,
+  toggleOpen,
 }: {
   dailyTotal: {
     date: string;
     total: number;
   }[];
+  open: boolean;
+  toggleOpen: () => void;
 }) {
-  const [collapse, setCollapse] = useState(false);
   const listState = useListState();
   const CustomTooltipDailyTotal = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -50,7 +52,7 @@ export default function DailyTotalBarChart({
   };
 
   return (
-    <Collapsible onOpenChange={setCollapse}>
+    <Collapsible onOpenChange={toggleOpen} open={open}>
       <Card className="overflow-x-hidden rounded-lg shadow-none">
         <CardHeader className="p-0">
           <div className="flex p-2">
@@ -59,9 +61,7 @@ export default function DailyTotalBarChart({
                 <CardTitle className="flex items-center gap-1">
                   <p>Daily Total</p>
                   <ChevronDown
-                    className={`size-4 ${
-                      collapse && "rotate-180"
-                    } transition-all`}
+                    className={`size-4 ${open && "rotate-180"} transition-all`}
                   />
                 </CardTitle>
               </div>

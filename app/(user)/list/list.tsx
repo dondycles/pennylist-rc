@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 // Icons
@@ -51,13 +51,13 @@ import MonthlyTotalBarChart from "./monthly-total-bar-chart";
 import { type Database } from "@/database.types";
 import { type User } from "@supabase/supabase-js";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type changes = {
   from: { name: string; amount: string; total: string };
   to: { name: string; amount: string; total: string };
 };
 export default function List({ user }: { user: User }) {
-  const [mounted, setMounted] = useState(false);
   var _ = require("lodash");
   const listState = useListState();
 
@@ -92,7 +92,6 @@ export default function List({ user }: { user: User }) {
   });
 
   const getDailyTotal = (days: number = 365) => {
-    if (!mounted) return [];
     if (logsLoading) return [];
 
     const groupedByDate: {
@@ -132,7 +131,6 @@ export default function List({ user }: { user: User }) {
   };
 
   const getMonthlyTotal = () => {
-    if (!mounted) return [];
     if (logsLoading) return [];
     const year = new Date().getFullYear();
     const groupedByMonth: { total: number; date: string }[] = [];
@@ -155,12 +153,6 @@ export default function List({ user }: { user: User }) {
   const dailyTotal = getDailyTotal();
   const monthlyTotal = getMonthlyTotal();
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return;
-
   if (moneys?.error || moneysError || logsError || logs?.error)
     return (
       <main className="w-full h-full p-2 ">
@@ -174,9 +166,12 @@ export default function List({ user }: { user: User }) {
     );
   if (isLoading || logsLoading)
     return (
-      <main className="w-full h-full p-2 ">
-        <div className="flex items-center text-sm text-muted-foreground gap-2 justify-center">
-          Loading... <Loader2 className="animate-spin" />
+      <main className="w-full h-full">
+        <div className=" max-w-[800px] mx-auto px-2 flex flex-col justify-start gap-2 mb-[5.5rem]">
+          <Skeleton className="w-full h-24  max-w-[800px] mt-2" />
+          <Skeleton className="w-full max-w-[800px] h-10 mt-8" />
+          <Skeleton className="w-full max-w-[800px] h-10" />
+          <Skeleton className="w-full max-w-[800px] h-10" />
         </div>
       </main>
     );
@@ -335,19 +330,35 @@ export default function List({ user }: { user: User }) {
           {logs?.data?.length ? (
             <>
               {/* tables */}
-              {logs?.data && <LogsTable logs={logs?.data} />}
+              {logs?.data && (
+                <LogsTable
+                  open={listState.showLogs}
+                  toggleOpen={() => listState.setShowLogs()}
+                  logs={logs?.data}
+                />
+              )}
               {/* pie */}
               {moneys?.data ? (
-                <TotalBreakdownPieChart moneys={moneys.data} />
+                <TotalBreakdownPieChart
+                  open={listState.showBreakdown}
+                  toggleOpen={() => listState.setShowBreakdown()}
+                  moneys={moneys.data}
+                />
               ) : null}
               {/* bars */}
               <DailyTotalBarChart
+                open={listState.showDailyTotal}
+                toggleOpen={() => listState.setShowDailyTotal()}
                 dailyTotal={dailyTotal.slice(
                   dailyTotal.length - listState.dailyTotalDays,
                   dailyTotal.length
                 )}
               />
-              <MonthlyTotalBarChart monthlyTotal={monthlyTotal} />
+              <MonthlyTotalBarChart
+                open={listState.showMonthlyTotal}
+                toggleOpen={() => listState.setShowMonthlyTotal()}
+                monthlyTotal={monthlyTotal}
+              />
             </>
           ) : null}
         </div>

@@ -12,10 +12,13 @@ import { Cell, Pie, PieChart, ResponsiveContainer, Sector } from "recharts";
 
 export default function TotalBreakdownPieChart({
   moneys,
+  open,
+  toggleOpen,
 }: {
   moneys: Omit<Database["public"]["Tables"]["moneys"]["Row"], "user">[];
+  open: boolean;
+  toggleOpen: () => void;
 }) {
-  const [collapse, setCollapse] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const renderActiveShape = (props: any) => {
     const {
@@ -87,7 +90,7 @@ export default function TotalBreakdownPieChart({
     );
   };
   return (
-    <Collapsible onOpenChange={setCollapse}>
+    <Collapsible onOpenChange={toggleOpen} open={open}>
       <Card className="w-full rounded-lg shadow-none">
         <CollapsibleTrigger>
           <CardHeader className="px-2 py-3">
@@ -95,7 +98,7 @@ export default function TotalBreakdownPieChart({
               <p>Total Breakdown</p>
 
               <ChevronDown
-                className={`size-4 ${collapse && "rotate-180"} transition-all`}
+                className={`size-4 ${open && "rotate-180"} transition-all`}
               />
             </CardTitle>
           </CardHeader>

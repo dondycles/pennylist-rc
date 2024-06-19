@@ -20,13 +20,16 @@ import {
 
 export default function MonthlyTotalBarChart({
   monthlyTotal,
+  open,
+  toggleOpen,
 }: {
   monthlyTotal: {
     total: number;
     date: string;
   }[];
+  open: boolean;
+  toggleOpen: () => void;
 }) {
-  const [collapse, setCollapse] = useState(false);
   const CustomTooltipMonthlyTotal = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
@@ -45,14 +48,14 @@ export default function MonthlyTotalBarChart({
     return null;
   };
   return (
-    <Collapsible onOpenChange={setCollapse}>
+    <Collapsible onOpenChange={toggleOpen} open={open}>
       <Card className="overflow-x-hidden rounded-lg shadow-none">
         <CollapsibleTrigger>
           <CardHeader className="px-2 py-3">
             <CardTitle className="flex items-center gap-1">
               <p>Monthly Total</p>
               <ChevronDown
-                className={`size-4 ${collapse && "rotate-180"} transition-all`}
+                className={`size-4 ${open && "rotate-180"} transition-all`}
               />
             </CardTitle>
           </CardHeader>
