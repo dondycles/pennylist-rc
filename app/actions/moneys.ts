@@ -24,7 +24,7 @@ export async function addMoney(
   const supabase = createClient();
 
   const { error } = await supabase.from("moneys").insert(money);
-  if (error) return { error };
+  if (error) return { error: error.message };
 
   const { error: logError } = await log("add", "add", {
     from: {
@@ -62,7 +62,7 @@ export async function editMoney(
     .from("moneys")
     .update(updatedMoney)
     .eq("id", updatedMoney.id);
-  if (error) return { error };
+  if (error) return { error: error.message };
 
   const { error: logError } = await log("update", reason, {
     from: {
@@ -92,7 +92,7 @@ export async function deleteMoney(
   const supabase = createClient();
 
   const { error } = await supabase.from("moneys").delete().eq("id", money.id);
-  if (error) return { error };
+  if (error) return { error: error.message };
 
   const { error: logError } = await log("delete", "delete", {
     from: {
@@ -106,8 +106,18 @@ export async function deleteMoney(
       total: String(Number(currentTotal) - Number(money.amount)),
     },
   });
-
   if (logError) return { logError };
 
   return { success: "deleted!" };
+}
+
+export async function setColor(money: Pick<money, "id">, color: string) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("moneys")
+    .update({ color })
+    .eq("id", money.id);
+
+  if (error) return { error: error.message };
+  return { success: "colored!" };
 }

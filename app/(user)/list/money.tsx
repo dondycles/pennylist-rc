@@ -4,12 +4,15 @@ import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import { deleteMoney } from "@/app/actions/moneys";
+import { deleteMoney, setColor } from "@/app/actions/moneys";
 import { useState } from "react";
 import { TbCurrencyPeso } from "react-icons/tb";
-import { Check, Pencil, Trash, X } from "lucide-react";
+import { Check, Palette, Pencil, Trash, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,6 +22,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { DialogDescription } from "@radix-ui/react-dialog";
+import { colors } from "@/constants/colors";
 
 export default function Money({
   money,
@@ -36,6 +40,13 @@ export default function Money({
   const [showWarning, setShowWarning] = useState(false);
   const [isPending, setIsPending] = useState(false);
   const [elevate, setElevate] = useState(false);
+
+  const handleSetColor = async (color: string) => {
+    const { error } = await setColor(money, color);
+    if (error) console.log(error);
+    done();
+  };
+
   const handleDelete = async () => {
     setIsPending(true);
     const { error } = await deleteMoney(money, currentTotal);
@@ -49,6 +60,11 @@ export default function Money({
         <ContextMenuTrigger>
           <div
             key={money.id}
+            style={{
+              borderColor: money.color ?? "",
+              color: money.color ?? "",
+              backgroundColor: money.color ? money.color + 20 : "",
+            }}
             className={`p-2 border rounded-lg flex flex-row justify-between items-center font-bold ${
               isPending && "opacity-50 pointer-events-none "
             } ${
@@ -65,6 +81,33 @@ export default function Money({
           </div>
         </ContextMenuTrigger>
         <ContextMenuContent>
+          <ContextMenuSub>
+            <ContextMenuSubTrigger className="text-xs">
+              <Palette className="size-4 mr-1" />
+              Color
+            </ContextMenuSubTrigger>
+            <ContextMenuSubContent className="p-0">
+              <ContextMenuItem className="flex flex-row gap-1 p-1">
+                {Object.values(colors).map((color, i) => {
+                  return (
+                    <div className="flex flex-col gap-1" key={i}>
+                      {Object.values(color).map((c) => {
+                        return (
+                          <button
+                            onClick={() => handleSetColor(c)}
+                            className="rounded bg-violet-100 size-4"
+                            style={{ backgroundColor: c }}
+                            key={c}
+                          />
+                        );
+                      })}
+                    </div>
+                  );
+                })}
+              </ContextMenuItem>
+            </ContextMenuSubContent>
+          </ContextMenuSub>
+
           <ContextMenuItem onClick={() => edit()} className="text-xs">
             <Pencil className="size-4 mr-1" />
             Edit
