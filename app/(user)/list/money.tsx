@@ -87,7 +87,7 @@ export default function Money({
               Color
             </ContextMenuSubTrigger>
             <ContextMenuSubContent className="p-0">
-              <ContextMenuItem className="flex flex-row gap-1 p-1">
+              <ContextMenuItem className="flex flex-row flex-wrap gap-1 p-1 max-w-[184px]">
                 {Object.values(colors).map((color, i) => {
                   return (
                     <div className="flex flex-col gap-1" key={i}>
@@ -107,7 +107,6 @@ export default function Money({
               </ContextMenuItem>
             </ContextMenuSubContent>
           </ContextMenuSub>
-
           <ContextMenuItem onClick={() => edit()} className="text-xs">
             <Pencil className="size-4 mr-1" />
             Edit
