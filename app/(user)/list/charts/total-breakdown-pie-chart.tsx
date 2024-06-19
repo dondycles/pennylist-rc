@@ -42,7 +42,10 @@ export default function TotalBreakdownPieChart({
           dy={-18}
           textAnchor="middle"
           fill={fill}
-          style={{ fontWeight: "bold", fontSize: "0.8rem" }}
+          style={{
+            fontSize: "0.8rem",
+            stroke: payload.color ?? "",
+          }}
         >
           {payload.name}
         </text>
@@ -71,20 +74,18 @@ export default function TotalBreakdownPieChart({
           cy={cy}
           innerRadius={innerRadius}
           outerRadius={outerRadius}
-          startAngle={startAngle}
-          endAngle={endAngle}
-          fill={fill}
-          stroke={fill}
-          strokeWidth={2}
+          startAngle={startAngle + 1}
+          endAngle={endAngle - 1}
+          fill={payload.color}
         />
         <Sector
           cx={cx}
           cy={cy}
           startAngle={startAngle}
           endAngle={endAngle}
-          innerRadius={outerRadius + 8}
-          outerRadius={outerRadius + 14}
-          fill={fill}
+          innerRadius={outerRadius + 4}
+          outerRadius={outerRadius + 8}
+          fill={payload.color}
         />
       </g>
     );
@@ -121,9 +122,14 @@ export default function TotalBreakdownPieChart({
                       setActiveIndex(i);
                     }}
                   >
-                    {moneys?.map((_, index) => (
+                    {moneys?.map((money, index) => (
                       <Cell
-                        className="fill-background stroke-foreground stroke-2"
+                        style={{
+                          strokeWidth: 1,
+                          stroke: money.color ?? "",
+                          fill: money.color ? money.color + 20 : "",
+                        }}
+                        className="fill-background"
                         key={`cell-${index}`}
                       />
                     ))}

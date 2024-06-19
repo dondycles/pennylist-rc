@@ -82,8 +82,14 @@ export default function Money({
         </ContextMenuTrigger>
         <ContextMenuContent>
           <ContextMenuSub>
-            <ContextMenuSubTrigger className="text-xs">
-              <Palette className="size-4 mr-1" />
+            <ContextMenuSubTrigger
+              className="text-xs"
+              style={{ color: money.color ?? "" }}
+            >
+              <Palette
+                className="size-4 mr-1"
+                style={{ color: money.color ?? "" }}
+              />
               Color
             </ContextMenuSubTrigger>
             <ContextMenuSubContent className="p-0">

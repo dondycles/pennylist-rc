@@ -71,7 +71,8 @@ export default function SignupForm() {
       >
         <Logo className="size-12 mx-auto" zoom={8} strokeWidth={24} />
         <p className="text-xl">
-          Sign up to <span className="font-black">pennylist.</span>{" "}
+          Sign up to{" "}
+          <span className="font-black text-primary-foreground">pennylist.</span>{" "}
         </p>
         <FormField
           control={form.control}

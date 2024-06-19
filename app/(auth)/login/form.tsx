@@ -61,7 +61,7 @@ export default function LoginForm() {
       >
         <Logo className="size-12 mx-auto" zoom={8} strokeWidth={24} />
         <p className="text-xl">
-          Log in to <span className="font-black">pennylist.</span>{" "}
+          Log in to <span className="font-black text-primary">pennylist.</span>{" "}
         </p>
         <FormField
           control={form.control}
