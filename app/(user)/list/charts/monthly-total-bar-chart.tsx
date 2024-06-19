@@ -6,7 +6,6 @@ import {
 } from "@/components/ui/collapsible";
 import { UsePhpPesoWSign, toMonthWord } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
-import { useState } from "react";
 import {
   Bar,
   BarChart,
@@ -30,7 +29,7 @@ export default function MonthlyTotalBarChart({
   open: boolean;
   toggleOpen: () => void;
 }) {
-  const CustomTooltipMonthlyTotal = ({ active, payload, label }: any) => {
+  const CustomTooltipMonthlyTotal = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       return (
         <div className="rounded-lg  p-2  text-sm backdrop-blur bg-foreground/75 text-background">

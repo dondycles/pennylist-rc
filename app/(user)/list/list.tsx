@@ -11,7 +11,6 @@ import {
   EyeOff,
   Gem,
   ListFilter,
-  Loader2,
   Plus,
 } from "lucide-react";
 import { TbCurrencyPeso } from "react-icons/tb";
@@ -39,13 +38,13 @@ import {
 import { useListState } from "@/store";
 
 // Importing custom components
-import AddMoneyForm from "./add-money-form";
-import EditMoneyForm from "./edit-money-form";
+import AddMoneyForm from "./forms/add-money-form";
+import EditMoneyForm from "./forms/edit-money-form";
 import Money from "./money";
-import TotalBreakdownPieChart from "./total-breakdown-pie-chart";
-import LogsTable from "./logs-table";
-import DailyTotalBarChart from "./daily-total-bar-chart";
-import MonthlyTotalBarChart from "./monthly-total-bar-chart";
+import TotalBreakdownPieChart from "./charts/total-breakdown-pie-chart";
+import LogsTable from "./charts/logs-table";
+import DailyTotalBarChart from "./charts/daily-total-bar-chart";
+import MonthlyTotalBarChart from "./charts/monthly-total-bar-chart";
 
 // Importing types
 import { type Database } from "@/database.types";

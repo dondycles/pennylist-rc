@@ -38,7 +38,7 @@ export default function DailyTotalBarChart({
   toggleOpen: () => void;
 }) {
   const listState = useListState();
-  const CustomTooltipDailyTotal = ({ active, payload, label }: any) => {
+  const CustomTooltipDailyTotal = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       return (
         <div className="rounded-lg  p-2  text-sm backdrop-blur bg-foreground/75 text-background">
