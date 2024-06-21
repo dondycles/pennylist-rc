@@ -18,7 +18,7 @@ import { login } from "@/app/actions/auth/login";
 import { useState } from "react";
 
 export const logInSchema = z.object({
-  email: z.string().min(1),
+  listname: z.string().min(1),
   password: z.string().min(1),
 });
 
@@ -27,7 +27,7 @@ export default function LoginForm() {
   const form = useForm<z.infer<typeof logInSchema>>({
     resolver: zodResolver(logInSchema),
     defaultValues: {
-      email: "",
+      listname: "",
       password: "",
     },
   });
@@ -65,11 +65,11 @@ export default function LoginForm() {
         </p>
         <FormField
           control={form.control}
-          name="email"
+          name="listname"
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="Username" {...field} />
+                <Input placeholder="Listname" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 export const signup = async (data: z.infer<typeof signUpSchema>) => {
   const supabase = createClient();
-  const email = `${data.email}@pennylist.com`;
+  const email = `${data.listname}@pennylist.com`;
   const password = data.password;
 
   const { error: authError } = await supabase.auth.signUp({
@@ -15,8 +15,8 @@ export const signup = async (data: z.infer<typeof signUpSchema>) => {
   if (authError) return { authError: authError.message };
 
   const { error: dbError } = await supabase
-    .from("users")
-    .insert({ username: data.email });
+    .from("lists")
+    .insert({ listname: data.listname });
 
   if (dbError) return { dbError: dbError.message };
 

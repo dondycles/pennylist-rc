@@ -18,9 +18,9 @@ import { useState } from "react";
 import { AlertCircle } from "lucide-react";
 export const signUpSchema = z
   .object({
-    email: z
+    listname: z
       .string()
-      .min(6, { message: "Username must be at least 6 characters." }),
+      .min(6, { message: "Listname must be at least 6 characters." }),
     password: z
       .string()
       .min(6, { message: "Password must be at least 6 characters." }),
@@ -36,7 +36,7 @@ export default function SignupForm() {
   const form = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
-      email: "",
+      listname: "",
       password: "",
       cpassword: "",
     },
@@ -74,11 +74,11 @@ export default function SignupForm() {
         </p>
         <FormField
           control={form.control}
-          name="email"
+          name="listname"
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="Username" {...field} />
+                <Input placeholder="Listname" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -86,7 +86,7 @@ export default function SignupForm() {
         />
         <div className="text-xs text-muted-foreground flex items-start gap-1">
           <AlertCircle className="size-5 shrink-0 text-destructive" />
-          <p>Make your username unrelated to you for your extra privacy.</p>
+          <p>Make your listname unrelated to you for your extra privacy.</p>
         </div>
         <FormField
           control={form.control}
