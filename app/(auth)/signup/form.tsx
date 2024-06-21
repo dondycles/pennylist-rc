@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-
 import {
   Form,
   FormControl,
@@ -16,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import Logo from "@/components/logo";
 import { signup } from "@/app/actions/auth/sign-up";
 import { useState } from "react";
-
+import { AlertCircle } from "lucide-react";
 export const signUpSchema = z
   .object({
     email: z
@@ -71,8 +70,7 @@ export default function SignupForm() {
       >
         <Logo className="size-12 mx-auto" zoom={8} strokeWidth={24} />
         <p className="text-xl">
-          Sign up to{" "}
-          <span className="font-black text-primary-foreground">pennylist.</span>{" "}
+          Sign up to <span className="font-black text-primary">pennylist.</span>{" "}
         </p>
         <FormField
           control={form.control}
@@ -86,6 +84,10 @@ export default function SignupForm() {
             </FormItem>
           )}
         />
+        <div className="text-xs text-muted-foreground flex items-start gap-1">
+          <AlertCircle className="size-5 shrink-0 text-destructive" />
+          <p>Make your username unrelated to you for your extra privacy.</p>
+        </div>
         <FormField
           control={form.control}
           name="password"
