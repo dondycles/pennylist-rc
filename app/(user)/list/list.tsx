@@ -52,12 +52,12 @@ import { type User } from "@supabase/supabase-js";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 type changes = {
   from: { name: string; amount: string; total: string };
@@ -211,7 +211,10 @@ export default function List({ list }: { list: User }) {
       }
     }
 
-    const sortedByMonth: { total: number; date: string }[] = [];
+    const sortedByMonth: {
+      total: number;
+      date: string;
+    }[] = [];
     groupedByMonth.forEach((monthData, i) => {
       if (new Date(monthData.date).getMonth() <= month) {
         sortedByMonth[i] = {
@@ -287,24 +290,32 @@ export default function List({ list }: { list: User }) {
                 </div>
                 <div className="text-2xl sm:text-4xl font-anton flex flex-row items-center truncate -ml-1 sm:-ml-2">
                   <TbCurrencyPeso className="shrink-0" />
-                  <p className="truncate">{UsePhpPeso(total)}</p>
-                  <TooltipProvider delayDuration={250}>
-                    <Tooltip>
-                      <TooltipTrigger
-                        className={`text-sm mb-auto mt-0 font-bold ${
-                          getDiffFromYesterday().isZero
-                            ? "text-muted-foreground"
-                            : getDiffFromYesterday().isUp
-                            ? "text-green-500"
-                            : "text-destructive"
-                        }`}
-                      >
-                        {getDiffFromYesterday().text}
-                      </TooltipTrigger>
-                      <TooltipContent align="center" side="bottom">
+                  <p className="truncate">
+                    {listState.hideAmounts
+                      ? AsteriskNumber(total)
+                      : UsePhpPeso(total)}
+                  </p>
+                  <HoverCard openDelay={150}>
+                    <HoverCardTrigger
+                      className={`ml-1 text-sm mb-auto mt-0 font-bold hover:cursor-pointer ${
+                        getDiffFromYesterday().isZero
+                          ? "text-muted-foreground"
+                          : getDiffFromYesterday().isUp
+                          ? "text-green-500"
+                          : "text-destructive"
+                      }`}
+                    >
+                      {getDiffFromYesterday().text}
+                    </HoverCardTrigger>
+                    <HoverCardContent
+                      align="center"
+                      side="bottom"
+                      className="text-wrap"
+                    >
+                      <p className="text-sm">
                         Difference from yesterday&apos;s total is{" "}
                         <span
-                          className={`text-sm mb-auto mt-0 font-bold ${
+                          className={`${
                             getDiffFromYesterday().isZero
                               ? "text-muted-foreground"
                               : getDiffFromYesterday().isUp
@@ -312,12 +323,11 @@ export default function List({ list }: { list: User }) {
                               : "text-destructive"
                           }`}
                         >
-                          {" "}
                           {getDiffFromYesterday().text}
                         </span>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                      </p>
+                    </HoverCardContent>
+                  </HoverCard>
                 </div>
               </div>
               <Drawer
