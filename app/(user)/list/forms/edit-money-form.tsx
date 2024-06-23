@@ -35,7 +35,7 @@ export default function EditMoneyForm({
   currentTotal,
 }: {
   close: () => void;
-  money: Omit<Database["public"]["Tables"]["moneys"]["Row"], "user">;
+  money: Omit<Database["public"]["Tables"]["moneys"]["Row"], "list">;
   currentTotal: string;
 }) {
   const form = useForm<z.infer<typeof moneySchema>>({

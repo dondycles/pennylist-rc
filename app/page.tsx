@@ -8,14 +8,14 @@ export default async function Home() {
   const supabase = createClient();
 
   const {
-    data: { user },
+    data: { user: list },
   } = await supabase.auth.getUser();
 
-  if (user) {
+  if (list) {
     return redirect("/list");
   }
 
-  if (!user)
+  if (!list)
     return (
       <div className="w-full pt-32 space-y-32 screen-x-padding">
         <div className="flex flex-col items-center justify-center w-full gap-4 text-center max-w-[800px] mx-auto">

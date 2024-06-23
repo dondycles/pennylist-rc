@@ -15,7 +15,7 @@ export default function TotalBreakdownPieChart({
   open,
   toggleOpen,
 }: {
-  moneys: Omit<Database["public"]["Tables"]["moneys"]["Row"], "user">[];
+  moneys: Omit<Database["public"]["Tables"]["moneys"]["Row"], "list">[];
   open: boolean;
   toggleOpen: () => void;
 }) {

@@ -6,11 +6,11 @@ export default async function ListPage() {
   const supabase = createClient();
 
   const {
-    data: { user },
+    data: { user: list },
   } = await supabase.auth.getUser();
 
-  if (!user) {
+  if (!list) {
     return redirect("/login");
   }
-  return <List user={user} />;
+  return <List list={list} />;
 }

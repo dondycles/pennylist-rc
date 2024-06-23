@@ -31,7 +31,7 @@ export default function Money({
   hideAmounts,
   currentTotal,
 }: {
-  money: Omit<Database["public"]["Tables"]["moneys"]["Row"], "user">;
+  money: Omit<Database["public"]["Tables"]["moneys"]["Row"], "list">;
   done: () => void;
   edit: () => void;
   hideAmounts: boolean;

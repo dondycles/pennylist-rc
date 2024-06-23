@@ -2,7 +2,7 @@
 
 import Nav from "./nav";
 
-export default function UserLayout({
+export default function ListLayout({
   children,
 }: {
   children: React.ReactNode;

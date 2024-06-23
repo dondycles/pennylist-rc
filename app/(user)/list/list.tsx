@@ -56,14 +56,14 @@ type changes = {
   from: { name: string; amount: string; total: string };
   to: { name: string; amount: string; total: string };
 };
-export default function List({ user }: { user: User }) {
+export default function List({ list }: { list: User }) {
   var _ = require("lodash");
   const listState = useListState();
 
   const [showAddMoneyForm, setShowAddMoneyForm] = useState(false);
   const [showEditMoneyForm, setEditMoneyForm] = useState<{
     open: boolean;
-    money: Omit<Database["public"]["Tables"]["moneys"]["Row"], "user"> | null;
+    money: Omit<Database["public"]["Tables"]["moneys"]["Row"], "list"> | null;
   }>({
     open: false,
     money: null,
@@ -75,7 +75,7 @@ export default function List({ user }: { user: User }) {
     isLoading,
     refetch: refetchMoneys,
   } = useQuery({
-    queryKey: ["moneys", listState.sort, user.id],
+    queryKey: ["moneys", listState.sort, list.id],
     queryFn: async () => await getMoneys(listState.sort),
   });
   const total = _.sum(moneys?.data?.map((money) => money.amount));
@@ -86,7 +86,7 @@ export default function List({ user }: { user: User }) {
     isLoading: logsLoading,
     refetch: refetchLogs,
   } = useQuery({
-    queryKey: ["logs", user.id],
+    queryKey: ["logs", list.id],
     queryFn: async () => await getLogs(),
   });
 

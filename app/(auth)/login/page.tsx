@@ -10,10 +10,10 @@ export default async function Login() {
   const supabase = createClient();
 
   const {
-    data: { user },
+    data: { user: list },
   } = await supabase.auth.getUser();
 
-  if (user) {
+  if (list) {
     return redirect("/list");
   }
 

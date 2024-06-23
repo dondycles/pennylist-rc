@@ -45,8 +45,8 @@ export async function addMoney(
 }
 
 export async function editMoney(
-  updatedMoney: Omit<money, "user">,
-  lastMoney: Omit<money, "user">,
+  updatedMoney: Omit<money, "list">,
+  lastMoney: Omit<money, "list">,
   currentTotal: string,
   reason: string
 ) {
