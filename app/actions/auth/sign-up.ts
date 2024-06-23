@@ -1,6 +1,6 @@
 "use server";
 import { signUpSchema } from "@/app/(auth)/signup/form";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 export const signup = async (data: z.infer<typeof signUpSchema>) => {

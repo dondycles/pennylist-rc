@@ -208,8 +208,17 @@ export default function List({ list }: { list: User }) {
     return sortedByMonth.sort((a, b) => a.order - b.order);
   };
 
-  const dailyTotal = getDailyTotal();
-  const monthlyTotal = getMonthlyTotal();
+  const { data: dailyTotal } = useQuery({
+    queryKey: ["dailytotal", list.id],
+    queryFn: () => getDailyTotal(),
+    enabled: list ? true : false && logs?.data,
+  });
+
+  const { data: monthlyTotal } = useQuery({
+    queryKey: ["monthlytotal", list.id],
+    queryFn: () => getMonthlyTotal(),
+    enabled: list ? true : false && logs?.data,
+  });
 
   if (moneys?.error || moneysError || logsError || logs?.error)
     return (
@@ -404,19 +413,23 @@ export default function List({ list }: { list: User }) {
                 />
               ) : null}
               {/* bars */}
-              <DailyTotalBarChart
-                open={listState.showDailyTotal}
-                toggleOpen={() => listState.setShowDailyTotal()}
-                dailyTotal={dailyTotal.slice(
-                  dailyTotal.length - listState.dailyTotalDays,
-                  dailyTotal.length
-                )}
-              />
-              <MonthlyTotalBarChart
-                open={listState.showMonthlyTotal}
-                toggleOpen={() => listState.setShowMonthlyTotal()}
-                monthlyTotal={monthlyTotal}
-              />
+              {dailyTotal ? (
+                <DailyTotalBarChart
+                  open={listState.showDailyTotal}
+                  toggleOpen={() => listState.setShowDailyTotal()}
+                  dailyTotal={dailyTotal.slice(
+                    dailyTotal.length - listState.dailyTotalDays,
+                    dailyTotal.length
+                  )}
+                />
+              ) : null}
+              {monthlyTotal ? (
+                <MonthlyTotalBarChart
+                  open={listState.showMonthlyTotal}
+                  toggleOpen={() => listState.setShowMonthlyTotal()}
+                  monthlyTotal={monthlyTotal}
+                />
+              ) : null}
             </>
           ) : null}
         </div>

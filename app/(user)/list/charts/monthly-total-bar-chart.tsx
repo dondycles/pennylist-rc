@@ -22,7 +22,6 @@ import {
   ResponsiveContainer,
   Tooltip,
   XAxis,
-  YAxis,
 } from "recharts";
 
 export default function MonthlyTotalBarChart({
@@ -116,13 +115,13 @@ export default function MonthlyTotalBarChart({
                       : toMonthWord(Number(value.split("-")[0]))
                   }
                 />
-                <YAxis
+                {/* <YAxis
                   stroke="hsl(var(--muted-foreground))"
                   fontSize={10}
                   tickLine={false}
                   tickFormatter={(value) => UsePhpPesoWSign(value, 0)}
                   axisLine={false}
-                />
+                /> */}
                 <Tooltip content={CustomTooltipMonthlyTotal} />
                 <Brush
                   dataKey="total"

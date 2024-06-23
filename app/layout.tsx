@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Raleway, Anton, Readex_Pro } from "next/font/google";
+import { Raleway, Readex_Pro } from "next/font/google";
 import "./globals.css";
 import QueryProvider from "@/components/query-provider";
 import { UseDefaultURL } from "@/lib/utils";

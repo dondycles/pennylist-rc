@@ -1,6 +1,6 @@
 "use server";
 import { Database } from "@/database.types";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import { log } from "./logs";
 
 type money = Database["public"]["Tables"]["moneys"]["Row"];

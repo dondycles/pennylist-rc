@@ -21,7 +21,6 @@ import {
   Cell,
   ResponsiveContainer,
   XAxis,
-  YAxis,
   Tooltip,
 } from "recharts";
 
@@ -140,13 +139,13 @@ export default function DailyTotalBarChart({
                       : new Date(value).getDate().toString()
                   }
                 />
-                <YAxis
+                {/* <YAxis
                   stroke="hsl(var(--muted-foreground))"
                   fontSize={10}
                   tickLine={false}
                   tickFormatter={(value) => UsePhpPesoWSign(value, 0)}
                   axisLine={false}
-                />
+                /> */}
                 <Tooltip content={CustomTooltipDailyTotal} />
                 <Brush
                   dataKey="total"
