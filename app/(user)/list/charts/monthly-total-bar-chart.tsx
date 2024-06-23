@@ -1,10 +1,18 @@
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { UsePhpPesoWSign, toMonthWord } from "@/lib/utils";
+import { useListState } from "@/store";
 import { ChevronDown } from "lucide-react";
 import {
   Bar,
@@ -29,6 +37,8 @@ export default function MonthlyTotalBarChart({
   open: boolean;
   toggleOpen: () => void;
 }) {
+  const listState = useListState();
+
   const CustomTooltipMonthlyTotal = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       return (
@@ -49,16 +59,47 @@ export default function MonthlyTotalBarChart({
   return (
     <Collapsible onOpenChange={toggleOpen} open={open}>
       <Card className="overflow-x-hidden rounded-lg shadow-none">
-        <CollapsibleTrigger>
-          <CardHeader className="px-2 py-3">
-            <CardTitle className="flex items-center gap-1">
-              <p>Monthly Total</p>
-              <ChevronDown
-                className={`size-4 ${open && "rotate-180"} transition-all`}
-              />
-            </CardTitle>
-          </CardHeader>
-        </CollapsibleTrigger>
+        <CardHeader className="px-2 py-2">
+          <div className="flex items-start">
+            <CollapsibleTrigger className="w-full">
+              <div className="flex  flex-row justify-between items-center">
+                <CardTitle className="flex items-center gap-1 py-1">
+                  <p>Monthly Total</p>
+                  <ChevronDown
+                    className={`size-4 ${open && "rotate-180"} transition-all`}
+                  />
+                </CardTitle>
+              </div>
+            </CollapsibleTrigger>
+            {open && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant={"outline"}>
+                    by {listState.monthlyTotalBy} record
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuCheckboxItem
+                    checked={listState.monthlyTotalBy === "last"}
+                    onClick={() => {
+                      listState.setMonthlyTotalBy("last");
+                    }}
+                  >
+                    last record
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    checked={listState.monthlyTotalBy === "avg"}
+                    onClick={() => {
+                      listState.setMonthlyTotalBy("avg");
+                    }}
+                  >
+                    average
+                  </DropdownMenuCheckboxItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
+        </CardHeader>
         <CollapsibleContent>
           <CardContent className="p-2 max-h-[300px] h-screen w-full">
             <ResponsiveContainer width="100%" height="100%">

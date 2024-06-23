@@ -99,6 +99,7 @@ export default function List({ list }: { list: User }) {
 
     logs?.data?.toReversed().forEach((log) => {
       const date = new Date(log.created_at).toDateString();
+
       const total = Number((log.changes as changes).to.total);
 
       // sets the log's date as the key, and overwrites its total to most recent reocrd if there are many records in that date
@@ -125,28 +126,85 @@ export default function List({ list }: { list: User }) {
       // sets the date to the next day
       currentDate.setDate(currentDate.getDate() + 1);
     }
-
     return eachDayTotal;
   };
 
   const getMonthlyTotal = () => {
     if (logsLoading) return [];
     const year = new Date().getFullYear();
+    const month = new Date().getMonth();
     const groupedByMonth: { total: number; date: string }[] = [];
 
-    for (let i = 0; i < 12; i++) {
-      const thisMonthsTotal = getDailyTotal(365).findLast(
-        (day) =>
-          new Date(day.date).getMonth() === i &&
-          new Date(day.date).getFullYear() === year
-      );
+    const dailyTotal = getDailyTotal(365);
+    if (listState.monthlyTotalBy === "last") {
+      // iterated by the number of months
+      for (let i = 0; i < 12; i++) {
+        // get the last data of the month
+        const monthsTotal = dailyTotal.findLast(
+          (day) =>
+            new Date(day.date).getMonth() === i &&
+            (new Date(day.date).getFullYear() === year ||
+              new Date(day.date).getFullYear() === year - 1)
+        );
 
-      groupedByMonth[i] = {
-        total: thisMonthsTotal?.total ?? 0,
-        date: `${i}-${year}`,
-      };
+        groupedByMonth[i] = {
+          total: monthsTotal?.total ?? 0,
+          date: monthsTotal?.date ?? "",
+        };
+      }
     }
-    return groupedByMonth;
+
+    if (listState.monthlyTotalBy === "avg") {
+      let average = [0];
+      // iterated by the number of months
+      for (let i = 0; i < 12; i++) {
+        // get the last data of the month
+        let monthsTotal:
+          | {
+              date: string;
+              total: number;
+            }
+          | undefined;
+        dailyTotal.map((day) => {
+          if (new Date(day.date).getMonth() !== i) return;
+          if (new Date(day.date).getDate() === 1) {
+            average = [0];
+          }
+          average.push(day.total);
+          if (
+            new Date(day.date).getMonth() === i &&
+            (new Date(day.date).getFullYear() === year ||
+              new Date(day.date).getFullYear() === year - 1)
+          )
+            monthsTotal = day;
+        });
+
+        groupedByMonth[i] = {
+          total: _.mean(average.filter((avg) => avg !== 0)) ?? 0,
+          date: monthsTotal?.date ?? "",
+        };
+        console.log(i, average);
+      }
+    }
+
+    const sortedByMonth: { total: number; date: string; order: number }[] = [];
+
+    groupedByMonth.forEach((monthData, i) => {
+      if (new Date(monthData.date).getMonth() <= month) {
+        sortedByMonth[i] = {
+          total: monthData.total,
+          date: `${i}-${year}`,
+          order: i + month - 1,
+        };
+      } else {
+        sortedByMonth[i] = {
+          total: monthData.total,
+          date: `${i}-${year - 1}`,
+          order: i - month - 1,
+        };
+      }
+    });
+    return sortedByMonth.sort((a, b) => a.order - b.order);
   };
 
   const dailyTotal = getDailyTotal();

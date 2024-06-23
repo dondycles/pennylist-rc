@@ -15,6 +15,8 @@ type listPage = {
   showBreakdown: boolean;
   showDailyTotal: boolean;
   showMonthlyTotal: boolean;
+  monthlyTotalBy: "last" | "avg";
+  setMonthlyTotalBy: (by: "last" | "avg") => void;
   setShowLogs: () => void;
   setShowBreakdown: () => void;
   setShowDailyTotal: () => void;
@@ -37,6 +39,8 @@ export const useListState = create<listPage>()(
       showDailyTotal: true,
       showLogs: true,
       showMonthlyTotal: true,
+      monthlyTotalBy: "last",
+      setMonthlyTotalBy: (by) => set(() => ({ monthlyTotalBy: by })),
       setShowLogs: () => set({ showLogs: !get().showLogs }),
       setShowBreakdown: () => set({ showBreakdown: !get().showBreakdown }),
       setShowDailyTotal: () => set({ showDailyTotal: !get().showDailyTotal }),
