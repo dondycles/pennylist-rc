@@ -454,13 +454,7 @@ export default function List({ list }: { list: User }) {
           )}
 
           <Separator />
-          <div>
-            <Card className="rounded-lg">
-              <CardHeader className="py-3 px-2">
-                <CardTitle>Comparison</CardTitle>
-              </CardHeader>
-            </Card>
-          </div>
+
           {logs?.data?.length ? (
             <>
               {/* tables */}
