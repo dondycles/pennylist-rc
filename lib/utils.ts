@@ -36,7 +36,8 @@ export const AsteriskNumber = (number: number) => {
   return asteriskString;
 };
 
-export const toMonthWord = (month: number): string => {
+export const toMonthWord = (date: string): string => {
+  const month = new Date(date).getMonth();
   const monthNames = [
     "Jan",
     "Feb",

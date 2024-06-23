@@ -133,9 +133,7 @@ export default function DailyTotalBarChart({
                     new Date(value).toDateString() === new Date().toDateString()
                       ? "Today"
                       : new Date(value).getDate() === 1
-                      ? `${toMonthWord(new Date(value).getMonth())} ${new Date(
-                          value
-                        ).getFullYear()}`
+                      ? `${toMonthWord(value)} ${new Date(value).getFullYear()}`
                       : new Date(value).getDate().toString()
                   }
                 />

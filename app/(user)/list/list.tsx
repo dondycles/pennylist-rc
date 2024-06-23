@@ -51,6 +51,13 @@ import { type Database } from "@/database.types";
 import { type User } from "@supabase/supabase-js";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type changes = {
   from: { name: string; amount: string; total: string };
@@ -59,7 +66,7 @@ type changes = {
 export default function List({ list }: { list: User }) {
   var _ = require("lodash");
   const listState = useListState();
-
+  const { isLastDayOfMonth } = require("date-fns");
   const [showAddMoneyForm, setShowAddMoneyForm] = useState(false);
   const [showEditMoneyForm, setEditMoneyForm] = useState<{
     open: boolean;
@@ -72,13 +79,14 @@ export default function List({ list }: { list: User }) {
   const {
     data: moneys,
     error: moneysError,
-    isLoading,
+    isLoading: moneysLoading,
     refetch: refetchMoneys,
   } = useQuery({
     queryKey: ["moneys", listState.sort, list.id],
     queryFn: async () => await getMoneys(listState.sort),
     enabled: list ? true : false,
   });
+
   const total = _.sum(moneys?.data?.map((money) => money.amount));
 
   const {
@@ -92,13 +100,12 @@ export default function List({ list }: { list: User }) {
     enabled: list ? true : false,
   });
 
-  const getDailyTotal = (days: number = 365) => {
+  const getDailyTotal = () => {
     if (logsLoading) return [];
-
     const groupedByDate: {
       [key: string]: number;
     } = {};
-
+    const days: number = 365;
     logs?.data?.toReversed().forEach((log) => {
       const date = new Date(log.created_at).toDateString();
 
@@ -118,7 +125,9 @@ export default function List({ list }: { list: User }) {
     for (let i = 0; i <= days; i++) {
       const day = currentDate.toDateString();
 
-      if (groupedByDate[day] !== undefined) {
+      if (i === days) {
+        lastTotal = total;
+      } else if (groupedByDate[day] !== undefined) {
         // if this date has total, set it to lastTotal so the next dates that does not have total will get that total as well to fill up the bars
         lastTotal = groupedByDate[day];
       }
@@ -137,88 +146,102 @@ export default function List({ list }: { list: User }) {
     const month = new Date().getMonth();
     const groupedByMonth: { total: number; date: string }[] = [];
 
-    const dailyTotal = getDailyTotal(365);
     if (listState.monthlyTotalBy === "last") {
       // iterated by the number of months
+
+      // starts at +1 of the current month of last year
+      let month = new Date().getMonth() + 1;
       for (let i = 0; i < 12; i++) {
+        // if its the last month back to first month of the current year
+        if (month === 12) month = 0;
         // get the last data of the month
-        const monthsTotal = dailyTotal.findLast(
+        const monthsTotal = dailyTotal?.findLast(
           (day) =>
-            new Date(day.date).getMonth() === i &&
+            // gets data equal to month and year or last year at least
+            new Date(day.date).getMonth() === month &&
             (new Date(day.date).getFullYear() === year ||
               new Date(day.date).getFullYear() === year - 1)
         );
 
+        // inserts the data to an object i or no. of month as the key
         groupedByMonth[i] = {
-          total: monthsTotal?.total ?? 0,
-          date: monthsTotal?.date ?? "",
+          // if the i is equal to current month, gets the current total instead for more accuracy
+          total: i === month ? total : monthsTotal?.total!,
+          date: monthsTotal?.date!,
         };
+
+        month += 1;
       }
     }
 
     if (listState.monthlyTotalBy === "avg") {
       let average = [0];
+      // starts at +1 of the current month of last year
+      let month = new Date().getMonth() + 1;
       // iterated by the number of months
       for (let i = 0; i < 12; i++) {
-        // get the last data of the month
-        let monthsTotal:
-          | {
-              date: string;
-              total: number;
-            }
-          | undefined;
-        dailyTotal.map((day) => {
-          if (new Date(day.date).getMonth() !== i) return;
-          if (new Date(day.date).getDate() === 1) {
-            average = [0];
-          }
-          average.push(day.total);
-          if (
-            new Date(day.date).getMonth() === i &&
-            (new Date(day.date).getFullYear() === year ||
-              new Date(day.date).getFullYear() === year - 1)
-          )
-            monthsTotal = day;
-        });
+        // if its the last month back to first month of the current year
+        if (month === 12) month = 0;
+        // gets the last Date
+        let lastDay: string;
 
+        dailyTotal
+          .filter(
+            (day) =>
+              new Date(day.date).getMonth() === month &&
+              (new Date(day.date).getFullYear() === year ||
+                new Date(day.date).getFullYear() === year - 1)
+          )
+          .map((day) => {
+            if (new Date(day.date).getDate() === 1) average = [0];
+            // pushes each day total but resets if its the first day
+            average.push(day.total);
+
+            // if it is last day, sets the lastDay
+            if (isLastDayOfMonth(new Date(day.date))) lastDay = day.date;
+          });
+        // sets the data for (i)month
         groupedByMonth[i] = {
-          total: _.mean(average.filter((avg) => avg !== 0)) ?? 0,
-          date: monthsTotal?.date ?? "",
+          total: !isNaN(_.mean(average.filter((avg) => avg !== 0)))
+            ? _.mean(average.filter((avg) => avg !== 0))
+            : 0,
+          date: lastDay!,
         };
+        month += 1;
       }
     }
 
-    const sortedByMonth: { total: number; date: string; order: number }[] = [];
-
+    const sortedByMonth: { total: number; date: string }[] = [];
     groupedByMonth.forEach((monthData, i) => {
       if (new Date(monthData.date).getMonth() <= month) {
         sortedByMonth[i] = {
-          total: monthData.total,
-          date: `${i}-${year}`,
-          order: i + month - 1,
+          total: monthData.total ?? 0,
+          date: new Date(monthData.date).toDateString(),
         };
       } else {
         sortedByMonth[i] = {
-          total: monthData.total,
-          date: `${i}-${year - 1}`,
-          order: i - month - 1,
+          total: monthData.total ?? 0,
+          date: new Date(monthData.date).toDateString(),
         };
       }
     });
-    return sortedByMonth.sort((a, b) => a.order - b.order);
+    return sortedByMonth;
   };
 
-  const { data: dailyTotal } = useQuery({
-    queryKey: ["dailytotal", list.id],
-    queryFn: () => getDailyTotal(),
-    enabled: list ? true : false && logs?.data,
-  });
+  const getDiffFromYesterday = () => {
+    const result = (
+      ((total - dailyTotal[dailyTotal.length - 1].total) / total) *
+      100
+    ).toFixed(1);
+    return {
+      text: `${result}%`,
+      isUp: Boolean(Number(result) > 0),
+      isZero: Boolean(Number(result) === 0),
+    };
+  };
 
-  const { data: monthlyTotal } = useQuery({
-    queryKey: ["monthlytotal", list.id],
-    queryFn: () => getMonthlyTotal(),
-    enabled: list ? true : false && logs?.data,
-  });
+  const dailyTotal = getDailyTotal();
+  const monthlyTotal = getMonthlyTotal();
 
   if (moneys?.error || moneysError || logsError || logs?.error)
     return (
@@ -231,7 +254,8 @@ export default function List({ list }: { list: User }) {
         </div>
       </main>
     );
-  if (isLoading || logsLoading)
+
+  if (moneysLoading || logsLoading)
     return (
       <main className="w-full h-full">
         <div className=" max-w-[800px] mx-auto px-2 flex flex-col justify-start gap-2 mb-[5.5rem]">
@@ -261,13 +285,39 @@ export default function List({ list }: { list: User }) {
                     )}
                   </button>
                 </div>
-                <div className="text-2xl sm:text-4xl font-anton flex flex-row items-center truncate">
+                <div className="text-2xl sm:text-4xl font-anton flex flex-row items-center truncate -ml-1 sm:-ml-2">
                   <TbCurrencyPeso className="shrink-0" />
-                  <p className="truncate">
-                    {listState.hideAmounts
-                      ? AsteriskNumber(total)
-                      : UsePhpPeso(total)}
-                  </p>
+                  <p className="truncate">{UsePhpPeso(total)}</p>
+                  <TooltipProvider delayDuration={250}>
+                    <Tooltip>
+                      <TooltipTrigger
+                        className={`text-sm mb-auto mt-0 font-bold ${
+                          getDiffFromYesterday().isZero
+                            ? "text-muted-foreground"
+                            : getDiffFromYesterday().isUp
+                            ? "text-green-500"
+                            : "text-destructive"
+                        }`}
+                      >
+                        {getDiffFromYesterday().text}
+                      </TooltipTrigger>
+                      <TooltipContent align="center" side="bottom">
+                        Difference from yesterday&apos;s total is{" "}
+                        <span
+                          className={`text-sm mb-auto mt-0 font-bold ${
+                            getDiffFromYesterday().isZero
+                              ? "text-muted-foreground"
+                              : getDiffFromYesterday().isUp
+                              ? "text-green-500"
+                              : "text-destructive"
+                          }`}
+                        >
+                          {" "}
+                          {getDiffFromYesterday().text}
+                        </span>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               </div>
               <Drawer
@@ -394,6 +444,13 @@ export default function List({ list }: { list: User }) {
           )}
 
           <Separator />
+          <div>
+            <Card className="rounded-lg">
+              <CardHeader className="py-3 px-2">
+                <CardTitle>Comparison</CardTitle>
+              </CardHeader>
+            </Card>
+          </div>
           {logs?.data?.length ? (
             <>
               {/* tables */}

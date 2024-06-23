@@ -43,10 +43,8 @@ export default function MonthlyTotalBarChart({
       return (
         <div className="rounded-lg  p-2  text-sm backdrop-blur bg-foreground/75 text-background">
           <p>
-            {toMonthWord(
-              Number((payload[0].payload.date as string).split("-")[0])
-            )}{" "}
-            {(payload[0].payload.date as string).split("-")[1]}
+            {toMonthWord(payload[0].payload.date as string)}{" "}
+            {new Date(payload[0].payload.date).getFullYear()}
           </p>
           <p>{UsePhpPesoWSign(payload[0]?.value)}</p>
         </div>
@@ -110,9 +108,9 @@ export default function MonthlyTotalBarChart({
                   axisLine={false}
                   dataKey="date"
                   tickFormatter={(value: string) =>
-                    Number(value.split("-")[0]) === new Date().getMonth()
+                    Number(new Date(value).getMonth()) === new Date().getMonth()
                       ? "This month"
-                      : toMonthWord(Number(value.split("-")[0]))
+                      : toMonthWord(value)
                   }
                 />
                 {/* <YAxis
