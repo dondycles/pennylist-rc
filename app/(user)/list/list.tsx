@@ -77,6 +77,7 @@ export default function List({ list }: { list: User }) {
   } = useQuery({
     queryKey: ["moneys", listState.sort, list.id],
     queryFn: async () => await getMoneys(listState.sort),
+    enabled: list ? true : false,
   });
   const total = _.sum(moneys?.data?.map((money) => money.amount));
 
@@ -88,6 +89,7 @@ export default function List({ list }: { list: User }) {
   } = useQuery({
     queryKey: ["logs", list.id],
     queryFn: async () => await getLogs(),
+    enabled: list ? true : false,
   });
 
   const getDailyTotal = (days: number = 365) => {
@@ -183,7 +185,6 @@ export default function List({ list }: { list: User }) {
           total: _.mean(average.filter((avg) => avg !== 0)) ?? 0,
           date: monthsTotal?.date ?? "",
         };
-        console.log(i, average);
       }
     }
 
