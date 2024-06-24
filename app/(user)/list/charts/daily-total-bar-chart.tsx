@@ -28,6 +28,7 @@ export default function DailyTotalBarChart({
   dailyTotal,
   open,
   toggleOpen,
+  differences,
 }: {
   dailyTotal: {
     date: string;
@@ -35,6 +36,32 @@ export default function DailyTotalBarChart({
   }[];
   open: boolean;
   toggleOpen: () => void;
+  differences: {
+    text: {
+      yesterday: string;
+      week: string;
+      twoWeek: string;
+      threeWeek: string;
+      fourWeek: string;
+      threeSixFive: string;
+    };
+    isUp: {
+      yesterday: boolean;
+      week: boolean;
+      twoWeek: boolean;
+      threeWeek: boolean;
+      fourWeek: boolean;
+      threeSixFive: boolean;
+    };
+    isZero: {
+      yesterday: boolean;
+      week: boolean;
+      twoWeek: boolean;
+      threeWeek: boolean;
+      fourWeek: boolean;
+      threeSixFive: boolean;
+    };
+  };
 }) {
   const listState = useListState();
   const CustomTooltipDailyTotal = ({ active, payload }: any) => {
@@ -120,8 +147,32 @@ export default function DailyTotalBarChart({
         </CardHeader>
 
         <CollapsibleContent>
-          <CardContent className="p-2 max-h-[300px] h-screen w-full">
-            <ResponsiveContainer width="100%" height="100%">
+          <CardContent className="p-2 h-fit w-full">
+            <p className="text-sm">
+              {listState.dailyTotalDays === 7 &&
+                `${differences.text.week}${
+                  differences.isUp.week ? " up" : " down" || "equal"
+                }`}{" "}
+              {listState.dailyTotalDays === 14 &&
+                `${differences.text.twoWeek}${
+                  differences.isUp.twoWeek ? " up" : " down" || "equal"
+                }`}{" "}
+              {listState.dailyTotalDays === 21 &&
+                `${differences.text.threeWeek}${
+                  differences.isUp.threeWeek ? " up" : " down" || "equal"
+                }`}{" "}
+              {listState.dailyTotalDays === 28 &&
+                `${differences.text.fourWeek}${
+                  differences.isUp.fourWeek ? " up" : " down" || "equal"
+                }`}{" "}
+              {listState.dailyTotalDays === 365 &&
+                `${differences.text.threeSixFive}${
+                  differences.isUp.threeSixFive ? " up" : " down" || "equal"
+                }`}{" "}
+              from past {listState.dailyTotalDays} days
+            </p>
+
+            <ResponsiveContainer width="100%" height={365}>
               <BarChart data={dailyTotal} className="h-12">
                 <XAxis
                   stroke="hsl(var(--muted-foreground))"

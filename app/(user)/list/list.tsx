@@ -54,23 +54,19 @@ import { type Database } from "@/database.types";
 import { type User } from "@supabase/supabase-js";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 
 import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type changes = {
   from: { name: string; amount: string; total: string };
   to: { name: string; amount: string; total: string };
 };
+
 export default function List({ list }: { list: User }) {
   var _ = require("lodash");
   const listState = useListState();
@@ -240,83 +236,93 @@ export default function List({ list }: { list: User }) {
   };
 
   const getDifferences = () => {
-    const pastweek = dailyTotal
-      .toReversed()
-      .splice(7, 7)
-      .map((data) => data.total);
-    const pastTwoWeek = dailyTotal
-      .toReversed()
-      .splice(14, 14)
-      .map((data) => data.total);
-    const pastThreeWeek = dailyTotal
-      .toReversed()
-      .splice(21, 21)
-      .map((data) => data.total);
-    const pastFourWeek = dailyTotal
-      .toReversed()
-      .splice(28, 28)
-      .map((data) => data.total);
+    // Reverse the dailyTotal array once
+    const reversedDailyTotal = dailyTotal.toReversed();
 
-    const currentweek = dailyTotal
-      .toReversed()
-      .splice(0, 7)
-      .map((data) => data.total);
-    const currentTwoWeek = dailyTotal
-      .toReversed()
-      .splice(0, 14)
-      .map((data) => data.total);
-    const currentThreeWeek = dailyTotal
-      .toReversed()
-      .splice(0, 21)
-      .map((data) => data.total);
-    const currentFourWeek = dailyTotal
-      .toReversed()
-      .splice(0, 28)
-      .map((data) => data.total);
+    // Helper function to calculate the sum of totals over a given range
+    const calculateSum = (
+      data: typeof reversedDailyTotal,
+      start: number,
+      end: number
+    ) => {
+      return data
+        .slice(start, end)
+        .reduce((sum, entry) => sum + entry.total, 0);
+    };
 
-    const yesterday = (
-      ((total - dailyTotal?.toReversed()[1]?.total) / total) *
-      100
-    ).toFixed(1);
-    const week = (
-      ((_.sum(currentweek) - _.sum(pastweek)) / _.sum(currentweek)) *
-      100
-    ).toFixed(1);
-    const twoWeek = (
-      ((_.sum(currentTwoWeek) - _.sum(pastTwoWeek)) / _.sum(currentTwoWeek)) *
-      100
-    ).toFixed(1);
-    const threeWeek = (
-      ((_.sum(currentThreeWeek) - _.sum(pastThreeWeek)) /
-        _.sum(currentThreeWeek)) *
-      100
-    ).toFixed(1);
-    const fourWeek = (
-      ((_.sum(currentFourWeek) - _.sum(pastFourWeek)) /
-        _.sum(currentFourWeek)) *
-      100
-    ).toFixed(1);
+    // Calculate sums for each week range
+    const sumCurrentWeek = calculateSum(reversedDailyTotal, 0, 7);
+    const sumCurrentTwoWeek = calculateSum(reversedDailyTotal, 0, 14);
+    const sumCurrentThreeWeek = calculateSum(reversedDailyTotal, 0, 21);
+    const sumCurrentFourWeek = calculateSum(reversedDailyTotal, 0, 28);
+    const sumCurrent365 = calculateSum(reversedDailyTotal, 0, 365);
+    const sumPastWeek = calculateSum(reversedDailyTotal, 7, 7);
+    const sumPastTwoWeek = calculateSum(reversedDailyTotal, 14, 14);
+    const sumPastThreeWeek = calculateSum(reversedDailyTotal, 21, 21);
+    const sumPastFourWeek = calculateSum(reversedDailyTotal, 28, 28);
+    const sumPast365 = calculateSum(reversedDailyTotal, 365, 365);
+
+    // Calculate percentage differences
+    const calculatePercentageDifference = (current: number, past: number) => {
+      return (((current - past) / current) * 100).toFixed(1);
+    };
+
+    const yesterday = calculatePercentageDifference(
+      total,
+      reversedDailyTotal[1]?.total
+    );
+    const week = calculatePercentageDifference(sumCurrentWeek, sumPastWeek);
+    const twoWeek = calculatePercentageDifference(
+      sumCurrentTwoWeek,
+      sumPastTwoWeek
+    );
+    const threeWeek = calculatePercentageDifference(
+      sumCurrentThreeWeek,
+      sumPastThreeWeek
+    );
+    const fourWeek = calculatePercentageDifference(
+      sumCurrentFourWeek,
+      sumPastFourWeek
+    );
+
+    const threeSixFive = calculatePercentageDifference(
+      sumCurrent365,
+      sumPast365
+    );
+
+    const createDifferenceObject = (value: string) => {
+      const numValue = Number(value);
+      return {
+        text: `${value}%`,
+        isUp: numValue > 0,
+        isZero: numValue === 0,
+      };
+    };
+
     return {
       text: {
-        yesterday: `${yesterday}%`,
-        week: `${week}%`,
-        twoWeek: `${twoWeek}%`,
-        threeWeek: `${threeWeek}%`,
-        fourWeek: `${fourWeek}%`,
+        yesterday: createDifferenceObject(yesterday).text,
+        week: createDifferenceObject(week).text,
+        twoWeek: createDifferenceObject(twoWeek).text,
+        threeWeek: createDifferenceObject(threeWeek).text,
+        fourWeek: createDifferenceObject(fourWeek).text,
+        threeSixFive: createDifferenceObject(threeSixFive).text,
       },
       isUp: {
-        yesterday: Boolean(Number(yesterday) > 0),
-        week: Boolean(Number(week) > 0),
-        twoWeek: Boolean(Number(twoWeek) > 0),
-        threeWeek: Boolean(Number(threeWeek) > 0),
-        fourWeek: Boolean(Number(fourWeek) > 0),
+        yesterday: createDifferenceObject(yesterday).isUp,
+        week: createDifferenceObject(week).isUp,
+        twoWeek: createDifferenceObject(twoWeek).isUp,
+        threeWeek: createDifferenceObject(threeWeek).isUp,
+        fourWeek: createDifferenceObject(fourWeek).isUp,
+        threeSixFive: createDifferenceObject(threeSixFive).isUp,
       },
       isZero: {
-        yesterday: Boolean(Number(yesterday) === 0),
-        week: Boolean(Number(week) === 0),
-        twoWeek: Boolean(Number(twoWeek) === 0),
-        threeWeek: Boolean(Number(threeWeek) === 0),
-        fourWeek: Boolean(Number(fourWeek) === 0),
+        yesterday: createDifferenceObject(yesterday).isZero,
+        week: createDifferenceObject(week).isZero,
+        twoWeek: createDifferenceObject(twoWeek).isZero,
+        threeWeek: createDifferenceObject(threeWeek).isZero,
+        fourWeek: createDifferenceObject(fourWeek).isZero,
+        threeSixFive: createDifferenceObject(threeSixFive).isZero,
       },
     };
   };
@@ -324,7 +330,6 @@ export default function List({ list }: { list: User }) {
   const dailyTotal = getDailyTotal();
   const monthlyTotal = getMonthlyTotal();
   const differences = getDifferences();
-
   if (moneys?.error || moneysError || logsError || logs?.error)
     return (
       <main className="w-full h-full p-2 ">
@@ -374,102 +379,35 @@ export default function List({ list }: { list: User }) {
                       ? AsteriskNumber(total)
                       : UsePhpPeso(total)}
                   </p>
-                  <Popover>
-                    <PopoverTrigger
-                      className={`ml-1 text-sm mb-auto mt-0 font-bold Popoversor-pointer flex items-center ${
-                        differences.isZero.yesterday
-                          ? "text-muted-foreground"
-                          : differences.isUp.yesterday
-                          ? "text-green-500"
-                          : "text-destructive"
-                      }`}
-                    >
-                      <span>{differences.text.yesterday}</span>
-                      {differences.isZero.yesterday ? (
-                        <Equal className="size-4" />
-                      ) : differences.isUp.yesterday ? (
-                        <ArrowUp className="size-4" />
-                      ) : (
-                        <ArrowDown className="size-4" />
-                      )}
-                    </PopoverTrigger>
-                    <PopoverContent
-                      align="center"
-                      side="bottom"
-                      className="text-wrap w-fit max-w-[156px] p-2"
-                    >
-                      <p className="text-sm">
-                        Difference from yesterday&apos;s total is{" "}
-                        <span
-                          className={`font-black ${
-                            differences.isZero.yesterday
-                              ? "text-muted-foreground"
-                              : differences.isUp.yesterday
-                              ? "text-green-500"
-                              : "text-destructive"
-                          }`}
-                        >
-                          {differences.text.yesterday}
-                        </span>
-                      </p>
-                      <p className="text-sm">
-                        week:{" "}
-                        <span
-                          className={`font-black ${
-                            differences.isZero.week
-                              ? "text-muted-foreground"
-                              : differences.isUp.week
-                              ? "text-green-500"
-                              : "text-destructive"
-                          }`}
-                        >
-                          {differences.text.week}
-                        </span>
-                      </p>
-                      <p className="text-sm">
-                        two week:{" "}
-                        <span
-                          className={`font-black ${
-                            differences.isZero.twoWeek
-                              ? "text-muted-foreground"
-                              : differences.isUp.twoWeek
-                              ? "text-green-500"
-                              : "text-destructive"
-                          }`}
-                        >
-                          {differences.text.twoWeek}
-                        </span>
-                      </p>
-                      <p className="text-sm">
-                        three week:{" "}
-                        <span
-                          className={`font-black ${
-                            differences.isZero.threeWeek
-                              ? "text-muted-foreground"
-                              : differences.isUp.threeWeek
-                              ? "text-green-500"
-                              : "text-destructive"
-                          }`}
-                        >
-                          {differences.text.threeWeek}
-                        </span>
-                      </p>
-                      <p className="text-sm">
-                        four week:{" "}
-                        <span
-                          className={`font-black ${
-                            differences.isZero.fourWeek
-                              ? "text-muted-foreground"
-                              : differences.isUp.fourWeek
-                              ? "text-green-500"
-                              : "text-destructive"
-                          }`}
-                        >
-                          {differences.text.fourWeek}
-                        </span>
-                      </p>
-                    </PopoverContent>
-                  </Popover>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger
+                        className={`ml-1 text-xs mb-auto mt-0 font-bold Tooltipsor-pointer flex items-center ${
+                          differences.isZero.yesterday
+                            ? "text-muted-foreground"
+                            : differences.isUp.yesterday
+                            ? "text-green-500"
+                            : "text-destructive"
+                        }`}
+                      >
+                        <span>{differences.text.yesterday}</span>
+                        {differences.isZero.yesterday ? (
+                          <Equal className="size-3" />
+                        ) : differences.isUp.yesterday ? (
+                          <ArrowUp className="size-3" />
+                        ) : (
+                          <ArrowDown className="size-3" />
+                        )}
+                      </TooltipTrigger>
+                      <TooltipContent
+                        align="center"
+                        side="bottom"
+                        className="text-wrap w-fit max-w-[156px] p-2 text-sm"
+                      >
+                        <p>Today vs yesterday</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               </div>
               <Drawer
@@ -618,6 +556,7 @@ export default function List({ list }: { list: User }) {
               {/* bars */}
               {dailyTotal ? (
                 <DailyTotalBarChart
+                  differences={differences}
                   open={listState.showDailyTotal}
                   toggleOpen={() => listState.setShowDailyTotal()}
                   dailyTotal={dailyTotal.slice(
