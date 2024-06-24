@@ -53,6 +53,15 @@ export default function MonthlyTotalBarChart({
 
     return null;
   };
+  // const CustomTooltipMonthlyTotal = (any: any) => {
+  //   return (
+  //     <div className="rounded-lg  p-2  text-sm backdrop-blur bg-foreground/75 text-background">
+  //       {JSON.stringify(any)}
+  //     </div>
+  //   );
+
+  //   return null;
+  // };
   return (
     <Collapsible onOpenChange={toggleOpen} open={open}>
       <Card className="overflow-x-hidden rounded-lg shadow-none">

@@ -160,13 +160,25 @@ export default function List({ list }: { list: User }) {
         // if its the last month back to first month of the current year
         if (month === 12) month = 0;
         // get the last data of the month
-        const monthsTotal = dailyTotal?.findLast(
-          (day) =>
-            // gets data equal to month and year or last year at least
-            new Date(day.date).getMonth() === month &&
-            (new Date(day.date).getFullYear() === year ||
-              new Date(day.date).getFullYear() === year - 1)
-        );
+        let monthsTotal;
+
+        if (month <= new Date().getMonth()) {
+          console.log(month, "2024");
+          monthsTotal = dailyTotal?.findLast(
+            (day) =>
+              // gets data equal to month and year or last year at least
+              new Date(day.date).getMonth() === month &&
+              new Date(day.date).getFullYear() === year
+          );
+        } else {
+          console.log(month, "2023");
+          monthsTotal = dailyTotal?.findLast(
+            (day) =>
+              // gets data equal to month and year or last year at least
+              new Date(day.date).getMonth() === month &&
+              new Date(day.date).getFullYear() === year - 1
+          );
+        }
 
         // inserts the data to an object i or no. of month as the key
         groupedByMonth[i] = {
@@ -190,21 +202,38 @@ export default function List({ list }: { list: User }) {
         // gets the last Date
         let lastDay: string;
 
-        dailyTotal
-          .filter(
-            (day) =>
-              new Date(day.date).getMonth() === month &&
-              (new Date(day.date).getFullYear() === year ||
-                new Date(day.date).getFullYear() === year - 1)
-          )
-          .map((day) => {
-            if (new Date(day.date).getDate() === 1) average = [0];
-            // pushes each day total but resets if its the first day
-            average.push(day.total);
+        if (month <= new Date().getMonth()) {
+          console.log(month, "2024");
+          dailyTotal
+            .filter(
+              (day) =>
+                new Date(day.date).getMonth() === month &&
+                new Date(day.date).getFullYear() === year
+            )
+            .map((day) => {
+              if (new Date(day.date).getDate() === 1) average = [0];
+              // pushes each day total but resets if its the first day
+              average.push(day.total);
 
-            // if it is last day, sets the lastDay
-            if (isLastDayOfMonth(new Date(day.date))) lastDay = day.date;
-          });
+              lastDay = day.date;
+            });
+        } else {
+          console.log(month, "2023");
+          dailyTotal
+            .filter(
+              (day) =>
+                new Date(day.date).getMonth() === month &&
+                new Date(day.date).getFullYear() === year - 1
+            )
+            .map((day) => {
+              if (new Date(day.date).getDate() === 1) average = [0];
+              // pushes each day total but resets if its the first day
+              average.push(day.total);
+
+              lastDay = day.date;
+            });
+        }
+
         // sets the data for (i)month
         groupedByMonth[i] = {
           total: !isNaN(_.mean(average.filter((avg) => avg !== 0)))
@@ -215,7 +244,7 @@ export default function List({ list }: { list: User }) {
         month += 1;
       }
     }
-
+    console.log("dailyTotal: ", dailyTotal);
     const sortedByMonth: {
       total: number;
       date: string;
@@ -241,27 +270,26 @@ export default function List({ list }: { list: User }) {
     const reversedDailyTotal = dailyTotal.toReversed();
 
     // Helper function to calculate the sum of totals over a given range
-    const calculateSum = (
-      data: typeof reversedDailyTotal,
-      start: number,
-      end: number
-    ) => {
-      return data
-        .slice(start, end)
-        .reduce((sum, entry) => sum + entry.total, 0);
+    const calculateSum = (start: number, end: number) => {
+      return _.sum(
+        dailyTotal
+          .toReversed()
+          .splice(start, end)
+          .map((d) => d.total)
+      );
     };
 
     // Calculate sums for each week range
-    const sumCurrentWeek = calculateSum(reversedDailyTotal, 0, 7);
-    const sumCurrentTwoWeek = calculateSum(reversedDailyTotal, 0, 14);
-    const sumCurrentThreeWeek = calculateSum(reversedDailyTotal, 0, 21);
-    const sumCurrentFourWeek = calculateSum(reversedDailyTotal, 0, 28);
-    const sumCurrent365 = calculateSum(reversedDailyTotal, 0, 365);
-    const sumPastWeek = calculateSum(reversedDailyTotal, 7, 7);
-    const sumPastTwoWeek = calculateSum(reversedDailyTotal, 14, 14);
-    const sumPastThreeWeek = calculateSum(reversedDailyTotal, 21, 21);
-    const sumPastFourWeek = calculateSum(reversedDailyTotal, 28, 28);
-    const sumPast365 = calculateSum(reversedDailyTotal, 365, 365);
+    const sumCurrentWeek = calculateSum(0, 7);
+    const sumCurrentTwoWeek = calculateSum(0, 14);
+    const sumCurrentThreeWeek = calculateSum(0, 21);
+    const sumCurrentFourWeek = calculateSum(0, 28);
+    const sumCurrent365 = calculateSum(0, 365);
+    const sumPastWeek = calculateSum(7, 7);
+    const sumPastTwoWeek = calculateSum(14, 14);
+    const sumPastThreeWeek = calculateSum(21, 21);
+    const sumPastFourWeek = calculateSum(28, 28);
+    const sumPast365 = calculateSum(365, 365);
 
     // Calculate percentage differences
     const calculatePercentageDifference = (current: number, past: number) => {

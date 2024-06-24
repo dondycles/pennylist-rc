@@ -53,9 +53,5 @@ export const toMonthWord = (date: string): string => {
     "Dec",
   ];
 
-  if (month >= 0 && month < 12) {
-    return monthNames[month];
-  } else {
-    throw new Error("Invalid month number");
-  }
+  return monthNames[month];
 };

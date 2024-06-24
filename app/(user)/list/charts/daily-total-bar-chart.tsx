@@ -78,6 +78,43 @@ export default function DailyTotalBarChart({
     return null;
   };
 
+  const getDifference = () => {
+    const difference =
+      (listState.dailyTotalDays === 7 && differences.text.week) ||
+      (listState.dailyTotalDays === 14 && differences.text.twoWeek) ||
+      (listState.dailyTotalDays === 21 && differences.text.threeWeek) ||
+      (listState.dailyTotalDays === 28 && differences.text.fourWeek) ||
+      (listState.dailyTotalDays === 365 && differences.text.threeSixFive) ||
+      "0";
+
+    const direction =
+      (listState.dailyTotalDays === 7 &&
+        `${differences.isUp.week ? "up" : "down" || "equal"}`) ||
+      (listState.dailyTotalDays === 14 &&
+        `${differences.isUp.twoWeek ? "up" : "down" || "equal"}`) ||
+      (listState.dailyTotalDays === 21 &&
+        `${differences.isUp.threeWeek ? "up" : "down" || "equal"}`) ||
+      (listState.dailyTotalDays === 28 &&
+        `${differences.isUp.fourWeek ? "up" : "down" || "equal"}`) ||
+      (listState.dailyTotalDays === 365 &&
+        `${differences.isUp.threeSixFive ? "up" : "down" || "equal"}`) ||
+      0;
+
+    return (
+      <span
+        className={`${
+          direction === "equal"
+            ? "text-muted-foreground"
+            : direction === "up"
+            ? "text-green-500"
+            : "text-red-400"
+        }`}
+      >
+        {difference} {direction}
+      </span>
+    );
+  };
+
   return (
     <Collapsible onOpenChange={toggleOpen} open={open}>
       <Card className="overflow-x-hidden rounded-lg shadow-none">
@@ -149,28 +186,8 @@ export default function DailyTotalBarChart({
 
         <CollapsibleContent>
           <CardContent className="p-2 h-fit w-full">
-            <Badge className="text-sm" variant={"secondary"}>
-              {(listState.dailyTotalDays === 7 &&
-                `${differences.text.week}${
-                  differences.isUp.week ? " up" : " down" || "equal"
-                }`) ||
-                (listState.dailyTotalDays === 14 &&
-                  `${differences.text.twoWeek}${
-                    differences.isUp.twoWeek ? " up" : " down" || "equal"
-                  }`) ||
-                (listState.dailyTotalDays === 21 &&
-                  `${differences.text.threeWeek}${
-                    differences.isUp.threeWeek ? " up" : " down" || "equal"
-                  }`) ||
-                (listState.dailyTotalDays === 28 &&
-                  `${differences.text.fourWeek}${
-                    differences.isUp.fourWeek ? " up" : " down" || "equal"
-                  }`) ||
-                (listState.dailyTotalDays === 365 &&
-                  `${differences.text.threeSixFive}${
-                    differences.isUp.threeSixFive ? " up" : " down" || "equal"
-                  }`)}{" "}
-              from past {listState.dailyTotalDays} days
+            <Badge className="text-sm block w-fit px-1" variant={"secondary"}>
+              {getDifference()} from past {listState.dailyTotalDays} days
             </Badge>
             <ResponsiveContainer width="100%" height={365}>
               <BarChart data={dailyTotal} className="h-12">
