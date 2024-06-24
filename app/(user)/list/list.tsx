@@ -4,9 +4,12 @@ import { useQuery } from "@tanstack/react-query";
 
 // Icons
 import {
+  ArrowDown,
   ArrowDownNarrowWide,
+  ArrowUp,
   ArrowUpNarrowWide,
   CalendarCheck,
+  Equal,
   Eye,
   EyeOff,
   Gem,
@@ -58,6 +61,11 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 type changes = {
   from: { name: string; amount: string; total: string };
@@ -231,20 +239,21 @@ export default function List({ list }: { list: User }) {
     return sortedByMonth;
   };
 
-  const getDiffFromYesterday = () => {
-    const result = (
-      ((total - dailyTotal[dailyTotal.length - 1].total) / total) *
+  const getDifferences = () => {
+    const yesterday = (
+      ((total - dailyTotal?.toReversed()[1]?.total) / total) *
       100
     ).toFixed(1);
     return {
-      text: `${result}%`,
-      isUp: Boolean(Number(result) > 0),
-      isZero: Boolean(Number(result) === 0),
+      text: `${yesterday}%`,
+      isUp: Boolean(Number(yesterday) > 0),
+      isZero: Boolean(Number(yesterday) === 0),
     };
   };
 
   const dailyTotal = getDailyTotal();
   const monthlyTotal = getMonthlyTotal();
+  const differences = getDifferences();
 
   if (moneys?.error || moneysError || logsError || logs?.error)
     return (
@@ -295,39 +304,46 @@ export default function List({ list }: { list: User }) {
                       ? AsteriskNumber(total)
                       : UsePhpPeso(total)}
                   </p>
-                  <HoverCard openDelay={150}>
-                    <HoverCardTrigger
-                      className={`ml-1 text-sm mb-auto mt-0 font-bold hover:cursor-pointer ${
-                        getDiffFromYesterday().isZero
+                  <Popover>
+                    <PopoverTrigger
+                      className={`ml-1 text-sm mb-auto mt-0 font-bold Popoversor-pointer flex items-center ${
+                        differences.isZero
                           ? "text-muted-foreground"
-                          : getDiffFromYesterday().isUp
+                          : differences.isUp
                           ? "text-green-500"
                           : "text-destructive"
                       }`}
                     >
-                      {getDiffFromYesterday().text}
-                    </HoverCardTrigger>
-                    <HoverCardContent
+                      <span>{differences.text}</span>
+                      {differences.isZero ? (
+                        <Equal className="size-4" />
+                      ) : differences.isUp ? (
+                        <ArrowUp className="size-4" />
+                      ) : (
+                        <ArrowDown className="size-4" />
+                      )}
+                    </PopoverTrigger>
+                    <PopoverContent
                       align="center"
                       side="bottom"
-                      className="text-wrap"
+                      className="text-wrap w-fit max-w-[244px]"
                     >
                       <p className="text-sm">
                         Difference from yesterday&apos;s total is{" "}
                         <span
-                          className={`${
-                            getDiffFromYesterday().isZero
+                          className={`font-black ${
+                            differences.isZero
                               ? "text-muted-foreground"
-                              : getDiffFromYesterday().isUp
+                              : differences.isUp
                               ? "text-green-500"
                               : "text-destructive"
                           }`}
                         >
-                          {getDiffFromYesterday().text}
+                          {differences.text}
                         </span>
                       </p>
-                    </HoverCardContent>
-                  </HoverCard>
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </div>
               <Drawer
