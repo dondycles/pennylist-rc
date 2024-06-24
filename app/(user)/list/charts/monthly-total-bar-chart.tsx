@@ -47,6 +47,54 @@ export default function MonthlyTotalBarChart({
             {new Date(payload[0].payload.date).getFullYear()}
           </p>
           <p>{UsePhpPesoWSign(payload[0]?.value)}</p>
+
+          <p>
+            {(
+              ((Number(payload[0]?.value) -
+                Number(
+                  monthlyTotal.find(
+                    (day) =>
+                      new Date(day.date).getMonth() ===
+                      (new Date(payload[0].payload.date).getMonth() - 1 === -1
+                        ? 11
+                        : new Date(payload[0].payload.date).getMonth() - 1)
+                  )?.total
+                )) /
+                Number(payload[0]?.value)) *
+              100
+            ).toFixed(1)}
+            %{" "}
+            {((Number(payload[0]?.value) -
+              Number(
+                monthlyTotal.find(
+                  (day) =>
+                    new Date(day.date).getMonth() ===
+                    (new Date(payload[0].payload.date).getMonth() - 1 === -1
+                      ? 11
+                      : new Date(payload[0].payload.date).getMonth() - 1)
+                )?.total
+              )) /
+              Number(payload[0]?.value)) *
+              100 ===
+            0
+              ? "equal"
+              : ((Number(payload[0]?.value) -
+                  Number(
+                    monthlyTotal.find(
+                      (day) =>
+                        new Date(day.date).getMonth() ===
+                        (new Date(payload[0].payload.date).getMonth() - 1 === -1
+                          ? 11
+                          : new Date(payload[0].payload.date).getMonth() - 1)
+                    )?.total
+                  )) /
+                  Number(payload[0]?.value)) *
+                  100 >
+                0
+              ? "up"
+              : "down"}{" "}
+            than last month
+          </p>
         </div>
       );
     }

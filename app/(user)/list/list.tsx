@@ -593,10 +593,7 @@ export default function List({ list }: { list: User }) {
                   differences={differences}
                   open={listState.showDailyTotal}
                   toggleOpen={() => listState.setShowDailyTotal()}
-                  dailyTotal={dailyTotal.slice(
-                    dailyTotal.length - listState.dailyTotalDays,
-                    dailyTotal.length
-                  )}
+                  dailyTotal={dailyTotal}
                 />
               ) : null}
               {monthlyTotal ? (
