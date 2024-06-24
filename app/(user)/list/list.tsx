@@ -61,6 +61,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
 
 type changes = {
   from: { name: string; amount: string; total: string };
@@ -382,22 +383,27 @@ export default function List({ list }: { list: User }) {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger
-                        className={`ml-1 text-xs mb-auto mt-0 font-bold Tooltipsor-pointer flex items-center ${
-                          differences.isZero.yesterday
-                            ? "text-muted-foreground"
-                            : differences.isUp.yesterday
-                            ? "text-green-500"
-                            : "text-destructive"
-                        }`}
+                        className={`ml-1 text-xs mb-auto mt-0 font-bold flex items-center`}
                       >
-                        <span>{differences.text.yesterday}</span>
-                        {differences.isZero.yesterday ? (
-                          <Equal className="size-3" />
-                        ) : differences.isUp.yesterday ? (
-                          <ArrowUp className="size-3" />
-                        ) : (
-                          <ArrowDown className="size-3" />
-                        )}
+                        <Badge
+                          variant={"secondary"}
+                          className={`font-bold px-1 flex gap-1 items-center justify-center ${
+                            differences.isZero.yesterday
+                              ? "text-muted-foreground"
+                              : differences.isUp.yesterday
+                              ? "text-green-500"
+                              : "text-red-400"
+                          }`}
+                        >
+                          <span>{differences.text.yesterday}</span>
+                          {differences.isZero.yesterday ? (
+                            <Equal className="size-3" />
+                          ) : differences.isUp.yesterday ? (
+                            <ArrowUp className="size-3" />
+                          ) : (
+                            <ArrowDown className="size-3" />
+                          )}
+                        </Badge>
                       </TooltipTrigger>
                       <TooltipContent
                         align="center"

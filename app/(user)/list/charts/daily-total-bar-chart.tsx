@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -148,30 +149,29 @@ export default function DailyTotalBarChart({
 
         <CollapsibleContent>
           <CardContent className="p-2 h-fit w-full">
-            <p className="text-sm">
-              {listState.dailyTotalDays === 7 &&
+            <Badge className="text-sm" variant={"secondary"}>
+              {(listState.dailyTotalDays === 7 &&
                 `${differences.text.week}${
                   differences.isUp.week ? " up" : " down" || "equal"
-                }`}{" "}
-              {listState.dailyTotalDays === 14 &&
-                `${differences.text.twoWeek}${
-                  differences.isUp.twoWeek ? " up" : " down" || "equal"
-                }`}{" "}
-              {listState.dailyTotalDays === 21 &&
-                `${differences.text.threeWeek}${
-                  differences.isUp.threeWeek ? " up" : " down" || "equal"
-                }`}{" "}
-              {listState.dailyTotalDays === 28 &&
-                `${differences.text.fourWeek}${
-                  differences.isUp.fourWeek ? " up" : " down" || "equal"
-                }`}{" "}
-              {listState.dailyTotalDays === 365 &&
-                `${differences.text.threeSixFive}${
-                  differences.isUp.threeSixFive ? " up" : " down" || "equal"
-                }`}{" "}
+                }`) ||
+                (listState.dailyTotalDays === 14 &&
+                  `${differences.text.twoWeek}${
+                    differences.isUp.twoWeek ? " up" : " down" || "equal"
+                  }`) ||
+                (listState.dailyTotalDays === 21 &&
+                  `${differences.text.threeWeek}${
+                    differences.isUp.threeWeek ? " up" : " down" || "equal"
+                  }`) ||
+                (listState.dailyTotalDays === 28 &&
+                  `${differences.text.fourWeek}${
+                    differences.isUp.fourWeek ? " up" : " down" || "equal"
+                  }`) ||
+                (listState.dailyTotalDays === 365 &&
+                  `${differences.text.threeSixFive}${
+                    differences.isUp.threeSixFive ? " up" : " down" || "equal"
+                  }`)}{" "}
               from past {listState.dailyTotalDays} days
-            </p>
-
+            </Badge>
             <ResponsiveContainer width="100%" height={365}>
               <BarChart data={dailyTotal} className="h-12">
                 <XAxis
