@@ -74,27 +74,65 @@ export default function DailyTotalBarChart({
   const CustomTooltipDailyTotal = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="rounded-lg  p-2  text-sm backdrop-blur bg-foreground/75 text-background">
+        <div className="rounded-lg  p-2  text-sm bg-foreground text-background">
           <p> {payload[0].payload.date}</p>
           <p>{UsePhpPesoWSign(payload[0]?.value)}</p>
           <p>
-            {(
-              ((Number(payload[0]?.value) -
-                Number(
-                  dailyTotal.find(
-                    (day) =>
-                      day.date ===
-                      new Date(
-                        new Date().setDate(
-                          new Date(payload[0].payload.date).getDate() - 1
-                        )
-                      ).toDateString()
-                  )?.total
-                )) /
-                Number(payload[0]?.value)) *
-              100
-            ).toFixed(1)}
-            %{" "}
+            <span
+              className={
+                ((Number(payload[0]?.value) -
+                  Number(
+                    dailyTotal.find(
+                      (day) =>
+                        day.date ===
+                        new Date(
+                          new Date().setDate(
+                            new Date(payload[0].payload.date).getDate() - 1
+                          )
+                        ).toDateString()
+                    )?.total
+                  )) /
+                  Number(payload[0]?.value)) *
+                  100 ===
+                0
+                  ? "text-muted-foreground"
+                  : ((Number(payload[0]?.value) -
+                      Number(
+                        dailyTotal.find(
+                          (day) =>
+                            day.date ===
+                            new Date(
+                              new Date().setDate(
+                                new Date(payload[0].payload.date).getDate() - 1
+                              )
+                            ).toDateString()
+                        )?.total
+                      )) /
+                      Number(payload[0]?.value)) *
+                      100 >
+                    0
+                  ? "text-green-500"
+                  : "text-red-400"
+              }
+            >
+              {(
+                ((Number(payload[0]?.value) -
+                  Number(
+                    dailyTotal.find(
+                      (day) =>
+                        day.date ===
+                        new Date(
+                          new Date().setDate(
+                            new Date(payload[0].payload.date).getDate() - 1
+                          )
+                        ).toDateString()
+                    )?.total
+                  )) /
+                  Number(payload[0]?.value)) *
+                100
+              ).toFixed(1)}
+              %{" "}
+            </span>
             {((Number(payload[0]?.value) -
               Number(
                 dailyTotal.find(

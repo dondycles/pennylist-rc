@@ -41,7 +41,7 @@ export default function MonthlyTotalBarChart({
   const CustomTooltipMonthlyTotal = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="rounded-lg  p-2  text-sm backdrop-blur bg-foreground/75 text-background">
+        <div className="rounded-lg  p-2  text-sm bg-foreground text-background">
           <p>
             {toMonthWord(payload[0].payload.date as string)}{" "}
             {new Date(payload[0].payload.date).getFullYear()}
@@ -49,21 +49,58 @@ export default function MonthlyTotalBarChart({
           <p>{UsePhpPesoWSign(payload[0]?.value)}</p>
 
           <p>
-            {(
-              ((Number(payload[0]?.value) -
-                Number(
-                  monthlyTotal.find(
-                    (day) =>
-                      new Date(day.date).getMonth() ===
-                      (new Date(payload[0].payload.date).getMonth() - 1 === -1
-                        ? 11
-                        : new Date(payload[0].payload.date).getMonth() - 1)
-                  )?.total
-                )) /
-                Number(payload[0]?.value)) *
-              100
-            ).toFixed(1)}
-            %{" "}
+            <span
+              className={
+                ((Number(payload[0]?.value) -
+                  Number(
+                    monthlyTotal.find(
+                      (day) =>
+                        new Date(day.date).getMonth() ===
+                        (new Date(payload[0].payload.date).getMonth() - 1 === -1
+                          ? 11
+                          : new Date(payload[0].payload.date).getMonth() - 1)
+                    )?.total
+                  )) /
+                  Number(payload[0]?.value)) *
+                  100 ===
+                0
+                  ? "text-muted-foreground"
+                  : ((Number(payload[0]?.value) -
+                      Number(
+                        monthlyTotal.find(
+                          (day) =>
+                            new Date(day.date).getMonth() ===
+                            (new Date(payload[0].payload.date).getMonth() -
+                              1 ===
+                            -1
+                              ? 11
+                              : new Date(payload[0].payload.date).getMonth() -
+                                1)
+                        )?.total
+                      )) /
+                      Number(payload[0]?.value)) *
+                      100 >
+                    0
+                  ? "text-green-500"
+                  : "text-red-400"
+              }
+            >
+              {(
+                ((Number(payload[0]?.value) -
+                  Number(
+                    monthlyTotal.find(
+                      (day) =>
+                        new Date(day.date).getMonth() ===
+                        (new Date(payload[0].payload.date).getMonth() - 1 === -1
+                          ? 11
+                          : new Date(payload[0].payload.date).getMonth() - 1)
+                    )?.total
+                  )) /
+                  Number(payload[0]?.value)) *
+                100
+              ).toFixed(1)}
+              %{" "}
+            </span>
             {((Number(payload[0]?.value) -
               Number(
                 monthlyTotal.find(
