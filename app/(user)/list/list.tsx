@@ -409,7 +409,7 @@ export default function List({ list }: { list: User }) {
                       : UsePhpPeso(total)}
                   </p>
                   <TooltipProvider>
-                    <Tooltip>
+                    <Tooltip delayDuration={250}>
                       <TooltipTrigger
                         className={`ml-1 text-xs mb-auto mt-0 font-bold flex items-center`}
                       >
