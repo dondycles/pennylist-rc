@@ -240,14 +240,84 @@ export default function List({ list }: { list: User }) {
   };
 
   const getDifferences = () => {
+    const pastweek = dailyTotal
+      .toReversed()
+      .splice(7, 7)
+      .map((data) => data.total);
+    const pastTwoWeek = dailyTotal
+      .toReversed()
+      .splice(14, 14)
+      .map((data) => data.total);
+    const pastThreeWeek = dailyTotal
+      .toReversed()
+      .splice(21, 21)
+      .map((data) => data.total);
+    const pastFourWeek = dailyTotal
+      .toReversed()
+      .splice(28, 28)
+      .map((data) => data.total);
+
+    const currentweek = dailyTotal
+      .toReversed()
+      .splice(0, 7)
+      .map((data) => data.total);
+    const currentTwoWeek = dailyTotal
+      .toReversed()
+      .splice(0, 14)
+      .map((data) => data.total);
+    const currentThreeWeek = dailyTotal
+      .toReversed()
+      .splice(0, 21)
+      .map((data) => data.total);
+    const currentFourWeek = dailyTotal
+      .toReversed()
+      .splice(0, 28)
+      .map((data) => data.total);
+
     const yesterday = (
       ((total - dailyTotal?.toReversed()[1]?.total) / total) *
       100
     ).toFixed(1);
+    const week = (
+      ((_.sum(currentweek) - _.sum(pastweek)) / _.sum(currentweek)) *
+      100
+    ).toFixed(1);
+    const twoWeek = (
+      ((_.sum(currentTwoWeek) - _.sum(pastTwoWeek)) / _.sum(currentTwoWeek)) *
+      100
+    ).toFixed(1);
+    const threeWeek = (
+      ((_.sum(currentThreeWeek) - _.sum(pastThreeWeek)) /
+        _.sum(currentThreeWeek)) *
+      100
+    ).toFixed(1);
+    const fourWeek = (
+      ((_.sum(currentFourWeek) - _.sum(pastFourWeek)) /
+        _.sum(currentFourWeek)) *
+      100
+    ).toFixed(1);
     return {
-      text: `${yesterday}%`,
-      isUp: Boolean(Number(yesterday) > 0),
-      isZero: Boolean(Number(yesterday) === 0),
+      text: {
+        yesterday: `${yesterday}%`,
+        week: `${week}%`,
+        twoWeek: `${twoWeek}%`,
+        threeWeek: `${threeWeek}%`,
+        fourWeek: `${fourWeek}%`,
+      },
+      isUp: {
+        yesterday: Boolean(Number(yesterday) > 0),
+        week: Boolean(Number(week) > 0),
+        twoWeek: Boolean(Number(twoWeek) > 0),
+        threeWeek: Boolean(Number(threeWeek) > 0),
+        fourWeek: Boolean(Number(fourWeek) > 0),
+      },
+      isZero: {
+        yesterday: Boolean(Number(yesterday) === 0),
+        week: Boolean(Number(week) === 0),
+        twoWeek: Boolean(Number(twoWeek) === 0),
+        threeWeek: Boolean(Number(threeWeek) === 0),
+        fourWeek: Boolean(Number(fourWeek) === 0),
+      },
     };
   };
 
@@ -307,17 +377,17 @@ export default function List({ list }: { list: User }) {
                   <Popover>
                     <PopoverTrigger
                       className={`ml-1 text-sm mb-auto mt-0 font-bold Popoversor-pointer flex items-center ${
-                        differences.isZero
+                        differences.isZero.yesterday
                           ? "text-muted-foreground"
-                          : differences.isUp
+                          : differences.isUp.yesterday
                           ? "text-green-500"
                           : "text-destructive"
                       }`}
                     >
-                      <span>{differences.text}</span>
-                      {differences.isZero ? (
+                      <span>{differences.text.yesterday}</span>
+                      {differences.isZero.yesterday ? (
                         <Equal className="size-4" />
-                      ) : differences.isUp ? (
+                      ) : differences.isUp.yesterday ? (
                         <ArrowUp className="size-4" />
                       ) : (
                         <ArrowDown className="size-4" />
@@ -326,20 +396,76 @@ export default function List({ list }: { list: User }) {
                     <PopoverContent
                       align="center"
                       side="bottom"
-                      className="text-wrap w-fit max-w-[244px]"
+                      className="text-wrap w-fit max-w-[156px] p-2"
                     >
                       <p className="text-sm">
                         Difference from yesterday&apos;s total is{" "}
                         <span
                           className={`font-black ${
-                            differences.isZero
+                            differences.isZero.yesterday
                               ? "text-muted-foreground"
-                              : differences.isUp
+                              : differences.isUp.yesterday
                               ? "text-green-500"
                               : "text-destructive"
                           }`}
                         >
-                          {differences.text}
+                          {differences.text.yesterday}
+                        </span>
+                      </p>
+                      <p className="text-sm">
+                        week:{" "}
+                        <span
+                          className={`font-black ${
+                            differences.isZero.week
+                              ? "text-muted-foreground"
+                              : differences.isUp.week
+                              ? "text-green-500"
+                              : "text-destructive"
+                          }`}
+                        >
+                          {differences.text.week}
+                        </span>
+                      </p>
+                      <p className="text-sm">
+                        two week:{" "}
+                        <span
+                          className={`font-black ${
+                            differences.isZero.twoWeek
+                              ? "text-muted-foreground"
+                              : differences.isUp.twoWeek
+                              ? "text-green-500"
+                              : "text-destructive"
+                          }`}
+                        >
+                          {differences.text.twoWeek}
+                        </span>
+                      </p>
+                      <p className="text-sm">
+                        three week:{" "}
+                        <span
+                          className={`font-black ${
+                            differences.isZero.threeWeek
+                              ? "text-muted-foreground"
+                              : differences.isUp.threeWeek
+                              ? "text-green-500"
+                              : "text-destructive"
+                          }`}
+                        >
+                          {differences.text.threeWeek}
+                        </span>
+                      </p>
+                      <p className="text-sm">
+                        four week:{" "}
+                        <span
+                          className={`font-black ${
+                            differences.isZero.fourWeek
+                              ? "text-muted-foreground"
+                              : differences.isUp.fourWeek
+                              ? "text-green-500"
+                              : "text-destructive"
+                          }`}
+                        >
+                          {differences.text.fourWeek}
                         </span>
                       </p>
                     </PopoverContent>
