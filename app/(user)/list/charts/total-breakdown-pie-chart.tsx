@@ -110,6 +110,7 @@ export default function TotalBreakdownPieChart({
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
+                    animationBegin={0}
                     activeIndex={activeIndex}
                     activeShape={renderActiveShape}
                     data={moneys}

@@ -318,6 +318,7 @@ export default function DailyTotalBarChart({
                   stroke="hsl(var(--muted-foreground))"
                 />
                 <Bar
+                  animationBegin={0}
                   dataKey="total"
                   fill="hsl(var(--foreground))"
                   radius={[8, 8, 0, 0]}
