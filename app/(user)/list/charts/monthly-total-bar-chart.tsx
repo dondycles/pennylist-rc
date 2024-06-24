@@ -223,7 +223,7 @@ export default function MonthlyTotalBarChart({
                 <Bar
                   dataKey="total"
                   fill="hsl(var(--foreground))"
-                  radius={[4, 4, 0, 0]}
+                  radius={[8, 8, 0, 0]}
                   className="bg-red-500"
                 >
                   {monthlyTotal?.map((e) => (

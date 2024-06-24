@@ -44,7 +44,7 @@ export default function TotalBreakdownPieChart({
           fill={fill}
           style={{
             fontSize: "0.8rem",
-            stroke: payload.color ?? "",
+            stroke: payload.color,
           }}
         >
           {payload.name}
@@ -76,7 +76,7 @@ export default function TotalBreakdownPieChart({
           outerRadius={outerRadius}
           startAngle={startAngle + 1}
           endAngle={endAngle - 1}
-          fill={payload.color}
+          fill={payload.color ?? "hsl(var(--primary))"}
         />
         <Sector
           cx={cx}
@@ -85,7 +85,7 @@ export default function TotalBreakdownPieChart({
           endAngle={endAngle}
           innerRadius={outerRadius + 4}
           outerRadius={outerRadius + 8}
-          fill={payload.color}
+          fill={payload.color ?? "hsl(var(--primary))"}
         />
       </g>
     );
@@ -126,7 +126,7 @@ export default function TotalBreakdownPieChart({
                       <Cell
                         style={{
                           strokeWidth: 1,
-                          stroke: money.color ?? "",
+                          stroke: money.color ?? "hsl(var(--primary))",
                           fill: money.color ? money.color + 20 : "",
                         }}
                         className="fill-background"
