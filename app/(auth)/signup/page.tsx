@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import SignupForm from "./form";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { currentVersion } from "@/constants/version";
 
 export default async function SignUp() {
   const supabase = createClient();
@@ -17,14 +18,21 @@ export default async function SignUp() {
     return redirect("/list");
   }
   return (
-    <div className="flex flex-col justify-center flex-1 w-full screen-x-padding p-4 h-full">
-      <Button asChild className="w-fit mb-auto">
+    <div className="flex flex-col justify-center flex-1 w-full screen-x-padding h-full">
+      <Button asChild className="w-fit mb-auto mt-4">
         <Link href="/">
           <ChevronLeft className="size-5" />
           Back
         </Link>
       </Button>
       <SignupForm />
+      <footer className="flex flex-row flex-wrap justify-between w-full gap-4 p-4 text-sm text-muted-foreground mb-0 mt-auto ">
+        <Link href={"/"}>© pennylist. {currentVersion} | 2024 </Link>
+        <div className="flex flex-row gap-4">
+          <Link href={"/privacypolicy"}>Privacy Policy</Link>
+          <Link href={"/termsandconditions"}>Terms and Conditions</Link>
+        </div>
+      </footer>
     </div>
   );
 }

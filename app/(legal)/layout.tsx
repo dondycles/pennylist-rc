@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { currentVersion } from "@/constants/version";
 import Link from "next/link";
 
 export default function LegalPage({ children }: { children: React.ReactNode }) {
@@ -11,8 +12,8 @@ export default function LegalPage({ children }: { children: React.ReactNode }) {
         <Button>Get Started</Button>
       </nav>
       {children}
-      <footer className="flex flex-row flex-wrap justify-between w-full gap-4 p-4 text-sm text-muted-foreground">
-        <Link href={"/"}>© pennylist. 2024 </Link>
+      <footer className="flex flex-row flex-wrap justify-between w-full gap-4 p-4 text-sm text-muted-foreground mb-0 mt-auto">
+        <Link href={"/"}>© pennylist. {currentVersion} | 2024 </Link>
         <div className="flex flex-row gap-4">
           <Link href={"/privacypolicy"}>Privacy Policy</Link>
           <Link href={"/termsandconditions"}>Terms and Conditions</Link>

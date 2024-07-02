@@ -57,7 +57,7 @@ export default function LoginForm() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4 mb-auto max-w-[256px] mx-auto w-full"
+        className="space-y-4 my-auto max-w-[256px] mx-auto w-full"
       >
         <Logo className="size-12 mx-auto" zoom={8} strokeWidth={24} />
         <p className="text-xl">

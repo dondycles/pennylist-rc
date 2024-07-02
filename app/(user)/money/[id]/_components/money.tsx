@@ -7,12 +7,7 @@ import {
 } from "@/app/actions/moneys";
 import Scrollable from "@/components/scrollable";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  AsteriskNumber,
-  UsePhpPeso,
-  UsePhpPesoWSign,
-  toMonthWord,
-} from "@/lib/utils";
+import { AsteriskNumber, UsePhpPeso, UsePhpPesoWSign } from "@/lib/utils";
 import { User } from "@supabase/supabase-js";
 import { useQuery } from "@tanstack/react-query";
 import { TbCurrencyPeso } from "react-icons/tb";
@@ -37,16 +32,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Bar,
-  BarChart,
-  Brush,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-} from "recharts";
+
+import ProgressBarChart from "./progress-bar-chart";
 
 export default function Money({
   list,
@@ -129,51 +116,6 @@ export default function Money({
     return eachDayTotal;
   };
   const progress = getProgress();
-
-  const CustomTooltipDailyTotal = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const value = Number(isNaN(payload[0]?.value) ? 0 : payload[0]?.value);
-      const predValue = Number(
-        progress.find(
-          (day) =>
-            day.date ===
-            new Date(
-              new Date().setDate(
-                new Date(payload[0].payload.date).getDate() - 1
-              )
-            ).toDateString()
-        )?.total
-      );
-      const difference = isNaN(((value - predValue) / value) * 100)
-        ? 0
-        : ((value - predValue) / value) * 100;
-      return (
-        <div className="rounded-lg  p-2  text-sm bg-foreground text-background">
-          <p> {payload[0].payload.date}</p>
-          <p>{UsePhpPesoWSign(value)}</p>
-          <p>
-            <span
-              className={
-                difference === 0
-                  ? "text-muted-foreground"
-                  : difference > 0
-                  ? "text-green-500"
-                  : "text-red-400"
-              }
-            >
-              {difference.toFixed(1)}%{" "}
-            </span>
-            {difference === 0 ? "equal" : difference > 0 ? "up" : "down"} than
-            last day
-          </p>
-        </div>
-      );
-    }
-
-    // return <div className="bg-black">{JSON.stringify(any)}</div>;
-
-    return null;
-  };
 
   if (moneyError || money?.error || totalError || totalData?.error)
     return (
@@ -347,65 +289,7 @@ export default function Money({
       {logs?.length !== 0 ? (
         <>
           {progress.length !== 0 ? (
-            <Card className="shadow-none rounded-lg">
-              <CardHeader className="px-2 py-3">
-                <CardTitle className="font-bold">
-                  Progress (Last 7 days)
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-2 h-fit w-full">
-                <ResponsiveContainer width="100%" height={200}>
-                  <BarChart data={progress} className="h-12">
-                    <XAxis
-                      stroke="hsl(var(--muted-foreground))"
-                      fontSize={10}
-                      tickLine={false}
-                      axisLine={false}
-                      dataKey="date"
-                      tickFormatter={(value) =>
-                        new Date(value).toDateString() ===
-                        new Date().toDateString()
-                          ? "Today"
-                          : new Date(value).getDate() === 1
-                          ? `${toMonthWord(value)} ${new Date(
-                              value
-                            ).getFullYear()}`
-                          : new Date(value).getDate().toString()
-                      }
-                    />
-                    {/* <YAxis
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={10}
-                  tickLine={false}
-                  tickFormatter={(value) => UsePhpPesoWSign(value, 0)}
-                  axisLine={false}
-                /> */}
-                    <Tooltip content={CustomTooltipDailyTotal} />
-                    <Brush
-                      dataKey="total"
-                      height={30}
-                      stroke="hsl(var(--muted-foreground))"
-                    />
-                    <Bar
-                      animationBegin={0}
-                      dataKey="total"
-                      fill="hsl(var(--foreground))"
-                      radius={[4, 4, 0, 0]}
-                      className="bg-red-500"
-                    >
-                      {progress.map((e) => (
-                        <Cell
-                          key={e.date}
-                          style={{
-                            fill: "hsl(var(--foreground))",
-                          }}
-                        />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
+            <ProgressBarChart progress={progress} />
           ) : null}
           {logs && <LogsTable logs={logs} />}
         </>

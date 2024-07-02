@@ -1,5 +1,6 @@
 import Logo from "@/components/logo";
 import { Button } from "@/components/ui/button";
+import { currentVersion } from "@/constants/version";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -51,7 +52,7 @@ export default async function Home() {
           </div>
         </div>
         <footer className="flex flex-row flex-wrap justify-between w-full gap-4 p-4 text-sm text-muted-foreground mb-0 mt-auto">
-          <Link href={"/"}>© pennylist. 2024 </Link>
+          <Link href={"/"}>© pennylist. {currentVersion} | 2024 </Link>
           <div className="flex flex-row gap-4">
             <Link href={"/privacypolicy"}>Privacy Policy</Link>
             <Link href={"/termsandconditions"}>Terms and Conditions</Link>
