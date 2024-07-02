@@ -317,9 +317,9 @@ export default function List({ list }: { list: User }) {
     );
 
     const createDifferenceObject = (value: number) => {
-      const numValue = Number(value);
+      const numValue = isNaN(value) ? 0 : Number(value);
       return {
-        value: `${value.toFixed(1)}%`,
+        value: `${numValue.toFixed(1)}%`,
         isUp: numValue > 0,
         isZero: numValue === 0,
       };
@@ -356,6 +356,7 @@ export default function List({ list }: { list: User }) {
   const dailyTotal = getDailyTotal();
   const monthlyTotal = getMonthlyTotal();
   const differences = getDifferences();
+
   if (moneys?.error || moneysError || logsError || logs?.error)
     return (
       <main className="w-full h-full p-2 ">
@@ -555,9 +556,7 @@ export default function List({ list }: { list: User }) {
           })}
         </div>
       )}
-
-      <Separator />
-
+      <Separator className="mt-14" />
       {logs?.data?.length ? (
         <>
           {/* bars */}
