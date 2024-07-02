@@ -1,6 +1,5 @@
 "use server";
 import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
 import { logInSchema } from "@/app/(auth)/login/form";
 import { z } from "zod";
 export const login = async (data: z.infer<typeof logInSchema>) => {
@@ -20,6 +19,4 @@ export const login = async (data: z.infer<typeof logInSchema>) => {
     .eq("id", authData.user.id)
     .single();
   if (dbError) return { dbError: dbError.message };
-
-  redirect("/list");
 };

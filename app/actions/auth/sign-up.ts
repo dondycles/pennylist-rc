@@ -1,7 +1,6 @@
 "use server";
 import { signUpSchema } from "@/app/(auth)/signup/form";
 import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
 import { z } from "zod";
 export const signup = async (data: z.infer<typeof signUpSchema>) => {
   const supabase = createClient();
@@ -19,6 +18,4 @@ export const signup = async (data: z.infer<typeof signUpSchema>) => {
     .insert({ listname: data.listname });
 
   if (dbError) return { dbError: dbError.message };
-
-  redirect("/list");
 };

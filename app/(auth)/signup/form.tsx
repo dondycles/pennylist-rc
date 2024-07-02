@@ -45,16 +45,16 @@ export default function SignupForm() {
     try {
       setSigningUp(true);
       const res = await signup(values);
-      if (res.authError) {
+      if (res?.authError) {
         setSigningUp(false);
         return form.setError("cpassword", {
           message: res.authError,
         });
       }
-      if (res.dbError) {
+      if (res?.dbError) {
         setSigningUp(false);
         return form.setError("cpassword", {
-          message: res.dbError,
+          message: res?.dbError,
         });
       }
     } catch (error) {

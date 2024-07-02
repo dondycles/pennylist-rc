@@ -12,10 +12,6 @@ import {
 import { Database } from "@/database.types";
 import { UsePhpPesoWSign } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
-type changes = {
-  from: { name: string; amount: string; total: string };
-  to: { name: string; amount: string; total: string };
-};
 
 export default function LogsTable({
   logs,

@@ -7,6 +7,7 @@ import { Serwist } from "serwist";
 // actual precache manifest. By default, this string is set to
 // `"self.__SW_MANIFEST"`.
 declare global {
+  // eslint-disable-next-line no-unused-vars
   interface WorkerGlobalScope extends SerwistGlobalConfig {
     __SW_MANIFEST: (PrecacheEntry | string)[] | undefined;
   }

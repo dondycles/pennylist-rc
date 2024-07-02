@@ -526,7 +526,6 @@ export default function List({ list }: { list: User }) {
           />
         </DrawerContent>
       </Drawer>
-
       {/* moneys list */}
       {total === 0 ? (
         <p className="text-sm text-center text-muted-foreground">

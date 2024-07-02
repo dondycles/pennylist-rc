@@ -36,16 +36,16 @@ export default function LoginForm() {
     try {
       setLoggingIn(true);
       const res = await login(values);
-      if (res.authError) {
+      if (res?.authError) {
         setLoggingIn(false);
         return form.setError("password", {
-          message: res.authError,
+          message: res?.authError,
         });
       }
-      if (res.dbError) {
+      if (res?.dbError) {
         setLoggingIn(false);
         return form.setError("password", {
-          message: res.dbError,
+          message: res?.dbError,
         });
       }
     } catch (error) {
