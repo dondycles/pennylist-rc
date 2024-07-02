@@ -1,10 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -148,99 +144,106 @@ export default function MonthlyTotalBarChart({
   //   return null;
   // };
   return (
-    <Collapsible onOpenChange={toggleOpen} open={open}>
-      <Card className="overflow-x-hidden rounded-lg shadow-none">
-        <CardHeader className="px-2 py-2">
-          <div className="flex items-start">
-            <CollapsibleTrigger className="w-full">
-              <div className="flex  flex-row justify-between items-center">
-                <CardTitle className="flex items-center gap-1 py-1">
-                  <p>Monthly Total</p>
-                  <ChevronDown
-                    className={`size-4 ${open && "rotate-180"} transition-all`}
-                  />
-                </CardTitle>
-              </div>
-            </CollapsibleTrigger>
-            {open && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant={"outline"}>
-                    by {listState.monthlyTotalBy} record
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuCheckboxItem
-                    checked={listState.monthlyTotalBy === "last"}
-                    onClick={() => {
-                      listState.setMonthlyTotalBy("last");
-                    }}
-                  >
-                    last record
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={listState.monthlyTotalBy === "avg"}
-                    onClick={() => {
-                      listState.setMonthlyTotalBy("avg");
-                    }}
-                  >
-                    average
-                  </DropdownMenuCheckboxItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
+    <Card
+      className={`overflow-hidden rounded-lg shadow-none transition-all ease-in-out duration-500 ${
+        open ? "h-[254px]" : "h-[42px]"
+      }`}
+    >
+      <CardHeader className="px-2 py-2">
+        <button
+          onClick={toggleOpen}
+          className="flex items-start justify-between"
+        >
+          <div className="flex  flex-row justify-between items-center">
+            <CardTitle className="flex items-center gap-1 py-1">
+              <p className="font-bold">Monthly Total</p>
+              <ChevronDown
+                className={`size-4 ${open && "rotate-180"} transition-all`}
+              />
+            </CardTitle>
           </div>
-        </CardHeader>
-        <CollapsibleContent>
-          <CardContent className="p-2 max-h-[200px] h-screen w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={monthlyTotal} className="h-12">
-                <XAxis
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={10}
-                  tickLine={false}
-                  axisLine={false}
-                  dataKey="date"
-                  tickFormatter={(value: string) =>
-                    Number(new Date(value).getMonth()) === new Date().getMonth()
-                      ? "This month"
-                      : toMonthWord(value)
-                  }
-                />
-                {/* <YAxis
+
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              asChild
+              className={` duration-500 ease-in-out transition-all ${
+                open ? "opacity-100" : "pointer-events-none opacity-0"
+              }`}
+            >
+              <Button variant={"outline"}>
+                by {listState.monthlyTotalBy} record
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuCheckboxItem
+                checked={listState.monthlyTotalBy === "last"}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  listState.setMonthlyTotalBy("last");
+                }}
+              >
+                last record
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={listState.monthlyTotalBy === "avg"}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  listState.setMonthlyTotalBy("avg");
+                }}
+              >
+                average
+              </DropdownMenuCheckboxItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </button>
+      </CardHeader>
+      <CardContent className="p-2 max-h-[200px] h-screen w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={monthlyTotal} className="h-12">
+            <XAxis
+              stroke="hsl(var(--muted-foreground))"
+              fontSize={10}
+              tickLine={false}
+              axisLine={false}
+              dataKey="date"
+              tickFormatter={(value: string) =>
+                Number(new Date(value).getMonth()) === new Date().getMonth()
+                  ? "This month"
+                  : toMonthWord(value)
+              }
+            />
+            {/* <YAxis
                   stroke="hsl(var(--muted-foreground))"
                   fontSize={10}
                   tickLine={false}
                   tickFormatter={(value) => UsePhpPesoWSign(value, 0)}
                   axisLine={false}
                 /> */}
-                <Tooltip content={CustomTooltipMonthlyTotal} />
-                <Brush
-                  dataKey="total"
-                  height={30}
-                  stroke="hsl(var(--muted-foreground))"
+            <Tooltip content={CustomTooltipMonthlyTotal} />
+            <Brush
+              dataKey="total"
+              height={30}
+              stroke="hsl(var(--muted-foreground))"
+            />
+            <Bar
+              animationBegin={0}
+              dataKey="total"
+              fill="hsl(var(--foreground))"
+              radius={[4, 4, 0, 0]}
+              className="bg-red-500"
+            >
+              {monthlyTotal?.map((e) => (
+                <Cell
+                  key={e.date}
+                  style={{
+                    fill: "hsl(var(--foreground))",
+                  }}
                 />
-                <Bar
-                  animationBegin={0}
-                  dataKey="total"
-                  fill="hsl(var(--foreground))"
-                  radius={[4, 4, 0, 0]}
-                  className="bg-red-500"
-                >
-                  {monthlyTotal?.map((e) => (
-                    <Cell
-                      key={e.date}
-                      style={{
-                        fill: "hsl(var(--foreground))",
-                      }}
-                    />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </CollapsibleContent>
-      </Card>
-    </Collapsible>
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
   );
 }

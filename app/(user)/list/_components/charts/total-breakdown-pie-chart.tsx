@@ -1,9 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+
 import { Database } from "@/database.types";
 import { UsePhpPesoWSign } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
@@ -91,60 +87,65 @@ export default function TotalBreakdownPieChart({
     );
   };
   return (
-    <Collapsible onOpenChange={toggleOpen} open={open}>
-      <Card className="w-full rounded-lg shadow-none">
-        <CollapsibleTrigger>
-          <CardHeader className="px-2 py-3">
-            <CardTitle className="flex items-center gap-1">
-              <p>Total Breakdown</p>
+    <Card
+      className={`overflow-hidden rounded-lg shadow-none transition-all ease-in-out duration-500 ${
+        open ? "h-[500px]" : "h-[42px]"
+      }`}
+    >
+      <CardHeader className="px-2 py-2">
+        <button
+          onClick={toggleOpen}
+          className="flex items-start justify-between"
+        >
+          <div className="flex  flex-row justify-between items-center">
+            <CardTitle className="flex items-center gap-1 py-1">
+              <p className="font-bold">Total Breakdown</p>
 
               <ChevronDown
                 className={`size-4 ${open && "rotate-180"} transition-all`}
               />
             </CardTitle>
-          </CardHeader>
-        </CollapsibleTrigger>
-        <CollapsibleContent>
-          {moneys.length ? (
-            <CardContent className="aspect-square p-2 max-h-[50vh] mx-auto">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    animationBegin={0}
-                    activeIndex={activeIndex}
-                    activeShape={renderActiveShape}
-                    data={moneys}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius="60%"
-                    fill="hsl(var(--foreground))"
-                    dataKey="amount"
-                    onMouseEnter={(_, i) => {
-                      setActiveIndex(i);
+          </div>
+        </button>
+      </CardHeader>
+      {moneys.length ? (
+        <CardContent className="aspect-square p-2 mx-auto max-h-[500px] h-screen w-full">
+          <ResponsiveContainer width="100%" height="90%">
+            <PieChart>
+              <Pie
+                animationBegin={0}
+                activeIndex={activeIndex}
+                activeShape={renderActiveShape}
+                data={moneys}
+                cx="50%"
+                cy="50%"
+                innerRadius="60%"
+                fill="hsl(var(--foreground))"
+                dataKey="amount"
+                onMouseEnter={(_, i) => {
+                  setActiveIndex(i);
+                }}
+              >
+                {moneys?.map((money, index) => (
+                  <Cell
+                    style={{
+                      strokeWidth: 1,
+                      stroke: money.color ?? "hsl(var(--primary))",
+                      fill: money.color ? money.color + 20 : "",
                     }}
-                  >
-                    {moneys?.map((money, index) => (
-                      <Cell
-                        style={{
-                          strokeWidth: 1,
-                          stroke: money.color ?? "hsl(var(--primary))",
-                          fill: money.color ? money.color + 20 : "",
-                        }}
-                        className="fill-background"
-                        key={`cell-${index}`}
-                      />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-            </CardContent>
-          ) : (
-            <CardContent className="p-2 w-full text-center text-sm text-muted-foreground">
-              <p>No records</p>
-            </CardContent>
-          )}
-        </CollapsibleContent>
-      </Card>
-    </Collapsible>
+                    className="fill-background"
+                    key={`cell-${index}`}
+                  />
+                ))}
+              </Pie>
+            </PieChart>
+          </ResponsiveContainer>
+        </CardContent>
+      ) : (
+        <CardContent className="p-2 w-full text-center text-sm text-muted-foreground">
+          <p>No records</p>
+        </CardContent>
+      )}
+    </Card>
   );
 }

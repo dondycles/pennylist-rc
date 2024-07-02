@@ -10,8 +10,6 @@ import {
   ArrowUpNarrowWide,
   CalendarCheck,
   Equal,
-  Eye,
-  EyeOff,
   Gem,
   ListFilter,
   Plus,
@@ -109,7 +107,7 @@ export default function List({ list }: { list: User }) {
     const groupedByDate: {
       [key: string]: number;
     } = {};
-    const days: number = 365;
+
     logs?.data?.toReversed().forEach((log) => {
       const date = new Date(log.created_at).toDateString();
 
@@ -124,12 +122,12 @@ export default function List({ list }: { list: User }) {
     let lastTotal = 0;
 
     // sets the current date back based on the days parameter
-    currentDate.setDate(currentDate.getDate() - days);
+    currentDate.setDate(currentDate.getDate() - 365);
 
-    for (let i = 0; i <= days; i++) {
+    for (let i = 0; i <= 365; i++) {
       const day = currentDate.toDateString();
 
-      if (i === days) {
+      if (i === 365) {
         lastTotal = total;
       } else if (groupedByDate[day] !== undefined) {
         // if this date has total, set it to lastTotal so the next dates that does not have total will get that total as well to fill up the bars
@@ -388,16 +386,9 @@ export default function List({ list }: { list: User }) {
       <div className="flex flex-col gap-8">
         <div className="mt-2 border rounded-lg p-4 flex flex-row gap-4 items-center justify-between shadow-lg">
           <div className="flex flex-col min-w-0">
-            <div className="text-muted-foreground text-xs flex items-center gap-1 w-fit">
-              Total Money{" "}
-              <button onClick={() => listState.toggleHideAmounts()}>
-                {!listState.hideAmounts ? (
-                  <EyeOff size={18} />
-                ) : (
-                  <Eye size={18} />
-                )}
-              </button>
-            </div>
+            <p className="text-muted-foreground text-xs flex items-center gap-1 w-fit">
+              Total Money
+            </p>
             <div className="text-2xl sm:text-4xl font-anton flex flex-row items-center truncate -ml-1 sm:-ml-2">
               <TbCurrencyPeso className="shrink-0" />
               <p className="truncate">
@@ -569,22 +560,6 @@ export default function List({ list }: { list: User }) {
 
       {logs?.data?.length ? (
         <>
-          {/* tables */}
-          {logs?.data && (
-            <LogsTable
-              open={listState.showLogs}
-              toggleOpen={() => listState.setShowLogs()}
-              logs={logs?.data}
-            />
-          )}
-          {/* pie */}
-          {moneys?.data ? (
-            <TotalBreakdownPieChart
-              open={listState.showBreakdown}
-              toggleOpen={() => listState.setShowBreakdown()}
-              moneys={moneys.data}
-            />
-          ) : null}
           {/* bars */}
           {dailyTotal ? (
             <DailyTotalBarChart
@@ -601,6 +576,22 @@ export default function List({ list }: { list: User }) {
               monthlyTotal={monthlyTotal}
             />
           ) : null}
+          {/* pie */}
+          {moneys?.data ? (
+            <TotalBreakdownPieChart
+              open={listState.showBreakdown}
+              toggleOpen={() => listState.setShowBreakdown()}
+              moneys={moneys.data}
+            />
+          ) : null}
+          {/* tables */}
+          {logs?.data && (
+            <LogsTable
+              open={listState.showLogs}
+              toggleOpen={() => listState.setShowLogs()}
+              logs={logs?.data}
+            />
+          )}
         </>
       ) : null}
     </Scrollable>

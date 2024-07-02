@@ -1,6 +1,6 @@
 "use client";
 
-import Nav from "./nav";
+import Nav from "./_components/nav";
 
 export default function ListLayout({
   children,

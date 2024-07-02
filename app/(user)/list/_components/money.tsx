@@ -118,7 +118,7 @@ export default function Money({
           <ContextMenuItem asChild>
             <DialogTrigger className="w-full">
               <Trash className="size-4 mr-1 text-destructive" />
-              <p className="text-destructive font-bold">Delete</p>
+              <p className="text-destructive">Delete</p>
             </DialogTrigger>
           </ContextMenuItem>
           <ContextMenuItem asChild>

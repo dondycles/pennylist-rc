@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import List from "./list";
+import List from "./_components/list";
 import { redirect } from "next/navigation";
 
 export default async function ListPage() {

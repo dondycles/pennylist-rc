@@ -23,6 +23,7 @@ export async function getMoney(id: string) {
     .from("moneys")
     .select("id,amount,name,created_at,color,updated_at, logs(*)")
     .eq("id", id)
+    .order("created_at", { ascending: false, referencedTable: "logs" })
     .single();
   return moneys;
 }
