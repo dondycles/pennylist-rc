@@ -47,11 +47,11 @@ import { useListState } from "@/store";
 // Importing custom components
 import AddMoneyForm from "./forms/add-money-form";
 import EditMoneyForm from "./forms/edit-money-form";
-import Money from "./money";
-import TotalBreakdownPieChart from "./charts/total-breakdown-pie-chart";
-import LogsTable from "./charts/logs-table";
-import DailyTotalBarChart from "./charts/daily-total-bar-chart";
-import MonthlyTotalBarChart from "./charts/monthly-total-bar-chart";
+import Money from "./list-money";
+import TotalBreakdownPieChart from "./charts/list-total-breakdown-pie-chart";
+import LogsTable from "./charts/list-logs-table";
+import DailyTotalBarChart from "./charts/list-daily-total-bar-chart";
+import MonthlyTotalBarChart from "./charts/list-monthly-total-bar-chart";
 
 // Importing types
 import { type Database } from "@/database.types";
@@ -67,6 +67,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import Scrollable from "@/components/scrollable";
+import FormsDrawer from "./forms/forms-drawer";
 
 export default function List({ list }: { list: User }) {
   var _ = require("lodash");
@@ -449,22 +450,17 @@ export default function List({ list }: { list: User }) {
               </TooltipProvider>
             </div>
           </div>
-          <Drawer open={showAddMoneyForm} onOpenChange={setShowAddMoneyForm}>
-            <DrawerTrigger asChild>
+          <FormsDrawer
+            open={showAddMoneyForm}
+            onOpenChange={setShowAddMoneyForm}
+            title="Add money"
+            desc="Add money by stating the name or its source and the amount."
+            trigger={
               <Button size={"icon"} className="rounded-full shrink-0">
                 <Plus />
               </Button>
-            </DrawerTrigger>
-            <DrawerContent className="p-2 gap-2">
-              <DrawerHeader className="py-2 px-0 w-[320px] mx-auto">
-                <DrawerTitle>
-                  <p className="font-bold text-sm text-center">Add money</p>
-                </DrawerTitle>
-                <DrawerDescription className="text-center">
-                  Add money by stating the name or its source and the amount.
-                </DrawerDescription>
-              </DrawerHeader>
-
+            }
+            form={
               <AddMoneyForm
                 currentTotal={String(total)}
                 close={() => {
@@ -472,8 +468,8 @@ export default function List({ list }: { list: User }) {
                   refetch();
                 }}
               />
-            </DrawerContent>
-          </Drawer>
+            }
+          />
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger className="text-xs text-muted-foreground ml-auto mr-0 flex items-center gap-1 ">
@@ -525,7 +521,7 @@ export default function List({ list }: { list: User }) {
         </DropdownMenu>
       </div>
       {/* edit money form */}
-      <Drawer
+      <FormsDrawer
         open={showEditMoneyForm.open}
         onOpenChange={(e) => {
           setEditMoneyForm((prev) => ({
@@ -533,16 +529,9 @@ export default function List({ list }: { list: User }) {
             open: e,
           }));
         }}
-      >
-        <DrawerContent className=" p-2 gap-2">
-          <DrawerHeader className="py-2 px-0 w-[320px] mx-auto">
-            <DrawerTitle>
-              <p className="font-bold text-sm text-center">Edit money</p>
-            </DrawerTitle>
-            <DrawerDescription className="text-center">
-              Any changes made are recorded to keep track of its progress.
-            </DrawerDescription>
-          </DrawerHeader>
+        title="Edit money"
+        desc="Any changes made are recorded to keep track of its progress."
+        form={
           <EditMoneyForm
             currentTotal={String(total)}
             money={showEditMoneyForm.money!}
@@ -554,8 +543,9 @@ export default function List({ list }: { list: User }) {
               refetch();
             }}
           />
-        </DrawerContent>
-      </Drawer>
+        }
+      />
+
       {/* moneys list */}
       {total === 0 ? (
         <p className="text-sm text-center text-muted-foreground">

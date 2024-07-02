@@ -11,7 +11,7 @@ import { AsteriskNumber, UsePhpPeso, UsePhpPesoWSign } from "@/lib/utils";
 import { User } from "@supabase/supabase-js";
 import { useQuery } from "@tanstack/react-query";
 import { TbCurrencyPeso } from "react-icons/tb";
-import LogsTable from "./logs-table";
+import LogsTable from "./charts/money-logs-table";
 import { Check, Palette, Pencil, Trash, X } from "lucide-react";
 import {
   Popover,
@@ -20,8 +20,15 @@ import {
 } from "@/components/ui/popover";
 import { colors } from "@/constants/colors";
 import { useState } from "react";
-import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
-import EditMoneyForm from "@/app/(user)/list/_components/forms/edit-money-form";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import EditMoneyForm from "@/components/forms/edit-money-form";
 import { useListState } from "@/store";
 import {
   Dialog,
@@ -33,7 +40,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
-import ProgressBarChart from "./progress-bar-chart";
+import ProgressBarChart from "./charts/money-progress-bar-chart";
+import FormsDrawer from "./forms/forms-drawer";
 
 export default function Money({
   list,
@@ -176,14 +184,17 @@ export default function Money({
         </div>
 
         <div className="flex gap-4 w-fit shrink-0 z-10">
-          <Drawer open={openEditForm} onOpenChange={setOpenEditForm}>
-            <DrawerTrigger asChild>
+          <FormsDrawer
+            open={openEditForm}
+            onOpenChange={setOpenEditForm}
+            title="Edit money"
+            desc="Any changes made are recorded to keep track of its progress."
+            trigger={
               <button>
                 <Pencil size={20} />
               </button>
-            </DrawerTrigger>
-            <DrawerContent className=" p-2 gap-2">
-              <p className="font-bold text-sm text-center">Edit money</p>
+            }
+            form={
               <EditMoneyForm
                 close={() => {
                   setOpenEditForm(false);
@@ -193,8 +204,9 @@ export default function Money({
                 currentTotal={String(total)}
                 money={money.data}
               />
-            </DrawerContent>
-          </Drawer>
+            }
+          />
+
           <Popover onOpenChange={setOpenPalette} open={openPalette}>
             <PopoverTrigger asChild>
               <button>
@@ -203,7 +215,7 @@ export default function Money({
             </PopoverTrigger>
             <PopoverContent
               align="end"
-              className="flex flex-row flex-wrap gap-1 p-1 max-w-[186px]"
+              className="flex flex-row flex-wrap gap-1 p-1 max-w-[186px]  bg-neutral-950  "
             >
               {Object.values(colors).map((color, i) => {
                 return (
@@ -212,7 +224,7 @@ export default function Money({
                       return (
                         <button
                           onClick={() => handleSetColor(c)}
-                          className="rounded bg-violet-100 size-4"
+                          className="rounded size-4  hover:scale-125 scale-100 ease-in-out duration-150 transition-all"
                           style={{ backgroundColor: c }}
                           key={c}
                         />

@@ -91,7 +91,7 @@ export default function Money({
               Color
             </ContextMenuSubTrigger>
             <ContextMenuSubContent className="p-0">
-              <ContextMenuItem className="flex flex-row flex-wrap gap-1 p-1 max-w-[184px]">
+              <ContextMenuItem className="flex flex-row flex-wrap gap-1 p-1 max-w-[184px] bg-neutral-950  focus:bg-neutral-950">
                 {Object.values(colors).map((color, i) => {
                   return (
                     <div className="flex flex-col gap-1" key={i}>
@@ -99,7 +99,7 @@ export default function Money({
                         return (
                           <button
                             onClick={() => handleSetColor(c)}
-                            className="rounded bg-violet-100 size-4"
+                            className="rounded size-4  hover:scale-125 scale-100 ease-in-out duration-150 transition-all"
                             style={{ backgroundColor: c }}
                             key={c}
                           />

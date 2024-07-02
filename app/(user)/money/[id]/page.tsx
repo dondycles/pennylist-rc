@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import Money from "./_components/money";
+import Money from "../../../../components/money";
 
 export default async function MoneyPage({
   params,
