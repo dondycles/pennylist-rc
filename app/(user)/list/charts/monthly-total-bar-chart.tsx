@@ -192,7 +192,7 @@ export default function MonthlyTotalBarChart({
           </div>
         </CardHeader>
         <CollapsibleContent>
-          <CardContent className="p-2 max-h-[300px] h-screen w-full">
+          <CardContent className="p-2 max-h-[200px] h-screen w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={monthlyTotal} className="h-12">
                 <XAxis
@@ -224,7 +224,7 @@ export default function MonthlyTotalBarChart({
                   animationBegin={0}
                   dataKey="total"
                   fill="hsl(var(--foreground))"
-                  radius={[8, 8, 0, 0]}
+                  radius={[4, 4, 0, 0]}
                   className="bg-red-500"
                 >
                   {monthlyTotal?.map((e) => (

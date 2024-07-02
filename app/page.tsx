@@ -17,13 +17,13 @@ export default async function Home() {
 
   if (!list)
     return (
-      <div className="w-full pt-32 space-y-32 screen-x-padding">
+      <div className="w-full pt-32 h-full flex flex-col screen-x-padding gap-6">
         <div className="flex flex-col items-center justify-center w-full gap-4 text-center max-w-[800px] mx-auto">
           <Logo zoom={8} className="h-16" strokeWidth={24} />
           <h1 className="text-5xl font-black xs:text-6xl">
             Avoid becoming penniless, <br /> start using pennylist.
           </h1>
-          <p className="text-xl">
+          <p className="text-xl text-muted-foreground">
             Designed to be simple like writing on a piece of paper. No more
             overwhelming features and complex interfaces.
           </p>
@@ -35,8 +35,7 @@ export default async function Home() {
           <div className="w-full rounded-[--radius] border p-4">
             <p className="pr-4 text-2xl font-black w-fit">Simple</p>
             <p className="text-muted-foreground">
-              Keep it as straightforward as jotting down notes on a piece of
-              paper.
+              As straightforward as jotting down notes on a piece of paper.
             </p>
           </div>
 
@@ -51,11 +50,11 @@ export default async function Home() {
             </p>
           </div>
         </div>
-        <footer className="flex flex-row flex-wrap justify-between w-full gap-4 p-4 text-sm text-muted-foreground">
+        <footer className="flex flex-row flex-wrap justify-between w-full gap-4 p-4 text-sm text-muted-foreground mb-0 mt-auto">
           <Link href={"/"}>© pennylist. 2024 </Link>
           <div className="flex flex-row gap-4">
-            <Link href={"/"}>Privacy Policy</Link>
-            <Link href={"/"}>Terms and Conditions</Link>
+            <Link href={"/privacypolicy"}>Privacy Policy</Link>
+            <Link href={"/termsandconditions"}>Terms and Conditions</Link>
           </div>
         </footer>
       </div>

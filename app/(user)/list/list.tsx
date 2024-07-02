@@ -62,6 +62,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
+import Scrollable from "@/components/scrollable";
 
 type changes = {
   from: { name: string; amount: string; total: string };
@@ -71,7 +72,6 @@ type changes = {
 export default function List({ list }: { list: User }) {
   var _ = require("lodash");
   const listState = useListState();
-  const { isLastDayOfMonth } = require("date-fns");
   const [showAddMoneyForm, setShowAddMoneyForm] = useState(false);
   const [showEditMoneyForm, setEditMoneyForm] = useState<{
     open: boolean;
@@ -293,7 +293,7 @@ export default function List({ list }: { list: User }) {
 
     // Calculate percentage differences
     const calculatePercentageDifference = (current: number, past: number) => {
-      return (((current - past) / current) * 100).toFixed(1);
+      return ((current - past) / current) * 100;
     };
 
     const yesterday = calculatePercentageDifference(
@@ -319,23 +319,23 @@ export default function List({ list }: { list: User }) {
       sumPast365
     );
 
-    const createDifferenceObject = (value: string) => {
+    const createDifferenceObject = (value: number) => {
       const numValue = Number(value);
       return {
-        text: `${value}%`,
+        value: `${value.toFixed(1)}%`,
         isUp: numValue > 0,
         isZero: numValue === 0,
       };
     };
 
     return {
-      text: {
-        yesterday: createDifferenceObject(yesterday).text,
-        week: createDifferenceObject(week).text,
-        twoWeek: createDifferenceObject(twoWeek).text,
-        threeWeek: createDifferenceObject(threeWeek).text,
-        fourWeek: createDifferenceObject(fourWeek).text,
-        threeSixFive: createDifferenceObject(threeSixFive).text,
+      value: {
+        yesterday: createDifferenceObject(yesterday).value,
+        week: createDifferenceObject(week).value,
+        twoWeek: createDifferenceObject(twoWeek).value,
+        threeWeek: createDifferenceObject(threeWeek).value,
+        fourWeek: createDifferenceObject(fourWeek).value,
+        threeSixFive: createDifferenceObject(threeSixFive).value,
       },
       isUp: {
         yesterday: createDifferenceObject(yesterday).isUp,
@@ -384,229 +384,226 @@ export default function List({ list }: { list: User }) {
     );
 
   return (
-    <main className="w-full h-full">
-      <ScrollArea className="w-full h-full">
-        <div className=" max-w-[800px] mx-auto px-2 flex flex-col justify-start gap-2 mb-[5.5rem]">
-          {/* total money and add money form */}
-          <div className="flex flex-col gap-8">
-            <div className="mt-2 border rounded-lg p-4 flex flex-row gap-4 items-center justify-between shadow-lg">
-              <div className="flex flex-col min-w-0">
-                <div className="text-muted-foreground text-xs flex items-center gap-1 w-fit">
-                  Total Money{" "}
-                  <button onClick={() => listState.toggleHideAmounts()}>
-                    {!listState.hideAmounts ? (
-                      <EyeOff size={18} />
-                    ) : (
-                      <Eye size={18} />
-                    )}
-                  </button>
-                </div>
-                <div className="text-2xl sm:text-4xl font-anton flex flex-row items-center truncate -ml-1 sm:-ml-2">
-                  <TbCurrencyPeso className="shrink-0" />
-                  <p className="truncate">
-                    {listState.hideAmounts
-                      ? AsteriskNumber(total)
-                      : UsePhpPeso(total)}
-                  </p>
-                  <TooltipProvider>
-                    <Tooltip delayDuration={250}>
-                      <TooltipTrigger
-                        className={`ml-1 text-xs mb-auto mt-0 font-bold flex items-center`}
-                      >
-                        <Badge
-                          variant={"secondary"}
-                          className={`font-bold px-1 flex gap-1 items-center justify-center ${
-                            differences.isZero.yesterday
-                              ? "text-muted-foreground"
-                              : differences.isUp.yesterday
-                              ? "text-green-500"
-                              : "text-red-400"
-                          }`}
-                        >
-                          <span>{differences.text.yesterday}</span>
-                          {differences.isZero.yesterday ? (
-                            <Equal className="size-3" />
-                          ) : differences.isUp.yesterday ? (
+    <Scrollable>
+      {/* total money and add money form */}
+      <div className="flex flex-col gap-8">
+        <div className="mt-2 border rounded-lg p-4 flex flex-row gap-4 items-center justify-between shadow-lg">
+          <div className="flex flex-col min-w-0">
+            <div className="text-muted-foreground text-xs flex items-center gap-1 w-fit">
+              Total Money{" "}
+              <button onClick={() => listState.toggleHideAmounts()}>
+                {!listState.hideAmounts ? (
+                  <EyeOff size={18} />
+                ) : (
+                  <Eye size={18} />
+                )}
+              </button>
+            </div>
+            <div className="text-2xl sm:text-4xl font-anton flex flex-row items-center truncate -ml-1 sm:-ml-2">
+              <TbCurrencyPeso className="shrink-0" />
+              <p className="truncate">
+                {listState.hideAmounts
+                  ? AsteriskNumber(total)
+                  : UsePhpPeso(total)}
+              </p>
+              <TooltipProvider>
+                <Tooltip delayDuration={250}>
+                  <TooltipTrigger
+                    className={`ml-1 text-xs mb-auto mt-0 font-bold flex items-center`}
+                  >
+                    <Badge
+                      variant={"secondary"}
+                      className={`font-bold px-1 flex items-center justify-center ${
+                        differences.isZero.yesterday
+                          ? "text-muted-foreground"
+                          : differences.isUp.yesterday
+                          ? "text-green-500"
+                          : "text-red-400"
+                      }`}
+                    >
+                      {differences.isZero.yesterday ? (
+                        <Equal className="size-3" />
+                      ) : (
+                        <>
+                          <span>{differences.value.yesterday}</span>
+                          {differences.isUp.yesterday ? (
                             <ArrowUp className="size-3" />
                           ) : (
                             <ArrowDown className="size-3" />
                           )}
-                        </Badge>
-                      </TooltipTrigger>
-                      <TooltipContent
-                        align="center"
-                        side="bottom"
-                        className="text-wrap w-fit max-w-[156px] p-2 text-sm"
-                      >
-                        <p>Today vs yesterday</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-              </div>
-              <Drawer
-                open={showAddMoneyForm}
-                onOpenChange={setShowAddMoneyForm}
-              >
-                <DrawerTrigger asChild>
-                  <Button size={"icon"} className="rounded-full shrink-0">
-                    <Plus />
-                  </Button>
-                </DrawerTrigger>
-                <DrawerContent className=" p-2 gap-2">
-                  <p className="font-bold text-sm text-center">Add money</p>
-                  <AddMoneyForm
-                    currentTotal={total}
-                    close={() => {
-                      setShowAddMoneyForm(false);
-                      refetchMoneys();
-                      refetchLogs();
-                    }}
-                  />
-                </DrawerContent>
-              </Drawer>
+                        </>
+                      )}
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    align="center"
+                    side="bottom"
+                    className="text-wrap w-fit max-w-[156px] p-2 text-sm"
+                  >
+                    <p>Today vs yesterday</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger className="text-xs text-muted-foreground ml-auto mr-0 flex items-center gap-1 ">
-                <p>sort</p> <ListFilter size={20} />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuCheckboxItem
-                  checked={listState.sort.by === "amount"}
-                  onClick={() => {
-                    listState.setSort(listState.sort.asc, "amount");
-                  }}
-                  className="text-xs"
-                >
-                  <Gem className="size-4 mr-1" />
-                  Value
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem
-                  checked={listState.sort.by === "created_at"}
-                  onClick={() => {
-                    listState.setSort(listState.sort.asc, "created_at");
-                  }}
-                  className="text-xs"
-                >
-                  <CalendarCheck className="size-4 mr-1" />
-                  Date created
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuCheckboxItem
-                  checked={listState.sort.asc}
-                  onClick={() => {
-                    listState.setSort(true, listState.sort.by);
-                  }}
-                  className="text-xs"
-                >
-                  <ArrowUpNarrowWide className="size-4 mr-1" />
-                  Ascending
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem
-                  checked={!listState.sort.asc}
-                  onClick={() => {
-                    listState.setSort(false, listState.sort.by);
-                  }}
-                  className="text-xs"
-                >
-                  <ArrowDownNarrowWide className="size-4 mr-1" />
-                  Descending
-                </DropdownMenuCheckboxItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
-          {/* edit money form */}
-          <Drawer
-            open={showEditMoneyForm.open}
-            onOpenChange={(e) => {
-              setEditMoneyForm((prev) => ({
-                ...prev,
-                open: e,
-              }));
-            }}
-          >
+          <Drawer open={showAddMoneyForm} onOpenChange={setShowAddMoneyForm}>
+            <DrawerTrigger asChild>
+              <Button size={"icon"} className="rounded-full shrink-0">
+                <Plus />
+              </Button>
+            </DrawerTrigger>
             <DrawerContent className=" p-2 gap-2">
-              <p className="font-bold text-sm text-center">Edit money</p>
-              <EditMoneyForm
+              <p className="font-bold text-sm text-center">Add money</p>
+              <AddMoneyForm
                 currentTotal={total}
-                money={showEditMoneyForm.money!}
                 close={() => {
-                  setEditMoneyForm((prev) => ({
-                    ...prev,
-                    open: false,
-                  }));
+                  setShowAddMoneyForm(false);
                   refetchMoneys();
                   refetchLogs();
                 }}
               />
             </DrawerContent>
           </Drawer>
-
-          {/* moneys list */}
-          {total === 0 ? (
-            <p className="text-sm text-center text-muted-foreground">
-              You are currently pennyless
-            </p>
-          ) : (
-            <div className="w-full flex flex-col gap-2">
-              {moneys?.data?.map((money) => {
-                return (
-                  <Money
-                    edit={() => setEditMoneyForm({ money: money, open: true })}
-                    done={() => {
-                      refetchLogs();
-                      refetchMoneys();
-                    }}
-                    money={money}
-                    key={money.id}
-                    hideAmounts={listState.hideAmounts}
-                    currentTotal={total}
-                  />
-                );
-              })}
-            </div>
-          )}
-
-          <Separator />
-
-          {logs?.data?.length ? (
-            <>
-              {/* tables */}
-              {logs?.data && (
-                <LogsTable
-                  open={listState.showLogs}
-                  toggleOpen={() => listState.setShowLogs()}
-                  logs={logs?.data}
-                />
-              )}
-              {/* pie */}
-              {moneys?.data ? (
-                <TotalBreakdownPieChart
-                  open={listState.showBreakdown}
-                  toggleOpen={() => listState.setShowBreakdown()}
-                  moneys={moneys.data}
-                />
-              ) : null}
-              {/* bars */}
-              {dailyTotal ? (
-                <DailyTotalBarChart
-                  differences={differences}
-                  open={listState.showDailyTotal}
-                  toggleOpen={() => listState.setShowDailyTotal()}
-                  dailyTotal={dailyTotal}
-                />
-              ) : null}
-              {monthlyTotal ? (
-                <MonthlyTotalBarChart
-                  open={listState.showMonthlyTotal}
-                  toggleOpen={() => listState.setShowMonthlyTotal()}
-                  monthlyTotal={monthlyTotal}
-                />
-              ) : null}
-            </>
-          ) : null}
         </div>
-      </ScrollArea>
-    </main>
+        <DropdownMenu>
+          <DropdownMenuTrigger className="text-xs text-muted-foreground ml-auto mr-0 flex items-center gap-1 ">
+            <p>sort</p> <ListFilter size={20} />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuCheckboxItem
+              checked={listState.sort.by === "amount"}
+              onClick={() => {
+                listState.setSort(listState.sort.asc, "amount");
+              }}
+              className="text-xs"
+            >
+              <Gem className="size-4 mr-1" />
+              Value
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem
+              checked={listState.sort.by === "created_at"}
+              onClick={() => {
+                listState.setSort(listState.sort.asc, "created_at");
+              }}
+              className="text-xs"
+            >
+              <CalendarCheck className="size-4 mr-1" />
+              Date created
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuCheckboxItem
+              checked={listState.sort.asc}
+              onClick={() => {
+                listState.setSort(true, listState.sort.by);
+              }}
+              className="text-xs"
+            >
+              <ArrowUpNarrowWide className="size-4 mr-1" />
+              Ascending
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem
+              checked={!listState.sort.asc}
+              onClick={() => {
+                listState.setSort(false, listState.sort.by);
+              }}
+              className="text-xs"
+            >
+              <ArrowDownNarrowWide className="size-4 mr-1" />
+              Descending
+            </DropdownMenuCheckboxItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      {/* edit money form */}
+      <Drawer
+        open={showEditMoneyForm.open}
+        onOpenChange={(e) => {
+          setEditMoneyForm((prev) => ({
+            ...prev,
+            open: e,
+          }));
+        }}
+      >
+        <DrawerContent className=" p-2 gap-2">
+          <p className="font-bold text-sm text-center">Edit money</p>
+          <EditMoneyForm
+            currentTotal={total}
+            money={showEditMoneyForm.money!}
+            close={() => {
+              setEditMoneyForm((prev) => ({
+                ...prev,
+                open: false,
+              }));
+              refetchMoneys();
+              refetchLogs();
+            }}
+          />
+        </DrawerContent>
+      </Drawer>
+
+      {/* moneys list */}
+      {total === 0 ? (
+        <p className="text-sm text-center text-muted-foreground">
+          You are currently pennyless
+        </p>
+      ) : (
+        <div className="w-full flex flex-col gap-2">
+          {moneys?.data?.map((money) => {
+            return (
+              <Money
+                edit={() => setEditMoneyForm({ money: money, open: true })}
+                done={() => {
+                  refetchLogs();
+                  refetchMoneys();
+                }}
+                money={money}
+                key={money.id}
+                hideAmounts={listState.hideAmounts}
+                currentTotal={total}
+              />
+            );
+          })}
+        </div>
+      )}
+
+      <Separator />
+
+      {logs?.data?.length ? (
+        <>
+          {/* tables */}
+          {logs?.data && (
+            <LogsTable
+              open={listState.showLogs}
+              toggleOpen={() => listState.setShowLogs()}
+              logs={logs?.data}
+            />
+          )}
+          {/* pie */}
+          {moneys?.data ? (
+            <TotalBreakdownPieChart
+              open={listState.showBreakdown}
+              toggleOpen={() => listState.setShowBreakdown()}
+              moneys={moneys.data}
+            />
+          ) : null}
+          {/* bars */}
+          {dailyTotal ? (
+            <DailyTotalBarChart
+              differences={differences}
+              open={listState.showDailyTotal}
+              toggleOpen={() => listState.setShowDailyTotal()}
+              dailyTotal={dailyTotal}
+            />
+          ) : null}
+          {monthlyTotal ? (
+            <MonthlyTotalBarChart
+              open={listState.showMonthlyTotal}
+              toggleOpen={() => listState.setShowMonthlyTotal()}
+              monthlyTotal={monthlyTotal}
+            />
+          ) : null}
+        </>
+      ) : null}
+    </Scrollable>
   );
 }

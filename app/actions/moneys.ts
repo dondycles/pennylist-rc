@@ -17,6 +17,16 @@ export async function getMoneys(sort: {
   return moneys;
 }
 
+export async function getMoney(id: string) {
+  const supabase = createClient();
+  const moneys = await supabase
+    .from("moneys")
+    .select("id,amount,name,created_at,color,updated_at")
+    .eq("id", id)
+    .single();
+  return moneys;
+}
+
 export async function addMoney(
   money: Pick<money, "amount" | "name">,
   currentTotal: string

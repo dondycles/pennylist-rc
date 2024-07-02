@@ -122,6 +122,10 @@ export default function SignupForm() {
         <Button asChild type="submit" className="w-full" variant={"link"}>
           <Link href={"/login"}>or Log in</Link>
         </Button>
+        <p className="text-xs text-muted-foreground">
+          By signing up, I agree to pennylist&apos;s Terms and Conditions &
+          Privacy Policy.
+        </p>
       </form>
     </Form>
   );

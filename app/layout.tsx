@@ -5,7 +5,10 @@ import QueryProvider from "@/components/query-provider";
 import { UseDefaultURL } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 
-const raleway = Raleway({ subsets: ["latin"], weight: ["500", "700", "900"] });
+const raleway = Raleway({
+  subsets: ["latin"],
+  weight: ["500", "600", "700", "900"],
+});
 const anton = Readex_Pro({
   weight: ["400"],
   subsets: ["latin"],

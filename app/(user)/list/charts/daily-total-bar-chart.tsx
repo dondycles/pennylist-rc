@@ -38,7 +38,7 @@ export default function DailyTotalBarChart({
   open: boolean;
   toggleOpen: () => void;
   differences: {
-    text: {
+    value: {
       yesterday: string;
       week: string;
       twoWeek: string;
@@ -73,100 +73,37 @@ export default function DailyTotalBarChart({
 
   const CustomTooltipDailyTotal = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
+      const value = Number(payload[0]?.value);
+      const predValue = Number(
+        dailyTotal.find(
+          (day) =>
+            day.date ===
+            new Date(
+              new Date().setDate(
+                new Date(payload[0].payload.date).getDate() - 1
+              )
+            ).toDateString()
+        )?.total
+      );
+      const difference = ((value - predValue) / value) * 100;
       return (
         <div className="rounded-lg  p-2  text-sm bg-foreground text-background">
           <p> {payload[0].payload.date}</p>
-          <p>{UsePhpPesoWSign(payload[0]?.value)}</p>
+          <p>{UsePhpPesoWSign(value)}</p>
           <p>
             <span
               className={
-                ((Number(payload[0]?.value) -
-                  Number(
-                    dailyTotal.find(
-                      (day) =>
-                        day.date ===
-                        new Date(
-                          new Date().setDate(
-                            new Date(payload[0].payload.date).getDate() - 1
-                          )
-                        ).toDateString()
-                    )?.total
-                  )) /
-                  Number(payload[0]?.value)) *
-                  100 ===
-                0
+                difference === 0
                   ? "text-muted-foreground"
-                  : ((Number(payload[0]?.value) -
-                      Number(
-                        dailyTotal.find(
-                          (day) =>
-                            day.date ===
-                            new Date(
-                              new Date().setDate(
-                                new Date(payload[0].payload.date).getDate() - 1
-                              )
-                            ).toDateString()
-                        )?.total
-                      )) /
-                      Number(payload[0]?.value)) *
-                      100 >
-                    0
+                  : difference > 0
                   ? "text-green-500"
                   : "text-red-400"
               }
             >
-              {(
-                ((Number(payload[0]?.value) -
-                  Number(
-                    dailyTotal.find(
-                      (day) =>
-                        day.date ===
-                        new Date(
-                          new Date().setDate(
-                            new Date(payload[0].payload.date).getDate() - 1
-                          )
-                        ).toDateString()
-                    )?.total
-                  )) /
-                  Number(payload[0]?.value)) *
-                100
-              ).toFixed(1)}
-              %{" "}
+              {difference.toFixed(1)}%{" "}
             </span>
-            {((Number(payload[0]?.value) -
-              Number(
-                dailyTotal.find(
-                  (day) =>
-                    day.date ===
-                    new Date(
-                      new Date().setDate(
-                        new Date(payload[0].payload.date).getDate() - 1
-                      )
-                    ).toDateString()
-                )?.total
-              )) /
-              Number(payload[0]?.value)) *
-              100 ===
-            0
-              ? "equal"
-              : ((Number(payload[0]?.value) -
-                  Number(
-                    dailyTotal.find(
-                      (day) =>
-                        day.date ===
-                        new Date(
-                          new Date().setDate(
-                            new Date(payload[0].payload.date).getDate() - 1
-                          )
-                        ).toDateString()
-                    )?.total
-                  )) /
-                  Number(payload[0]?.value)) *
-                  100 >
-                0
-              ? "up"
-              : "down"}{" "}
-            than last day
+            {difference === 0 ? "equal" : difference > 0 ? "up" : "down"} than
+            last day
           </p>
         </div>
       );
@@ -179,11 +116,11 @@ export default function DailyTotalBarChart({
 
   const getDifference = () => {
     const difference =
-      (listState.dailyTotalDays === 7 && differences.text.week) ||
-      (listState.dailyTotalDays === 14 && differences.text.twoWeek) ||
-      (listState.dailyTotalDays === 21 && differences.text.threeWeek) ||
-      (listState.dailyTotalDays === 28 && differences.text.fourWeek) ||
-      (listState.dailyTotalDays === 365 && differences.text.threeSixFive) ||
+      (listState.dailyTotalDays === 7 && differences.value.week) ||
+      (listState.dailyTotalDays === 14 && differences.value.twoWeek) ||
+      (listState.dailyTotalDays === 21 && differences.value.threeWeek) ||
+      (listState.dailyTotalDays === 28 && differences.value.fourWeek) ||
+      (listState.dailyTotalDays === 365 && differences.value.threeSixFive) ||
       "0";
 
     const direction =
@@ -288,7 +225,7 @@ export default function DailyTotalBarChart({
             <Badge className="text-sm block w-fit px-1" variant={"secondary"}>
               {getDifference()} from past {listState.dailyTotalDays} days
             </Badge>
-            <ResponsiveContainer width="100%" height={365}>
+            <ResponsiveContainer width="100%" height={200}>
               <BarChart data={slicedDailyTotal} className="h-12">
                 <XAxis
                   stroke="hsl(var(--muted-foreground))"
@@ -321,7 +258,7 @@ export default function DailyTotalBarChart({
                   animationBegin={0}
                   dataKey="total"
                   fill="hsl(var(--foreground))"
-                  radius={[8, 8, 0, 0]}
+                  radius={[4, 4, 0, 0]}
                   className="bg-red-500"
                 >
                   {dailyTotal.map((e) => (

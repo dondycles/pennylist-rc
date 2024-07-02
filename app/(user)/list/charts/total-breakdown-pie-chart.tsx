@@ -106,7 +106,7 @@ export default function TotalBreakdownPieChart({
         </CollapsibleTrigger>
         <CollapsibleContent>
           {moneys.length ? (
-            <CardContent className="aspect-square p-2 max-h-[60vh] mx-auto">
+            <CardContent className="aspect-square p-2 max-h-[50vh] mx-auto">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie

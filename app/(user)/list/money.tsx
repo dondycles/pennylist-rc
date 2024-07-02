@@ -12,7 +12,7 @@ import {
 import { deleteMoney, setColor } from "@/app/actions/moneys";
 import { useState } from "react";
 import { TbCurrencyPeso } from "react-icons/tb";
-import { Check, Palette, Pencil, Trash, X } from "lucide-react";
+import { Check, Info, Palette, Pencil, Trash, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { colors } from "@/constants/colors";
+import Link from "next/link";
 
 export default function Money({
   money,
@@ -82,10 +83,7 @@ export default function Money({
         </ContextMenuTrigger>
         <ContextMenuContent>
           <ContextMenuSub>
-            <ContextMenuSubTrigger
-              className="text-xs"
-              style={{ color: money.color ?? "" }}
-            >
+            <ContextMenuSubTrigger style={{ color: money.color ?? "" }}>
               <Palette
                 className="size-4 mr-1"
                 style={{ color: money.color ?? "" }}
@@ -113,15 +111,20 @@ export default function Money({
               </ContextMenuItem>
             </ContextMenuSubContent>
           </ContextMenuSub>
-          <ContextMenuItem onClick={() => edit()} className="text-xs">
+          <ContextMenuItem onClick={() => edit()}>
             <Pencil className="size-4 mr-1" />
             Edit
           </ContextMenuItem>
-          <ContextMenuItem className="text-xs" asChild>
+          <ContextMenuItem asChild>
             <DialogTrigger className="w-full">
               <Trash className="size-4 mr-1 text-destructive" />
-              <span className="text-destructive">Delete</span>
+              <p className="text-destructive font-bold">Delete</p>
             </DialogTrigger>
+          </ContextMenuItem>
+          <ContextMenuItem asChild>
+            <Link href={"/money/" + money.id}>
+              <Info className="size-4 mr-1 " /> Details
+            </Link>
           </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
