@@ -74,31 +74,25 @@ export default function LogsTable({
                     <TableCell>
                       {log.type === "add" ? (
                         <>
-                          {(log.changes as changes).to.name} -{" "}
-                          {UsePhpPesoWSign((log.changes as changes).to.amount)}
+                          {log.changes?.to.name} -{" "}
+                          {UsePhpPesoWSign(log.changes?.to.amount)}
                         </>
                       ) : (
                         <div className="flex flex-col gap-2  w-fit">
-                          {(log.changes as changes).from.name !==
-                            (log.changes as changes).to.name && (
+                          {log.changes?.from.name !== log.changes?.to.name && (
                             <div className="flex flex-row ">
                               <p className="flex-1">
-                                {(log.changes as changes).from.name} to{" "}
-                                {(log.changes as changes).to.name}
+                                {log.changes?.from.name} to{" "}
+                                {log.changes?.to.name}
                               </p>
                             </div>
                           )}
-                          {(log.changes as changes).from.amount !==
-                            (log.changes as changes).to.amount && (
+                          {log.changes?.from.amount !==
+                            log.changes?.to.amount && (
                             <div className="flex flex-row  ">
                               <p className="flex-1 w-fit ">
-                                {UsePhpPesoWSign(
-                                  (log.changes as changes).from.amount
-                                )}{" "}
-                                to{" "}
-                                {UsePhpPesoWSign(
-                                  (log.changes as changes).to.amount
-                                )}
+                                {UsePhpPesoWSign(log.changes?.from.amount)} to{" "}
+                                {UsePhpPesoWSign(log.changes?.to.amount)}
                               </p>
                             </div>
                           )}
@@ -107,7 +101,7 @@ export default function LogsTable({
                     </TableCell>
                     <TableCell>{log.reason}</TableCell>
                     <TableCell>
-                      {UsePhpPesoWSign((log.changes as changes).to.total)}
+                      {UsePhpPesoWSign(log.changes?.to.total)}
                     </TableCell>
                     <TableCell>
                       {new Date(log.created_at).toLocaleString()}

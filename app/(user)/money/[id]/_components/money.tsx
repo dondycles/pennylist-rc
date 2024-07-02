@@ -8,10 +8,6 @@ import { useQuery } from "@tanstack/react-query";
 import { TbCurrencyPeso } from "react-icons/tb";
 import LogsTable from "./logs-table";
 
-type changes = {
-  from: { name: string; amount: string; total: string };
-  to: { name: string; amount: string; total: string };
-};
 export default function Money({
   list,
   moneyId,
@@ -25,42 +21,6 @@ export default function Money({
   });
   const money = data?.data;
   const logs = data?.data?.logs;
-
-  const getDailyTotal = () => {
-    if (!logs) return [];
-    let groupedByDate: { [key: string]: number } = {};
-
-    logs.toReversed().forEach((log) => {
-      const date = new Date(log.created_at).toDateString();
-
-      const total = Number((log.changes as changes).to.total);
-
-      // sets the log's date as the key, and overwrites its total to most recent reocrd if there are many records in that date
-      groupedByDate[date] = total;
-    });
-
-    const eachDayTotal: { date: string; total: number }[] = [];
-    const currentDate = new Date();
-    let lastTotal = 0;
-
-    // sets the current date back based on the days parameter
-    currentDate.setDate(currentDate.getDate() - 365);
-
-    for (let i = 0; i <= 365; i++) {
-      const day = currentDate.toDateString();
-
-      if (groupedByDate[day] !== undefined) {
-        // if this date has total, set it to lastTotal so the next dates that does not have total will get that total as well to fill up the bars
-        lastTotal = groupedByDate[day];
-      }
-
-      eachDayTotal.push({ date: day, total: lastTotal });
-
-      // sets the date to the next day
-      currentDate.setDate(currentDate.getDate() + 1);
-    }
-    return eachDayTotal;
-  };
 
   if (error || data?.error)
     return (

@@ -61,11 +61,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Scrollable from "@/components/scrollable";
 
-type changes = {
-  from: { name: string; amount: string; total: string };
-  to: { name: string; amount: string; total: string };
-};
-
 export default function List({ list }: { list: User }) {
   var _ = require("lodash");
   const listState = useListState();
@@ -111,7 +106,7 @@ export default function List({ list }: { list: User }) {
     logs?.data?.toReversed().forEach((log) => {
       const date = new Date(log.created_at).toDateString();
 
-      const total = Number((log.changes as changes).to.total);
+      const total = Number(log.changes?.to.total);
 
       // sets the log's date as the key, and overwrites its total to most recent reocrd if there are many records in that date
       groupedByDate[date] = total;
