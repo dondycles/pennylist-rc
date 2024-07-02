@@ -130,10 +130,13 @@ export default function Money({
       </ContextMenu>
       <DialogContent className="p-2 w-fit">
         <DialogHeader>
-          <DialogTitle className="text-destructive text-center">
+          <DialogTitle className="text-destructive text-center font-black">
             Warning!
           </DialogTitle>
-          <DialogDescription>Are you sure to delete?</DialogDescription>
+          <DialogDescription className="text-center text-sm">
+            Are you sure to delete? <br /> This will also delete its log
+            history.
+          </DialogDescription>
           <div
             key={money.id}
             className={`p-2 border rounded-lg flex flex-row justify-between items-center font-bold ${

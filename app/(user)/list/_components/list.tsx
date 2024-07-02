@@ -25,7 +25,14 @@ import { getLogs } from "@/app/actions/logs";
 
 // Importing UI components
 import { Button } from "@/components/ui/button";
-import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -448,8 +455,16 @@ export default function List({ list }: { list: User }) {
                 <Plus />
               </Button>
             </DrawerTrigger>
-            <DrawerContent className=" p-2 gap-2">
-              <p className="font-bold text-sm text-center">Add money</p>
+            <DrawerContent className="p-2 gap-2">
+              <DrawerHeader className="py-2 px-0 w-[320px] mx-auto">
+                <DrawerTitle>
+                  <p className="font-bold text-sm text-center">Add money</p>
+                </DrawerTitle>
+                <DrawerDescription className="text-center">
+                  Add money by stating the name or its source and the amount.
+                </DrawerDescription>
+              </DrawerHeader>
+
               <AddMoneyForm
                 currentTotal={String(total)}
                 close={() => {
@@ -520,7 +535,14 @@ export default function List({ list }: { list: User }) {
         }}
       >
         <DrawerContent className=" p-2 gap-2">
-          <p className="font-bold text-sm text-center">Edit money</p>
+          <DrawerHeader className="py-2 px-0 w-[320px] mx-auto">
+            <DrawerTitle>
+              <p className="font-bold text-sm text-center">Edit money</p>
+            </DrawerTitle>
+            <DrawerDescription className="text-center">
+              Any changes made are recorded to keep track of its progress.
+            </DrawerDescription>
+          </DrawerHeader>
           <EditMoneyForm
             currentTotal={String(total)}
             money={showEditMoneyForm.money!}
