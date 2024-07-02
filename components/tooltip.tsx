@@ -13,9 +13,9 @@ export default function TooltipC({
   text: string;
 }) {
   return (
-    <TooltipProvider delayDuration={250}>
+    <TooltipProvider delayDuration={500}>
       <Tooltip>
-        <TooltipTrigger asChild>{children}</TooltipTrigger>
+        <TooltipTrigger>{children}</TooltipTrigger>
         <TooltipContent>{text}</TooltipContent>
       </Tooltip>
     </TooltipProvider>
