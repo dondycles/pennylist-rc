@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 export async function log(
   type: string,
   reason: string,
+  money: string,
   changes?: {
     from: { name: string; amount: string; total: string };
     to: { name: string; amount: string; total: string };
@@ -13,7 +14,7 @@ export async function log(
   const supabase = createClient();
   const { error } = await supabase
     .from("logs")
-    .insert({ type, changes, reason });
+    .insert({ type, changes, reason, money });
 
   if (error) return { error: error.message };
   return { success: "Logged" };

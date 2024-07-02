@@ -1,12 +1,12 @@
 "use client";
 import { getMoney } from "@/app/actions/moneys";
 import Scrollable from "@/components/scrollable";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UsePhpPeso } from "@/lib/utils";
 import { User } from "@supabase/supabase-js";
 import { useQuery } from "@tanstack/react-query";
 import { TbCurrencyPeso } from "react-icons/tb";
+import LogsTable from "../../list/charts/logs-table";
 
 export default function Money({
   list,
@@ -60,6 +60,7 @@ export default function Money({
           {UsePhpPeso(money.amount ?? 0)}
         </div>
       </div>
+      <LogsTable open toggleOpen={() => {}} logs={money.logs} />
     </Scrollable>
   );
 }

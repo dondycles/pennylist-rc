@@ -67,7 +67,8 @@ export default function EditMoneyForm({
         newMoneyData,
         money,
         currentTotal,
-        values.reason
+        values.reason,
+        values.id
       );
       if (error) {
         return error;
