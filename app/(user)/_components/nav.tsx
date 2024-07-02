@@ -1,4 +1,4 @@
-import { ThemeToggle } from "@/components/theme-toggle";
+import { ThemeToggle } from "./theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff, Home, LogOut } from "lucide-react";
 import { logout } from "../../actions/auth/log-out";
