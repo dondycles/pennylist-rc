@@ -1,7 +1,7 @@
 import { persist } from "zustand/middleware";
 import { create } from "zustand";
 
-type listPage = {
+export type ListState = {
   currentTotal: number;
   setCurrentTotal: (total: number) => void;
   sort: {
@@ -25,7 +25,7 @@ type listPage = {
   setShowMonthlyTotal: () => void;
 };
 
-export const useListState = create<listPage>()(
+export const useListState = create<ListState>()(
   persist(
     (set, get) => ({
       sort: {
