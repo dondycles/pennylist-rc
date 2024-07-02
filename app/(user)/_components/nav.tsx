@@ -37,7 +37,7 @@ export default function Nav() {
           size={"icon"}
           onClick={() => listState.toggleHideAmounts()}
         >
-          {!listState.hideAmounts ? <EyeOff size={18} /> : <Eye size={18} />}
+          {!listState.hideAmounts ? <EyeOff size={20} /> : <Eye size={20} />}
         </Button>
       </TooltipC>
       <TooltipC text="Logout">

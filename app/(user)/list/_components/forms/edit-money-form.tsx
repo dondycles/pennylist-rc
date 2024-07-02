@@ -46,7 +46,7 @@ export default function EditMoneyForm({
       id: money.id,
       created_at: money.created_at,
       color: money.color,
-      updated_at: money.updated_at,
+      updated_at: String(new Date()),
       reason: "",
       ded: "",
       add: "",
