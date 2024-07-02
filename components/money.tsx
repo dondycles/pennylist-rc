@@ -20,14 +20,6 @@ import {
 } from "@/components/ui/popover";
 import { colors } from "@/constants/colors";
 import { useState } from "react";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
 import EditMoneyForm from "@/components/forms/edit-money-form";
 import { useListState } from "@/store";
 import {
@@ -165,7 +157,7 @@ export default function Money({
           backgroundColor: money.data.color ? money.data.color + 20 : "",
         }}
         className={
-          "p-4 shadow-lg border rounded-lg flex flex-row justify-between items-center font-bold ease-in-out transition-all mt-2 relative overflow-hidden"
+          "p-4 shadow-lg border rounded-lg flex flex-row justify-between items-center ease-in-out transition-all mt-2 relative overflow-hidden"
         }
       >
         <div className="flex flex-col min-w-0 z-10">
@@ -174,7 +166,7 @@ export default function Money({
           </p>
           <div className="text-2xl sm:text-4xl font-anton flex flex-row items-center truncate -ml-1 sm:-ml-2">
             <TbCurrencyPeso className="shrink-0" />
-            <p className="truncate">
+            <p className="truncate font-bold ">
               {" "}
               {listState.hideAmounts
                 ? AsteriskNumber(money.data.amount ?? 0)

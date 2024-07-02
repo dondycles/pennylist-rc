@@ -25,14 +25,7 @@ import { getLogs } from "@/app/actions/logs";
 
 // Importing UI components
 import { Button } from "@/components/ui/button";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
+
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -405,7 +398,7 @@ export default function List({ list }: { list: User }) {
             </p>
             <div className="text-2xl sm:text-4xl font-anton flex flex-row items-center truncate -ml-1 sm:-ml-2">
               <TbCurrencyPeso className="shrink-0" />
-              <p className="truncate">
+              <p className="truncate  font-bold">
                 {listState.hideAmounts
                   ? AsteriskNumber(total)
                   : UsePhpPeso(total)}
