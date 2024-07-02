@@ -80,7 +80,9 @@ export default function DailyTotalBarChart({
             ).toDateString()
         )?.total
       );
-      const difference = ((value - predValue) / value) * 100;
+      const difference = isNaN(((value - predValue) / value) * 100)
+        ? 0
+        : ((value - predValue) / value) * 100;
       return (
         <div className="rounded-lg  p-2  text-sm bg-foreground text-background">
           <p> {payload[0].payload.date}</p>

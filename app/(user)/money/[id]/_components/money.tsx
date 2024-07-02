@@ -7,7 +7,12 @@ import {
 } from "@/app/actions/moneys";
 import Scrollable from "@/components/scrollable";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AsteriskNumber, UsePhpPeso, UsePhpPesoWSign } from "@/lib/utils";
+import {
+  AsteriskNumber,
+  UsePhpPeso,
+  UsePhpPesoWSign,
+  toMonthWord,
+} from "@/lib/utils";
 import { User } from "@supabase/supabase-js";
 import { useQuery } from "@tanstack/react-query";
 import { TbCurrencyPeso } from "react-icons/tb";
@@ -23,7 +28,6 @@ import { useState } from "react";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import EditMoneyForm from "@/app/(user)/list/_components/forms/edit-money-form";
 import { useListState } from "@/store";
-import { Separator } from "@/components/ui/separator";
 import {
   Dialog,
   DialogContent,
@@ -33,6 +37,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Bar,
+  BarChart,
+  Brush,
+  Cell,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+} from "recharts";
 
 export default function Money({
   list,
@@ -85,18 +99,91 @@ export default function Money({
     refetchMoney();
   };
 
-  if (
-    moneyError ||
-    money?.error ||
-    totalError ||
-    totalData?.error ||
-    !money?.data
-  )
+  const getProgress = () => {
+    if (!logs) return [];
+    let groupedByDate: { [key: string]: number } = {};
+
+    logs.toReversed().forEach((log) => {
+      const date = new Date(log.created_at).toDateString();
+      groupedByDate[date] = Number(log.changes?.to.amount);
+    });
+
+    let eachDayTotal: { date: string; total: number }[] = [];
+    const currentDate = new Date();
+    let lastTotal = 0;
+
+    currentDate.setDate(currentDate.getDate() - 28);
+
+    for (let i = 0; i <= 28; i++) {
+      const day = currentDate.toDateString();
+
+      if (groupedByDate[day] !== undefined) {
+        // if this date has total, set it to lastTotal so the next dates that does not have total will get that total as well to fill up the bars
+        lastTotal = groupedByDate[day];
+      }
+
+      eachDayTotal.push({ date: day, total: lastTotal });
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return eachDayTotal;
+  };
+  const progress = getProgress();
+
+  const CustomTooltipDailyTotal = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const value = Number(isNaN(payload[0]?.value) ? 0 : payload[0]?.value);
+      const predValue = Number(
+        progress.find(
+          (day) =>
+            day.date ===
+            new Date(
+              new Date().setDate(
+                new Date(payload[0].payload.date).getDate() - 1
+              )
+            ).toDateString()
+        )?.total
+      );
+      const difference = isNaN(((value - predValue) / value) * 100)
+        ? 0
+        : ((value - predValue) / value) * 100;
+      return (
+        <div className="rounded-lg  p-2  text-sm bg-foreground text-background">
+          <p> {payload[0].payload.date}</p>
+          <p>{UsePhpPesoWSign(value)}</p>
+          <p>
+            <span
+              className={
+                difference === 0
+                  ? "text-muted-foreground"
+                  : difference > 0
+                  ? "text-green-500"
+                  : "text-red-400"
+              }
+            >
+              {difference.toFixed(1)}%{" "}
+            </span>
+            {difference === 0 ? "equal" : difference > 0 ? "up" : "down"} than
+            last day
+          </p>
+        </div>
+      );
+    }
+
+    // return <div className="bg-black">{JSON.stringify(any)}</div>;
+
+    return null;
+  };
+
+  if (moneyError || money?.error || totalError || totalData?.error)
     return (
       <main className="w-full h-full p-2 ">
-        <p className="text-xs text-muted-foreground text-center">
-          Money not found.
-        </p>
+        <div className="flex items-center text-sm text-destructive gap-2 justify-center">
+          {money?.error && money?.error?.message}
+          {moneyError && moneyError?.message}
+          {totalData?.error && totalData?.error?.message}
+          {totalError && totalError?.message}
+        </div>
       </main>
     );
   if (moneyLoading || totalLoading)
@@ -110,6 +197,15 @@ export default function Money({
         </div>
       </main>
     );
+  if (!money?.data)
+    return (
+      <main className="w-full h-full p-2">
+        <p className="text-xs text-muted-foreground text-center">
+          Money not found.
+        </p>
+      </main>
+    );
+
   return (
     <Scrollable>
       <div
@@ -237,7 +333,7 @@ export default function Money({
         </div>
       </div>
 
-      <div className="text-xs text-muted-foreground">
+      <div className="text-xs text-muted-foreground mt-8">
         <p>Created at: {new Date(money.data.created_at).toLocaleString()}</p>
         {lastUpdate && (
           <p>Last update at: {new Date(lastUpdate).toLocaleString()}</p>
@@ -248,7 +344,72 @@ export default function Money({
         </p>
       </div>
 
-      {logs?.length !== 0 ? <>{logs && <LogsTable logs={logs} />}</> : null}
+      {logs?.length !== 0 ? (
+        <>
+          {progress.length !== 0 ? (
+            <Card className="shadow-none rounded-lg">
+              <CardHeader className="px-2 py-3">
+                <CardTitle className="font-bold">
+                  Progress (Last 7 days)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-2 h-fit w-full">
+                <ResponsiveContainer width="100%" height={200}>
+                  <BarChart data={progress} className="h-12">
+                    <XAxis
+                      stroke="hsl(var(--muted-foreground))"
+                      fontSize={10}
+                      tickLine={false}
+                      axisLine={false}
+                      dataKey="date"
+                      tickFormatter={(value) =>
+                        new Date(value).toDateString() ===
+                        new Date().toDateString()
+                          ? "Today"
+                          : new Date(value).getDate() === 1
+                          ? `${toMonthWord(value)} ${new Date(
+                              value
+                            ).getFullYear()}`
+                          : new Date(value).getDate().toString()
+                      }
+                    />
+                    {/* <YAxis
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={10}
+                  tickLine={false}
+                  tickFormatter={(value) => UsePhpPesoWSign(value, 0)}
+                  axisLine={false}
+                /> */}
+                    <Tooltip content={CustomTooltipDailyTotal} />
+                    <Brush
+                      dataKey="total"
+                      height={30}
+                      stroke="hsl(var(--muted-foreground))"
+                    />
+                    <Bar
+                      animationBegin={0}
+                      dataKey="total"
+                      fill="hsl(var(--foreground))"
+                      radius={[4, 4, 0, 0]}
+                      className="bg-red-500"
+                    >
+                      {progress.map((e) => (
+                        <Cell
+                          key={e.date}
+                          style={{
+                            fill: "hsl(var(--foreground))",
+                          }}
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          ) : null}
+          {logs && <LogsTable logs={logs} />}
+        </>
+      ) : null}
     </Scrollable>
   );
 }

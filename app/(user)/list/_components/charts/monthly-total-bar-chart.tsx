@@ -36,6 +36,20 @@ export default function MonthlyTotalBarChart({
 
   const CustomTooltipMonthlyTotal = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
+      const value = Number(payload[0]?.value);
+      const predValue = Number(
+        monthlyTotal.find(
+          (day) =>
+            new Date(day.date).getMonth() ===
+            (new Date(payload[0].payload.date).getMonth() - 1 === -1
+              ? 11
+              : new Date(payload[0].payload.date).getMonth() - 1)
+        )?.total
+      );
+
+      const difference = isNaN(((value - predValue) / value) * 100)
+        ? 0
+        : ((value - predValue) / value) * 100;
       return (
         <div className="rounded-lg  p-2  text-sm bg-foreground text-background">
           <p>
@@ -47,86 +61,17 @@ export default function MonthlyTotalBarChart({
           <p>
             <span
               className={
-                ((Number(payload[0]?.value) -
-                  Number(
-                    monthlyTotal.find(
-                      (day) =>
-                        new Date(day.date).getMonth() ===
-                        (new Date(payload[0].payload.date).getMonth() - 1 === -1
-                          ? 11
-                          : new Date(payload[0].payload.date).getMonth() - 1)
-                    )?.total
-                  )) /
-                  Number(payload[0]?.value)) *
-                  100 ===
-                0
+                difference === 0
                   ? "text-muted-foreground"
-                  : ((Number(payload[0]?.value) -
-                      Number(
-                        monthlyTotal.find(
-                          (day) =>
-                            new Date(day.date).getMonth() ===
-                            (new Date(payload[0].payload.date).getMonth() -
-                              1 ===
-                            -1
-                              ? 11
-                              : new Date(payload[0].payload.date).getMonth() -
-                                1)
-                        )?.total
-                      )) /
-                      Number(payload[0]?.value)) *
-                      100 >
-                    0
+                  : difference > 0
                   ? "text-green-500"
                   : "text-red-400"
               }
             >
-              {(
-                ((Number(payload[0]?.value) -
-                  Number(
-                    monthlyTotal.find(
-                      (day) =>
-                        new Date(day.date).getMonth() ===
-                        (new Date(payload[0].payload.date).getMonth() - 1 === -1
-                          ? 11
-                          : new Date(payload[0].payload.date).getMonth() - 1)
-                    )?.total
-                  )) /
-                  Number(payload[0]?.value)) *
-                100
-              ).toFixed(1)}
-              %{" "}
+              {difference.toFixed(1)}%{" "}
             </span>
-            {((Number(payload[0]?.value) -
-              Number(
-                monthlyTotal.find(
-                  (day) =>
-                    new Date(day.date).getMonth() ===
-                    (new Date(payload[0].payload.date).getMonth() - 1 === -1
-                      ? 11
-                      : new Date(payload[0].payload.date).getMonth() - 1)
-                )?.total
-              )) /
-              Number(payload[0]?.value)) *
-              100 ===
-            0
-              ? "equal"
-              : ((Number(payload[0]?.value) -
-                  Number(
-                    monthlyTotal.find(
-                      (day) =>
-                        new Date(day.date).getMonth() ===
-                        (new Date(payload[0].payload.date).getMonth() - 1 === -1
-                          ? 11
-                          : new Date(payload[0].payload.date).getMonth() - 1)
-                    )?.total
-                  )) /
-                  Number(payload[0]?.value)) *
-                  100 >
-                0
-              ? "up"
-              : "down"}{" "}
-            than last month
+            {difference === 0 ? "equal" : difference > 0 ? "up" : "down"} than
+            last month
           </p>
         </div>
       );
