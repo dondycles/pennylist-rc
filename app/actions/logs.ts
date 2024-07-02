@@ -12,12 +12,14 @@ export async function log(
   }
 ) {
   const supabase = createClient();
-  const { error } = await supabase
+  const { error, data } = await supabase
     .from("logs")
-    .insert({ type, changes, reason, money });
+    .insert({ type, changes, reason, money })
+    .select("id")
+    .single();
 
   if (error) return { error: error.message };
-  return { success: "Logged" };
+  return { success: data.id };
 }
 
 export async function getLogs() {

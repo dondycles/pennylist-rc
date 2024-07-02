@@ -2,6 +2,8 @@ import { persist } from "zustand/middleware";
 import { create } from "zustand";
 
 type listPage = {
+  currentTotal: number;
+  setCurrentTotal: (total: number) => void;
   sort: {
     asc: boolean;
     by: "created_at" | "amount";
@@ -46,6 +48,8 @@ export const useListState = create<listPage>()(
       setShowDailyTotal: () => set({ showDailyTotal: !get().showDailyTotal }),
       setShowMonthlyTotal: () =>
         set({ showMonthlyTotal: !get().showMonthlyTotal }),
+      currentTotal: 0,
+      setCurrentTotal: (total) => set({ currentTotal: total }),
     }),
     { name: "list-page" }
   )

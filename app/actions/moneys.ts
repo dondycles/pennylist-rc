@@ -5,6 +5,13 @@ import { log } from "./logs";
 
 type money = Database["public"]["Tables"]["moneys"]["Row"];
 
+export async function getTotal() {
+  const supabase = createClient();
+  const total = await supabase.rpc("getTotal");
+
+  return total;
+}
+
 export async function getMoneys(sort: {
   asc: boolean;
   by: "created_at" | "amount";
@@ -107,22 +114,30 @@ export async function deleteMoney(
 ) {
   const supabase = createClient();
 
-  const { error } = await supabase.from("moneys").delete().eq("id", money.id);
-  if (error) return { error: error.message };
-
-  const { error: logError } = await log("delete", "delete", money.id, {
-    from: {
-      amount: String(money.amount),
-      name: money.name,
-      total: String(currentTotal),
-    },
-    to: {
-      amount: "",
-      name: "",
-      total: String(Number(currentTotal) - Number(money.amount)),
-    },
-  });
+  const { error: logError, success: logId } = await log(
+    "delete",
+    "delete",
+    money.id,
+    {
+      from: {
+        amount: String(money.amount),
+        name: money.name,
+        total: String(currentTotal),
+      },
+      to: {
+        amount: "",
+        name: "",
+        total: String(Number(currentTotal) - Number(money.amount)),
+      },
+    }
+  );
   if (logError) return { logError };
+
+  const { error } = await supabase.from("moneys").delete().eq("id", money.id);
+  if (error) {
+    await supabase.from("logs").delete().eq("id", logId!);
+    return { error: error.message };
+  }
 
   return { success: "deleted!" };
 }

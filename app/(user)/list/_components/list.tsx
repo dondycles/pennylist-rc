@@ -20,7 +20,7 @@ import { TbCurrencyPeso } from "react-icons/tb";
 import { AsteriskNumber, UsePhpPeso } from "@/lib/utils";
 
 // Importing actions
-import { getMoneys } from "@/app/actions/moneys";
+import { getMoneys, getTotal } from "@/app/actions/moneys";
 import { getLogs } from "@/app/actions/logs";
 
 // Importing UI components
@@ -84,7 +84,16 @@ export default function List({ list }: { list: User }) {
     enabled: list ? true : false,
   });
 
-  const total = _.sum(moneys?.data?.map((money) => money.amount));
+  const {
+    data: totalData,
+    isLoading: totalLoading,
+    refetch: refetchTotal,
+  } = useQuery({
+    queryKey: ["total", list.id],
+    queryFn: async () => await getTotal(),
+  });
+
+  const total = totalData?.data ?? 0;
 
   const {
     data: logs,
@@ -155,7 +164,6 @@ export default function List({ list }: { list: User }) {
         let monthsTotal;
 
         if (month <= new Date().getMonth()) {
-          console.log(month, "2024");
           monthsTotal = dailyTotal?.findLast(
             (day) =>
               // gets data equal to month and year or last year at least
@@ -163,7 +171,6 @@ export default function List({ list }: { list: User }) {
               new Date(day.date).getFullYear() === year
           );
         } else {
-          console.log(month, "2023");
           monthsTotal = dailyTotal?.findLast(
             (day) =>
               // gets data equal to month and year or last year at least
@@ -195,7 +202,6 @@ export default function List({ list }: { list: User }) {
         let lastDay: string;
 
         if (month <= new Date().getMonth()) {
-          console.log(month, "2024");
           dailyTotal
             .filter(
               (day) =>
@@ -210,7 +216,6 @@ export default function List({ list }: { list: User }) {
               lastDay = day.date;
             });
         } else {
-          console.log(month, "2023");
           dailyTotal
             .filter(
               (day) =>
@@ -236,7 +241,6 @@ export default function List({ list }: { list: User }) {
         month += 1;
       }
     }
-    console.log("dailyTotal: ", dailyTotal);
     const sortedByMonth: {
       total: number;
       date: string;
@@ -348,6 +352,12 @@ export default function List({ list }: { list: User }) {
     };
   };
 
+  const refetch = () => {
+    refetchMoneys();
+    refetchLogs();
+    refetchTotal();
+  };
+
   const dailyTotal = getDailyTotal();
   const monthlyTotal = getMonthlyTotal();
   const differences = getDifferences();
@@ -364,7 +374,7 @@ export default function List({ list }: { list: User }) {
       </main>
     );
 
-  if (moneysLoading || logsLoading)
+  if (moneysLoading || logsLoading || totalLoading)
     return (
       <main className="w-full h-full">
         <div className=" max-w-[800px] mx-auto px-2 flex flex-col justify-start gap-2 mb-[5.5rem]">
@@ -441,11 +451,10 @@ export default function List({ list }: { list: User }) {
             <DrawerContent className=" p-2 gap-2">
               <p className="font-bold text-sm text-center">Add money</p>
               <AddMoneyForm
-                currentTotal={total}
+                currentTotal={String(total)}
                 close={() => {
                   setShowAddMoneyForm(false);
-                  refetchMoneys();
-                  refetchLogs();
+                  refetch();
                 }}
               />
             </DrawerContent>
@@ -513,15 +522,14 @@ export default function List({ list }: { list: User }) {
         <DrawerContent className=" p-2 gap-2">
           <p className="font-bold text-sm text-center">Edit money</p>
           <EditMoneyForm
-            currentTotal={total}
+            currentTotal={String(total)}
             money={showEditMoneyForm.money!}
             close={() => {
               setEditMoneyForm((prev) => ({
                 ...prev,
                 open: false,
               }));
-              refetchMoneys();
-              refetchLogs();
+              refetch();
             }}
           />
         </DrawerContent>
@@ -537,14 +545,11 @@ export default function List({ list }: { list: User }) {
             return (
               <Money
                 edit={() => setEditMoneyForm({ money: money, open: true })}
-                done={() => {
-                  refetchLogs();
-                  refetchMoneys();
-                }}
+                done={() => refetch()}
                 money={money}
                 key={money.id}
                 hideAmounts={listState.hideAmounts}
-                currentTotal={total}
+                currentTotal={String(total)}
               />
             );
           })}
