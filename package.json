@@ -3,10 +3,11 @@
   "version": "1.0.9",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "webpack dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "vitest"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.6.0",
@@ -73,16 +74,21 @@
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.13",
+    "@testing-library/react": "^16.0.0",
     "@types/node": "^20.14.9",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
     "eslint": "^8.57.0",
     "eslint-config-next": "14.2.4",
+    "jsdom": "^24.1.0",
     "postcss": "^8.4.39",
     "prettier": "3.3.2",
     "serwist": "^9.0.3",
     "supabase": "^1.178.2",
     "tailwindcss": "^3.4.4",
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.3",
+    "vite-tsconfig-paths": "^4.3.2",
+    "vitest": "^1.6.0"
   }
 }
