@@ -317,7 +317,7 @@ export default function List({ list }: { list: User }) {
             {moneys?.data?.map((money, i) => {
               return (
                 <motion.div
-                  key={money.id}
+                  key={money.id + i}
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 42, marginBottom: 8 }}
                   exit={{ opacity: 0, height: 0, marginBottom: 0 }}

@@ -24,6 +24,7 @@ import {
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { colors } from "@/lib/constants/colors";
 import Link from "next/link";
+import { motion } from "framer-motion";
 export default function Money({
   money,
   done,
@@ -58,7 +59,7 @@ export default function Money({
     <Dialog key={money.id} open={showWarning} onOpenChange={setShowWarning}>
       <ContextMenu key={money.id} onOpenChange={setElevate}>
         <ContextMenuTrigger>
-          <div
+          <motion.div
             key={money.id}
             style={{
               borderColor: money.color ?? "",
@@ -67,9 +68,16 @@ export default function Money({
             }}
             className={`p-2 border rounded-lg flex flex-row justify-between items-center font-bold ${
               isPending && "opacity-50 pointer-events-none "
-            } ${
-              elevate ? "shadow-lg scale-[100.5%]" : "shadow-none"
-            } ease-in-out transition-all`}
+            } `}
+            animate={
+              elevate
+                ? {
+                    scale: 1.005,
+                    boxShadow: "0px 8px 8px rgba(0, 0, 0, 0.05)",
+                  }
+                : { scale: 1, boxShadow: "0px 0px 0px rgba(0, 0, 0, 0)" }
+            }
+            transition={{ type: "spring", duration: 0.5, bounce: 0.5 }}
           >
             <p className="truncate">{money.name}</p>
             <div className="font-semibold font-anton flex items-center">
@@ -78,7 +86,7 @@ export default function Money({
                 ? AsteriskNumber(money.amount ?? 0)
                 : UsePhpPeso(money.amount ?? 0)}
             </div>
-          </div>
+          </motion.div>
         </ContextMenuTrigger>
         <ContextMenuContent>
           <ContextMenuSub>
