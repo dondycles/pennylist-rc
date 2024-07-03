@@ -1,5 +1,4 @@
 import { ScrollArea } from "./ui/scroll-area";
-
 export default function Scrollable({
   children,
 }: {
@@ -8,7 +7,7 @@ export default function Scrollable({
   return (
     <main className="w-full h-full">
       <ScrollArea className="w-full h-full">
-        <div className=" max-w-[800px] mx-auto px-2 flex flex-col justify-start gap-2 mb-[5.5rem]">
+        <div className="w-full xs:max-w-[800px] mx-auto px-2 flex flex-col justify-start gap-2 mb-[5.5rem]">
           {children}
         </div>
       </ScrollArea>

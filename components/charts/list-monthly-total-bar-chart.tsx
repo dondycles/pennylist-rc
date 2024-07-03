@@ -19,7 +19,7 @@ import {
   Tooltip,
   XAxis,
 } from "recharts";
-
+import { motion } from "framer-motion";
 export default function MonthlyTotalBarChart({
   monthlyTotal,
   open,
@@ -89,106 +89,122 @@ export default function MonthlyTotalBarChart({
   //   return null;
   // };
   return (
-    <Card
-      className={`overflow-hidden rounded-lg shadow-none transition-all ease-in-out duration-500 ${
-        open ? "h-[254px]" : "h-[42px]"
-      }`}
+    <motion.div
+      initial={false}
+      transition={{
+        type: "spring",
+        duration: 0.5,
+        stiffness: 100,
+        damping: 12,
+      }}
+      animate={open ? { height: 296 } : { height: 42 }}
     >
-      <CardHeader className="px-2 py-2">
-        <button
-          onClick={toggleOpen}
-          className="flex items-start justify-between"
-        >
-          <div className="flex  flex-row justify-between items-center">
-            <CardTitle className="flex items-center gap-1 py-1">
-              <p className="font-bold">Monthly Total</p>
-              <ChevronDown
-                className={`size-4 ${open && "rotate-180"} transition-all`}
-              />
-            </CardTitle>
-          </div>
+      <Card className={"overflow-hidden rounded-lg shadow-none h-full"}>
+        <CardHeader className="px-2 py-2">
+          <button
+            onClick={toggleOpen}
+            className="flex items-start justify-between"
+          >
+            <div className="flex  flex-row justify-between items-center">
+              <CardTitle className="flex items-center gap-1 py-1">
+                <p className="font-bold">Monthly Total</p>
+                <motion.div
+                  transition={{
+                    type: "spring",
+                    duration: 0.5,
+                    stiffness: 100,
+                  }}
+                  animate={open ? { rotate: 180 } : { rotate: 0 }}
+                >
+                  <ChevronDown className={"size-4"} />
+                </motion.div>
+              </CardTitle>
+            </div>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              asChild
-              className={` duration-500 ease-in-out transition-all ${
-                open ? "opacity-100" : "pointer-events-none opacity-0"
-              }`}
-            >
-              <Button variant={"outline"}>
-                by {listState.monthlyTotalBy} record
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuCheckboxItem
-                checked={listState.monthlyTotalBy === "last"}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  listState.setMonthlyTotalBy("last");
-                }}
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                asChild
+                className={` duration-500 ease-in-out transition-all ${
+                  open ? "opacity-100" : "pointer-events-none opacity-0"
+                }`}
               >
-                last record
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={listState.monthlyTotalBy === "avg"}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  listState.setMonthlyTotalBy("avg");
-                }}
-              >
-                average
-              </DropdownMenuCheckboxItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </button>
-      </CardHeader>
-      <CardContent className="p-2 max-h-[200px] h-screen w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={monthlyTotal} className="h-12">
-            <XAxis
-              stroke="hsl(var(--muted-foreground))"
-              fontSize={10}
-              tickLine={false}
-              axisLine={false}
-              dataKey="date"
-              tickFormatter={(value: string) =>
-                Number(new Date(value).getMonth()) === new Date().getMonth()
-                  ? "This month"
-                  : toMonthWord(value)
-              }
-            />
-            {/* <YAxis
+                <Button variant={"outline"}>
+                  by {listState.monthlyTotalBy} record
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuCheckboxItem
+                  checked={listState.monthlyTotalBy === "last"}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    listState.setMonthlyTotalBy("last");
+                  }}
+                >
+                  last record
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  checked={listState.monthlyTotalBy === "avg"}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    listState.setMonthlyTotalBy("avg");
+                  }}
+                >
+                  average
+                </DropdownMenuCheckboxItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </button>
+        </CardHeader>
+        <CardContent
+          className={`p-2 max-h-[200px] h-screen w-full transition-all duration-500 ease-in-out opacity-100 ${!open && "pointer-events-none opacity-0"}`}
+        >
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={monthlyTotal} className="h-12">
+              <XAxis
+                stroke="hsl(var(--muted-foreground))"
+                fontSize={10}
+                tickLine={false}
+                axisLine={false}
+                dataKey="date"
+                tickFormatter={(value: string) =>
+                  Number(new Date(value).getMonth()) === new Date().getMonth()
+                    ? "This month"
+                    : toMonthWord(value)
+                }
+              />
+              {/* <YAxis
                   stroke="hsl(var(--muted-foreground))"
                   fontSize={10}
                   tickLine={false}
                   tickFormatter={(value) => UsePhpPesoWSign(value, 0)}
                   axisLine={false}
                 /> */}
-            <Tooltip content={CustomTooltipMonthlyTotal} />
-            <Brush
-              dataKey="total"
-              height={30}
-              stroke="hsl(var(--muted-foreground))"
-            />
-            <Bar
-              animationBegin={0}
-              dataKey="total"
-              fill="hsl(var(--foreground))"
-              radius={[4, 4, 0, 0]}
-              className="bg-red-500"
-            >
-              {monthlyTotal?.map((e) => (
-                <Cell
-                  key={e.date}
-                  style={{
-                    fill: "hsl(var(--foreground))",
-                  }}
-                />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </CardContent>
-    </Card>
+              <Tooltip content={CustomTooltipMonthlyTotal} />
+              <Brush
+                dataKey="total"
+                height={30}
+                stroke="hsl(var(--muted-foreground))"
+              />
+              <Bar
+                animationBegin={0}
+                dataKey="total"
+                fill="hsl(var(--foreground))"
+                radius={[4, 4, 0, 0]}
+                className="bg-red-500"
+              >
+                {monthlyTotal?.map((e) => (
+                  <Cell
+                    key={e.date}
+                    style={{
+                      fill: "hsl(var(--foreground))",
+                    }}
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }

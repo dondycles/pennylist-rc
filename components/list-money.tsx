@@ -24,7 +24,6 @@ import {
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { colors } from "@/lib/constants/colors";
 import Link from "next/link";
-
 export default function Money({
   money,
   done,
@@ -33,7 +32,7 @@ export default function Money({
   currentTotal,
 }: {
   money: Omit<Database["public"]["Tables"]["moneys"]["Row"], "list">;
-  done: () => void;
+  done: (_delete?: boolean) => void;
   edit: () => void;
   hideAmounts: boolean;
   currentTotal: string;
@@ -52,7 +51,7 @@ export default function Money({
     setIsPending(true);
     const { error } = await deleteMoney(money, currentTotal);
     if (error) return setIsPending(false);
-    done();
+    done(true);
   };
 
   return (

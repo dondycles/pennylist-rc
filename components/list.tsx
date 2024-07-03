@@ -52,6 +52,8 @@ import type { User } from "@supabase/supabase-js";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 
+import { AnimatePresence, motion } from "framer-motion";
+
 import {
   Tooltip,
   TooltipContent,
@@ -66,6 +68,7 @@ import { calculateListChartsData } from "@/lib/hooks";
 export default function List({ list }: { list: User }) {
   let _ = require("lodash");
   const listState = useListState();
+  const [animated, setAnimated] = useState(false);
   const [showAddMoneyForm, setShowAddMoneyForm] = useState(false);
   const [showEditMoneyForm, setEditMoneyForm] = useState<{
     open: boolean;
@@ -121,6 +124,8 @@ export default function List({ list }: { list: User }) {
     refetchTotal();
   };
 
+  const loaded = !moneysLoading && !logsLoading && !totalLoading;
+
   if (moneys?.error || moneysError || logsError || logs?.error)
     return (
       <main className="w-full h-full p-2 ">
@@ -133,7 +138,7 @@ export default function List({ list }: { list: User }) {
       </main>
     );
 
-  if (moneysLoading || logsLoading || totalLoading)
+  if (!loaded)
     return (
       <main className="w-full h-full">
         <div className=" max-w-[800px] mx-auto px-2 flex flex-col justify-start gap-2 mb-[5.5rem]">
@@ -296,31 +301,68 @@ export default function List({ list }: { list: User }) {
           />
         }
       />
-
       {/* moneys list */}
       {total === 0 ? (
         <p className="text-sm text-center text-muted-foreground">
           You are currently pennyless
         </p>
       ) : (
-        <div className="w-full flex flex-col gap-2">
-          {moneys?.data?.map((money) => {
-            return (
-              <Money
-                edit={() => setEditMoneyForm({ money: money, open: true })}
-                done={() => refetch()}
-                money={money}
-                key={money.id}
-                hideAmounts={listState.hideAmounts}
-                currentTotal={String(total)}
-              />
-            );
-          })}
-        </div>
+        <motion.div
+          transition={{ type: "spring", duration: 1, bounce: 0.5 }}
+          layout
+          animate={{ height: 50 * Number(moneys?.data?.length) - 8 }}
+          className="w-full flex flex-col"
+        >
+          <AnimatePresence>
+            {moneys?.data?.map((money, i) => {
+              return (
+                <motion.div
+                  key={money.id}
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 42, marginBottom: 8 }}
+                  exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                  transition={{
+                    type: "spring",
+                    duration: 1,
+                    bounce: 0.5,
+                    delay: animated ? 0 : i / 6,
+                    stiffness: 200,
+                  }}
+                  onAnimationStart={() => {
+                    if (animated) return;
+                    if (i === moneys.data.length - 1)
+                      setTimeout(
+                        () => setAnimated(true),
+                        (moneys.data.length / 6) * 1000,
+                      );
+                  }}
+                >
+                  <Money
+                    edit={() => {
+                      setEditMoneyForm({ money: money, open: true });
+                    }}
+                    done={(_delete) => {
+                      refetch();
+                    }}
+                    money={money}
+                    hideAmounts={listState.hideAmounts}
+                    currentTotal={String(total)}
+                  />
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
+        </motion.div>
       )}
-      <Separator className="mt-14" />
       {logs?.data?.length ? (
-        <>
+        <motion.div
+          initial={{ opacity: 0, y: -60 }}
+          animate={animated ? { opacity: 1, y: 0 } : { opacity: 0, y: -60 }}
+          className="flex flex-col gap-2"
+          transition={{ type: "spring", duration: 1, bounce: 0.5 }}
+          layout
+        >
+          <Separator className="mt-14" />
           {/* bars */}
           {dailyTotal ? (
             <DailyTotalBarChart
@@ -353,7 +395,7 @@ export default function List({ list }: { list: User }) {
               logs={logs?.data}
             />
           )}
-        </>
+        </motion.div>
       ) : null}
     </Scrollable>
   );

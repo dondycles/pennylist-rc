@@ -19,7 +19,7 @@ import {
   XAxis,
   Tooltip,
 } from "recharts";
-
+import { motion, AnimatePresence } from "framer-motion";
 export default function DailyTotalBarChart({
   dailyTotal,
   open,
@@ -149,143 +149,153 @@ export default function DailyTotalBarChart({
   };
 
   return (
-    <Card
-      className={`overflow-hidden rounded-lg shadow-none transition-all ease-in-out duration-500 ${
-        open ? "h-[296px]" : "h-[42px]"
-      }`}
+    <motion.div
+      initial={false}
+      transition={{
+        type: "spring",
+        duration: 0.5,
+        stiffness: 100,
+        damping: 12,
+      }}
+      animate={open ? { height: 296 } : { height: 42 }}
     >
-      <CardHeader className="px-2 py-2">
-        <button
-          onClick={toggleOpen}
-          className="flex items-start justify-between"
+      <Card className={"overflow-hidden rounded-lg shadow-none h-full"}>
+        <CardHeader className="px-2 py-2">
+          <button
+            onClick={toggleOpen}
+            className="flex items-start justify-between"
+          >
+            <div className="flex  flex-row justify-between items-center">
+              <CardTitle className="flex items-center gap-1 py-1">
+                <p className="font-bold">Daily Total</p>
+                <motion.div
+                  transition={{ type: "spring", duration: 0.5, stiffness: 100 }}
+                  animate={open ? { rotate: 180 } : { rotate: 0 }}
+                >
+                  <ChevronDown className={"size-4"} />
+                </motion.div>
+              </CardTitle>
+            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                asChild
+                className={` duration-500 ease-in-out transition-all ${
+                  open ? "opacity-100" : "pointer-events-none opacity-0"
+                }`}
+              >
+                <Button variant={"outline"}>
+                  Last {listState.dailyTotalDays} days
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuCheckboxItem
+                  checked={listState.dailyTotalDays === 7}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    listState.setDailyTotalDays(7);
+                  }}
+                >
+                  7 days
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  checked={listState.dailyTotalDays === 14}
+                  onClick={(e) => {
+                    e.stopPropagation();
+
+                    listState.setDailyTotalDays(14);
+                  }}
+                >
+                  14 days
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  checked={listState.dailyTotalDays === 21}
+                  onClick={(e) => {
+                    e.stopPropagation();
+
+                    listState.setDailyTotalDays(21);
+                  }}
+                >
+                  21 days
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  checked={listState.dailyTotalDays === 28}
+                  onClick={(e) => {
+                    e.stopPropagation();
+
+                    listState.setDailyTotalDays(28);
+                  }}
+                >
+                  28 days
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  checked={listState.dailyTotalDays === 365}
+                  onClick={(e) => {
+                    e.stopPropagation();
+
+                    listState.setDailyTotalDays(365);
+                  }}
+                >
+                  365 days
+                </DropdownMenuCheckboxItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </button>
+        </CardHeader>
+        <CardContent
+          className={`p-2 h-fit w-full animate-all duration-500 opacity-100 ease-in-out ${!open && "pointer-events-none opacity-0"}`}
         >
-          <div className="flex  flex-row justify-between items-center">
-            <CardTitle className="flex items-center gap-1 py-1">
-              <p className="font-bold">Daily Total</p>
-              <ChevronDown
-                className={`size-4 ${open && "rotate-180"} transition-all`}
+          <Badge className="text-sm block w-fit px-1" variant={"secondary"}>
+            {getDifference()} from past {listState.dailyTotalDays} days
+          </Badge>
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={slicedDailyTotal} className="h-12">
+              <XAxis
+                stroke="hsl(var(--muted-foreground))"
+                fontSize={10}
+                tickLine={false}
+                axisLine={false}
+                dataKey="date"
+                tickFormatter={(value) =>
+                  new Date(value).toDateString() === new Date().toDateString()
+                    ? "Today"
+                    : new Date(value).getDate() === 1
+                      ? `${toMonthWord(value)} ${new Date(value).getFullYear()}`
+                      : new Date(value).getDate().toString()
+                }
               />
-            </CardTitle>
-          </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              asChild
-              className={` duration-500 ease-in-out transition-all ${
-                open ? "opacity-100" : "pointer-events-none opacity-0"
-              }`}
-            >
-              <Button variant={"outline"}>
-                Last {listState.dailyTotalDays} days
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuCheckboxItem
-                checked={listState.dailyTotalDays === 7}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  listState.setDailyTotalDays(7);
-                }}
-              >
-                7 days
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={listState.dailyTotalDays === 14}
-                onClick={(e) => {
-                  e.stopPropagation();
-
-                  listState.setDailyTotalDays(14);
-                }}
-              >
-                14 days
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={listState.dailyTotalDays === 21}
-                onClick={(e) => {
-                  e.stopPropagation();
-
-                  listState.setDailyTotalDays(21);
-                }}
-              >
-                21 days
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={listState.dailyTotalDays === 28}
-                onClick={(e) => {
-                  e.stopPropagation();
-
-                  listState.setDailyTotalDays(28);
-                }}
-              >
-                28 days
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={listState.dailyTotalDays === 365}
-                onClick={(e) => {
-                  e.stopPropagation();
-
-                  listState.setDailyTotalDays(365);
-                }}
-              >
-                365 days
-              </DropdownMenuCheckboxItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </button>
-      </CardHeader>
-      <CardContent
-        className={`p-2 h-fit w-full ${!open && "pointer-events-none"}`}
-      >
-        <Badge className="text-sm block w-fit px-1" variant={"secondary"}>
-          {getDifference()} from past {listState.dailyTotalDays} days
-        </Badge>
-        <ResponsiveContainer width="100%" height={200}>
-          <BarChart data={slicedDailyTotal} className="h-12">
-            <XAxis
-              stroke="hsl(var(--muted-foreground))"
-              fontSize={10}
-              tickLine={false}
-              axisLine={false}
-              dataKey="date"
-              tickFormatter={(value) =>
-                new Date(value).toDateString() === new Date().toDateString()
-                  ? "Today"
-                  : new Date(value).getDate() === 1
-                    ? `${toMonthWord(value)} ${new Date(value).getFullYear()}`
-                    : new Date(value).getDate().toString()
-              }
-            />
-            {/* <YAxis
+              {/* <YAxis
                   stroke="hsl(var(--muted-foreground))"
                   fontSize={10}
                   tickLine={false}
                   tickFormatter={(value) => UsePhpPesoWSign(value, 0)}
                   axisLine={false}
                 /> */}
-            <Tooltip content={CustomTooltipDailyTotal} />
-            <Brush
-              dataKey="total"
-              height={30}
-              stroke="hsl(var(--muted-foreground))"
-            />
-            <Bar
-              animationBegin={0}
-              dataKey="total"
-              fill="hsl(var(--foreground))"
-              radius={[4, 4, 0, 0]}
-              className="bg-red-500"
-            >
-              {dailyTotal.map((e) => (
-                <Cell
-                  key={e.date}
-                  style={{
-                    fill: "hsl(var(--foreground))",
-                  }}
-                />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </CardContent>
-    </Card>
+              <Tooltip content={CustomTooltipDailyTotal} />
+              <Brush
+                dataKey="total"
+                height={30}
+                stroke="hsl(var(--muted-foreground))"
+              />
+              <Bar
+                animationBegin={0}
+                dataKey="total"
+                fill="hsl(var(--foreground))"
+                radius={[4, 4, 0, 0]}
+                className="bg-red-500"
+              >
+                {dailyTotal.map((e) => (
+                  <Cell
+                    key={e.date}
+                    style={{
+                      fill: "hsl(var(--foreground))",
+                    }}
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }

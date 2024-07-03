@@ -114,12 +114,7 @@ export default function EditMoneyForm({
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input
-                  autoFocus
-                  data-vaul-no-drag
-                  placeholder="name"
-                  {...field}
-                />
+                <Input data-vaul-no-drag placeholder="name" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -204,7 +199,7 @@ export default function EditMoneyForm({
             </FormItem>
           )}
         />
-        <div className=" flex flex-row gap-4">
+        <div className=" flex flex-row gap-2">
           <Button
             size={"sm"}
             data-vaul-no-drag

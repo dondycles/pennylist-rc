@@ -5,7 +5,7 @@ import { UsePhpPesoWSign } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Sector } from "recharts";
-
+import { motion } from "framer-motion";
 export default function TotalBreakdownPieChart({
   moneys,
   open,
@@ -87,65 +87,81 @@ export default function TotalBreakdownPieChart({
     );
   };
   return (
-    <Card
-      className={`overflow-hidden rounded-lg shadow-none transition-all ease-in-out duration-500 ${
-        open ? "h-[500px]" : "h-[42px]"
-      }`}
+    <motion.div
+      initial={false}
+      transition={{
+        type: "spring",
+        duration: 0.5,
+        stiffness: 100,
+        damping: 12,
+      }}
+      animate={open ? { height: 500 } : { height: 42 }}
     >
-      <CardHeader className="px-2 py-2">
-        <button
-          onClick={toggleOpen}
-          className="flex items-start justify-between"
-        >
-          <div className="flex  flex-row justify-between items-center">
-            <CardTitle className="flex items-center gap-1 py-1">
-              <p className="font-bold">Total Breakdown</p>
+      <Card className={"overflow-hidden rounded-lg shadow-none h-full"}>
+        <CardHeader className="px-2 py-2">
+          <button
+            onClick={toggleOpen}
+            className="flex items-start justify-between"
+          >
+            <div className="flex  flex-row justify-between items-center">
+              <CardTitle className="flex items-center gap-1 py-1">
+                <p className="font-bold">Total Breakdown</p>
 
-              <ChevronDown
-                className={`size-4 ${open && "rotate-180"} transition-all`}
-              />
-            </CardTitle>
-          </div>
-        </button>
-      </CardHeader>
-      {moneys.length ? (
-        <CardContent className="aspect-square p-2 mx-auto max-h-[500px] h-screen w-full">
-          <ResponsiveContainer width="100%" height="90%">
-            <PieChart>
-              <Pie
-                animationBegin={0}
-                activeIndex={activeIndex}
-                activeShape={renderActiveShape}
-                data={moneys}
-                cx="50%"
-                cy="50%"
-                innerRadius="60%"
-                fill="hsl(var(--foreground))"
-                dataKey="amount"
-                onMouseEnter={(_, i) => {
-                  setActiveIndex(i);
-                }}
-              >
-                {moneys?.map((money, index) => (
-                  <Cell
-                    style={{
-                      strokeWidth: 1,
-                      stroke: money.color ?? "hsl(var(--primary))",
-                      fill: money.color ? money.color + 20 : "",
-                    }}
-                    className="fill-background"
-                    key={`cell-${index}`}
-                  />
-                ))}
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
-        </CardContent>
-      ) : (
-        <CardContent className="p-2 w-full text-center text-sm text-muted-foreground">
-          <p>No records</p>
-        </CardContent>
-      )}
-    </Card>
+                <motion.div
+                  transition={{
+                    type: "spring",
+                    duration: 0.5,
+                    stiffness: 100,
+                  }}
+                  animate={open ? { rotate: 180 } : { rotate: 0 }}
+                >
+                  <ChevronDown className={"size-4"} />
+                </motion.div>
+              </CardTitle>
+            </div>
+          </button>
+        </CardHeader>
+        {moneys.length ? (
+          <CardContent
+            className={`aspect-square p-2 mx-auto max-h-[500px] h-screen w-full transition-all duration-500 ease-in-out opacity-100 ${!open && " opacity-0 pointer-events-none"}`}
+          >
+            <ResponsiveContainer width="100%" height="90%">
+              <PieChart>
+                <Pie
+                  animationBegin={0}
+                  activeIndex={activeIndex}
+                  activeShape={renderActiveShape}
+                  data={moneys}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius="60%"
+                  fill="hsl(var(--foreground))"
+                  dataKey="amount"
+                  onMouseEnter={(_, i) => {
+                    setActiveIndex(i);
+                  }}
+                >
+                  {moneys?.map((money, index) => (
+                    <Cell
+                      style={{
+                        strokeWidth: 1,
+                        stroke: money.color ?? "hsl(var(--primary))",
+                        fill: money.color ? money.color + 20 : "",
+                      }}
+                      className="fill-background"
+                      key={`cell-${index}`}
+                    />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        ) : (
+          <CardContent className="p-2 w-full text-center text-sm text-muted-foreground">
+            <p>No records</p>
+          </CardContent>
+        )}
+      </Card>
+    </motion.div>
   );
 }
