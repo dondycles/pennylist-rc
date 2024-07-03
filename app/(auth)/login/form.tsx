@@ -18,8 +18,8 @@ import { login } from "@/app/actions/auth/login";
 import { useState } from "react";
 
 export const logInSchema = z.object({
-  listname: z.string().min(1),
-  password: z.string().min(1),
+  listname: z.string().min(1, { message: "Please input listname" }),
+  password: z.string().min(1, { message: "Please input password" }),
 });
 
 export default function LoginForm() {

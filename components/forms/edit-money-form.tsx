@@ -18,13 +18,16 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 const moneySchema = z.object({
-  name: z.string().min(1),
+  name: z.string().min(1, { message: "Name can't be empty" }),
   amount: z.string(),
   id: z.string().uuid(),
   created_at: z.string(),
   color: z.string().nullable(),
   updated_at: z.string().nullable(),
-  reason: z.string().min(1).max(55),
+  reason: z
+    .string()
+    .min(1, { message: "Please your state reason" })
+    .max(55, { message: "Max of 55 characters only" }),
   add: z.string().optional(),
   ded: z.string().optional(),
 });

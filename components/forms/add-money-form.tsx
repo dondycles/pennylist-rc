@@ -21,7 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Plus, X } from "lucide-react";
 
 const moneySchema = z.object({
-  name: z.string().min(1),
+  name: z.string().min(1, { message: "Please your state reason" }),
   amount: z.string(),
 });
 
