@@ -37,7 +37,7 @@ export async function getMoney(id: string) {
 
 export async function addMoney(
   money: Pick<money, "amount" | "name">,
-  currentTotal: string
+  currentTotal: string,
 ) {
   const supabase = createClient();
 
@@ -71,7 +71,7 @@ export async function editMoney(
   lastMoney: Omit<money, "list">,
   currentTotal: string,
   reason: string,
-  money: string
+  money: string,
 ) {
   if (
     updatedMoney.amount === lastMoney.amount &&
@@ -98,7 +98,7 @@ export async function editMoney(
       name: updatedMoney.name,
       total: String(
         Number(currentTotal) +
-          (Number(updatedMoney.amount) - Number(lastMoney.amount))
+          (Number(updatedMoney.amount) - Number(lastMoney.amount)),
       ),
     },
   });
@@ -110,7 +110,7 @@ export async function editMoney(
 
 export async function deleteMoney(
   money: Pick<money, "id" | "amount" | "name">,
-  currentTotal: string
+  currentTotal: string,
 ) {
   const supabase = createClient();
 
@@ -129,7 +129,7 @@ export async function deleteMoney(
         name: "",
         total: String(Number(currentTotal) - Number(money.amount)),
       },
-    }
+    },
   );
   if (logError) return { logError };
 

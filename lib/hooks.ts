@@ -75,14 +75,14 @@ export const calculateListChartsData = ({
             (day) =>
               // gets data equal to month and year or last year at least
               new Date(day.date).getMonth() === month &&
-              new Date(day.date).getFullYear() === year
+              new Date(day.date).getFullYear() === year,
           );
         } else {
           monthsTotal = getDailyTotal()?.findLast(
             (day) =>
               // gets data equal to month and year or last year at least
               new Date(day.date).getMonth() === month &&
-              new Date(day.date).getFullYear() === year - 1
+              new Date(day.date).getFullYear() === year - 1,
           );
         }
 
@@ -113,7 +113,7 @@ export const calculateListChartsData = ({
             .filter(
               (day) =>
                 new Date(day.date).getMonth() === month &&
-                new Date(day.date).getFullYear() === year
+                new Date(day.date).getFullYear() === year,
             )
             .map((day) => {
               if (new Date(day.date).getDate() === 1) average = [0];
@@ -127,7 +127,7 @@ export const calculateListChartsData = ({
             .filter(
               (day) =>
                 new Date(day.date).getMonth() === month &&
-                new Date(day.date).getFullYear() === year - 1
+                new Date(day.date).getFullYear() === year - 1,
             )
             .map((day) => {
               if (new Date(day.date).getDate() === 1) average = [0];
@@ -178,7 +178,7 @@ export const calculateListChartsData = ({
         getDailyTotal()
           .toReversed()
           .splice(start, end)
-          .map((d) => d.total)
+          .map((d) => d.total),
       );
     };
 
@@ -201,25 +201,25 @@ export const calculateListChartsData = ({
 
     const yesterday = calculatePercentageDifference(
       total,
-      reversedDailyTotal[1]?.total
+      reversedDailyTotal[1]?.total,
     );
     const week = calculatePercentageDifference(sumCurrentWeek, sumPastWeek);
     const twoWeek = calculatePercentageDifference(
       sumCurrentTwoWeek,
-      sumPastTwoWeek
+      sumPastTwoWeek,
     );
     const threeWeek = calculatePercentageDifference(
       sumCurrentThreeWeek,
-      sumPastThreeWeek
+      sumPastThreeWeek,
     );
     const fourWeek = calculatePercentageDifference(
       sumCurrentFourWeek,
-      sumPastFourWeek
+      sumPastFourWeek,
     );
 
     const threeSixFive = calculatePercentageDifference(
       sumCurrent365,
-      sumPast365
+      sumPast365,
     );
 
     const createDifferenceObject = (value: number) => {

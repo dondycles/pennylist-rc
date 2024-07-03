@@ -58,7 +58,7 @@ export default function AddMoneyForm({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit((values: z.infer<typeof moneySchema>) =>
-          mutateMoney(values)
+          mutateMoney(values),
         )}
         className="flex flex-col gap-2 w-[320px] mx-auto"
       >

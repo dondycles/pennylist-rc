@@ -63,7 +63,7 @@ export default function DailyTotalBarChart({
 
   const slicedDailyTotal = dailyTotal.slice(
     dailyTotal.length - listState.dailyTotalDays,
-    dailyTotal.length
+    dailyTotal.length,
   );
 
   const CustomTooltipDailyTotal = ({ active, payload }: any) => {
@@ -75,10 +75,10 @@ export default function DailyTotalBarChart({
             day.date ===
             new Date(
               new Date().setDate(
-                new Date(payload[0].payload.date).getDate() - 1
-              )
-            ).toDateString()
-        )?.total
+                new Date(payload[0].payload.date).getDate() - 1,
+              ),
+            ).toDateString(),
+        )?.total,
       );
       const difference = isNaN(((value - predValue) / value) * 100)
         ? 0
@@ -93,8 +93,8 @@ export default function DailyTotalBarChart({
                 difference === 0
                   ? "text-muted-foreground"
                   : difference > 0
-                  ? "text-green-500"
-                  : "text-red-400"
+                    ? "text-green-500"
+                    : "text-red-400"
               }
             >
               {difference.toFixed(1)}%{" "}
@@ -139,8 +139,8 @@ export default function DailyTotalBarChart({
           direction === "equal"
             ? "text-muted-foreground"
             : direction === "up"
-            ? "text-green-500"
-            : "text-red-400"
+              ? "text-green-500"
+              : "text-red-400"
         }`}
       >
         {difference} {direction}
@@ -250,8 +250,8 @@ export default function DailyTotalBarChart({
                 new Date(value).toDateString() === new Date().toDateString()
                   ? "Today"
                   : new Date(value).getDate() === 1
-                  ? `${toMonthWord(value)} ${new Date(value).getFullYear()}`
-                  : new Date(value).getDate().toString()
+                    ? `${toMonthWord(value)} ${new Date(value).getFullYear()}`
+                    : new Date(value).getDate().toString()
               }
             />
             {/* <YAxis

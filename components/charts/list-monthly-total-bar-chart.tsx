@@ -43,8 +43,8 @@ export default function MonthlyTotalBarChart({
             new Date(day.date).getMonth() ===
             (new Date(payload[0].payload.date).getMonth() - 1 === -1
               ? 11
-              : new Date(payload[0].payload.date).getMonth() - 1)
-        )?.total
+              : new Date(payload[0].payload.date).getMonth() - 1),
+        )?.total,
       );
 
       const difference = isNaN(((value - predValue) / value) * 100)
@@ -64,8 +64,8 @@ export default function MonthlyTotalBarChart({
                 difference === 0
                   ? "text-muted-foreground"
                   : difference > 0
-                  ? "text-green-500"
-                  : "text-red-400"
+                    ? "text-green-500"
+                    : "text-red-400"
               }
             >
               {difference.toFixed(1)}%{" "}

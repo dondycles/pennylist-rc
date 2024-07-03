@@ -18,7 +18,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { colors } from "@/constants/colors";
+import { colors } from "@/lib/constants/colors";
 import { useState } from "react";
 import EditMoneyForm from "@/components/forms/edit-money-form";
 import { useListState } from "@/store";

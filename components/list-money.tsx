@@ -22,7 +22,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { DialogDescription } from "@radix-ui/react-dialog";
-import { colors } from "@/constants/colors";
+import { colors } from "@/lib/constants/colors";
 import Link from "next/link";
 
 export default function Money({

@@ -68,7 +68,7 @@ export default function EditMoneyForm({
         money,
         currentTotal,
         values.reason,
-        values.id
+        values.id,
       );
       if (error) {
         return error;
@@ -95,8 +95,8 @@ export default function EditMoneyForm({
       String(
         Number(money.amount) -
           Number(form.watch("ded")) +
-          Number(form.watch("add"))
-      )
+          Number(form.watch("add")),
+      ),
     );
   }, [form.watch("add"), form.watch("ded")]);
 
@@ -104,7 +104,7 @@ export default function EditMoneyForm({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit((values: z.infer<typeof moneySchema>) =>
-          mutateMoney(values)
+          mutateMoney(values),
         )}
         className="flex flex-col gap-2 w-[320px] mx-auto"
       >

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { currentVersion } from "@/constants/version";
+import { currentVersion } from "@/lib/constants/version";
 import Link from "next/link";
 
 export default function LegalPage({ children }: { children: React.ReactNode }) {

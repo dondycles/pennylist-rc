@@ -51,6 +51,6 @@ export const useListState = create<ListState>()(
       currentTotal: 0,
       setCurrentTotal: (total) => set({ currentTotal: total }),
     }),
-    { name: "list-page" }
-  )
+    { name: "list-page" },
+  ),
 );

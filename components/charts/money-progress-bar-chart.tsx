@@ -23,10 +23,10 @@ export default function ProgressBarChart({
             day.date ===
             new Date(
               new Date().setDate(
-                new Date(payload[0].payload.date).getDate() - 1
-              )
-            ).toDateString()
-        )?.total
+                new Date(payload[0].payload.date).getDate() - 1,
+              ),
+            ).toDateString(),
+        )?.total,
       );
       const difference = isNaN(((value - predValue) / value) * 100)
         ? 0
@@ -41,8 +41,8 @@ export default function ProgressBarChart({
                 difference === 0
                   ? "text-muted-foreground"
                   : difference > 0
-                  ? "text-green-500"
-                  : "text-red-400"
+                    ? "text-green-500"
+                    : "text-red-400"
               }
             >
               {difference.toFixed(1)}%{" "}
@@ -77,8 +77,8 @@ export default function ProgressBarChart({
                 new Date(value).toDateString() === new Date().toDateString()
                   ? "Today"
                   : new Date(value).getDate() === 1
-                  ? `${toMonthWord(value)} ${new Date(value).getFullYear()}`
-                  : new Date(value).getDate().toString()
+                    ? `${toMonthWord(value)} ${new Date(value).getFullYear()}`
+                    : new Date(value).getDate().toString()
               }
             />
             {/* <YAxis

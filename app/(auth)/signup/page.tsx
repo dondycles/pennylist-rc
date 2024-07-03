@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import SignupForm from "./form";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { currentVersion } from "@/constants/version";
+import { currentVersion } from "@/lib/constants/version";
 
 export default async function SignUp() {
   const supabase = createClient();

@@ -9,7 +9,7 @@ export async function log(
   changes?: {
     from: { name: string; amount: string; total: string };
     to: { name: string; amount: string; total: string };
-  }
+  },
 ) {
   const supabase = createClient();
   const { error, data } = await supabase

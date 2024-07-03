@@ -13,7 +13,7 @@ export const UsePhpPeso = (number?: string | number) => {
 
 export const UsePhpPesoWSign = (
   number?: string | number,
-  decimals?: number
+  decimals?: number,
 ) => {
   const formatted = new Intl.NumberFormat("en-US", {
     style: "currency",

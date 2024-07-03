@@ -17,10 +17,10 @@ export function createClient(secret_key?: string) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
+            cookieStore.set(name, value, options),
           );
         },
       },
-    }
+    },
   );
 }

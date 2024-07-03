@@ -47,8 +47,8 @@ import DailyTotalBarChart from "./charts/list-daily-total-bar-chart";
 import MonthlyTotalBarChart from "./charts/list-monthly-total-bar-chart";
 
 // Importing types
-import { type Database } from "@/database.types";
-import { type User } from "@supabase/supabase-js";
+import type { Database } from "@/database.types";
+import type { User } from "@supabase/supabase-js";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -64,7 +64,7 @@ import FormsDrawer from "./forms/forms-drawer";
 import { calculateListChartsData } from "@/lib/hooks";
 
 export default function List({ list }: { list: User }) {
-  var _ = require("lodash");
+  let _ = require("lodash");
   const listState = useListState();
   const [showAddMoneyForm, setShowAddMoneyForm] = useState(false);
   const [showEditMoneyForm, setEditMoneyForm] = useState<{
@@ -172,8 +172,8 @@ export default function List({ list }: { list: User }) {
                         differences.isZero.yesterday
                           ? "text-muted-foreground"
                           : differences.isUp.yesterday
-                          ? "text-green-500"
-                          : "text-red-400"
+                            ? "text-green-500"
+                            : "text-red-400"
                       }`}
                     >
                       {differences.isZero.yesterday ? (
