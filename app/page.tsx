@@ -2,8 +2,8 @@ import Logo from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { currentVersion } from "@/lib/constants/version";
 import { createClient } from "@/lib/supabase/server";
-import Link from "next/link";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 
 export default async function Page() {
   const supabase = createClient();
@@ -39,7 +39,6 @@ export default async function Page() {
               As straightforward as jotting down notes on a piece of paper.
             </p>
           </div>
-
           <div className="w-full rounded-[--radius] border border-yellow-500 bg-yellow-500/5 text-yellow-500 p-4">
             <p className="pr-4 text-2xl font-black w-fit">Customizable</p>
             <p>Bored with black and white? Then, make it colorful.</p>

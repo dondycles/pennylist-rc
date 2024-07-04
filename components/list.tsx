@@ -64,6 +64,7 @@ import { Badge } from "@/components/ui/badge";
 import Scrollable from "@/components/scrollable";
 import FormsDrawer from "./forms/forms-drawer";
 import { calculateListChartsData } from "@/lib/hooks";
+import Chat from "./ai";
 
 export default function List({ list }: { list: User }) {
   let _ = require("lodash");
@@ -153,7 +154,7 @@ export default function List({ list }: { list: User }) {
   return (
     <Scrollable>
       {/* total money and add money form */}
-      <div className="flex flex-col gap-8">
+      <motion.div layout className="flex flex-col gap-2">
         <div className="mt-2 border rounded-lg p-4 flex flex-row gap-4 items-center justify-between shadow-lg">
           <div className="flex flex-col min-w-0">
             <p className="text-muted-foreground text-xs flex items-center gap-1 w-fit">
@@ -227,6 +228,12 @@ export default function List({ list }: { list: User }) {
             }
           />
         </div>
+        {list.email && (
+          <Chat
+            moneys={JSON.stringify(differences)}
+            listname={list.email.replace("@pennylist.com", "")}
+          />
+        )}
         <DropdownMenu>
           <DropdownMenuTrigger className="text-xs text-muted-foreground ml-auto mr-0 flex items-center gap-1 ">
             <p>sort</p> <ListFilter size={20} />
@@ -275,7 +282,7 @@ export default function List({ list }: { list: User }) {
             </DropdownMenuCheckboxItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      </div>
+      </motion.div>
       {/* edit money form */}
       <FormsDrawer
         open={showEditMoneyForm.open}
