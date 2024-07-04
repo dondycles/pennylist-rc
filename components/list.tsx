@@ -158,7 +158,7 @@ export default function List({ list }: { list: User }) {
         <div className="mt-2 border rounded-lg p-4 flex flex-row gap-4 items-center justify-between shadow-lg">
           <div className="flex flex-col min-w-0">
             <p className="text-muted-foreground text-xs flex items-center gap-1 w-fit">
-              Total Money
+              Total Money of {list.email?.replace("@pennylist.com", "")}
             </p>
             <div className="text-2xl sm:text-4xl font-anton flex flex-row items-center truncate -ml-1 sm:-ml-2">
               <TbCurrencyPeso className="shrink-0" />
@@ -234,54 +234,6 @@ export default function List({ list }: { list: User }) {
             listname={list.email.replace("@pennylist.com", "")}
           />
         )}
-        <DropdownMenu>
-          <DropdownMenuTrigger className="text-xs text-muted-foreground ml-auto mr-0 flex items-center gap-1 ">
-            <p>sort</p> <ListFilter size={20} />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuCheckboxItem
-              checked={listState.sort.by === "amount"}
-              onClick={() => {
-                listState.setSort(listState.sort.asc, "amount");
-              }}
-              className="text-xs"
-            >
-              <Gem className="size-4 mr-1" />
-              Value
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={listState.sort.by === "created_at"}
-              onClick={() => {
-                listState.setSort(listState.sort.asc, "created_at");
-              }}
-              className="text-xs"
-            >
-              <CalendarCheck className="size-4 mr-1" />
-              Date created
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuCheckboxItem
-              checked={listState.sort.asc}
-              onClick={() => {
-                listState.setSort(true, listState.sort.by);
-              }}
-              className="text-xs"
-            >
-              <ArrowUpNarrowWide className="size-4 mr-1" />
-              Ascending
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={!listState.sort.asc}
-              onClick={() => {
-                listState.setSort(false, listState.sort.by);
-              }}
-              className="text-xs"
-            >
-              <ArrowDownNarrowWide className="size-4 mr-1" />
-              Descending
-            </DropdownMenuCheckboxItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </motion.div>
       {/* edit money form */}
       <FormsDrawer

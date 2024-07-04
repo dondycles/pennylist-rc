@@ -1,6 +1,6 @@
 "use server";
 
-import { createStreamableValue, readStreamableValue } from "ai/rsc";
+import { createStreamableValue } from "ai/rsc";
 import { CoreMessage, streamText } from "ai";
 import { openai } from "@ai-sdk/openai";
 import { Ratelimit } from "@upstash/ratelimit";

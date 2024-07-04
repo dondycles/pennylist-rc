@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Logo from "@/components/logo";
-import { login } from "@/app/actions/auth/login";
+import { login } from "@/app/actions/auth";
 import { useState } from "react";
 
 export const logInSchema = z.object({
