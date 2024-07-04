@@ -3,17 +3,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 // Icons
-import {
-  ArrowDown,
-  ArrowDownNarrowWide,
-  ArrowUp,
-  ArrowUpNarrowWide,
-  CalendarCheck,
-  Equal,
-  Gem,
-  ListFilter,
-  Plus,
-} from "lucide-react";
+import { ArrowDown, ArrowUp, Equal, Plus } from "lucide-react";
 import { TbCurrencyPeso } from "react-icons/tb";
 
 // Importing utility functions
@@ -25,14 +15,6 @@ import { getLogs } from "@/app/actions/logs";
 
 // Importing UI components
 import { Button } from "@/components/ui/button";
-
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 // Importing state management
 import { useListState } from "@/store";
@@ -260,6 +242,8 @@ export default function List({ list }: { list: User }) {
           />
         }
       />
+      <Separator />
+
       {/* moneys list */}
       {total === 0 ? (
         <p className="text-sm text-center text-muted-foreground">
@@ -313,6 +297,7 @@ export default function List({ list }: { list: User }) {
           </AnimatePresence>
         </motion.div>
       )}
+
       {logs?.data?.length ? (
         <motion.div
           initial={{ opacity: 0, y: -60 }}

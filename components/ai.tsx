@@ -80,49 +80,39 @@ export default function Chat({
   }, []);
 
   return (
-    <AnimatePresence>
-      {open && (
-        <motion.div
-          transition={{ type: "spring", duration: 0.5, bounce: 0.5 }}
-          className="text-muted-foreground text-sm h-fit rounded-lg p-2 flex flex-col gap-2"
+    <div className="space-y-2">
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            transition={{ type: "spring", duration: 0.5, bounce: 0.5 }}
+            className="text-muted-foreground text-sm h-fit rounded-lg flex flex-col gap-2"
+          >
+            <p className="whitespace-pre-wrap">
+              {greeting.role === "assistant"
+                ? (greeting.content as string)
+                : "Thinking..."}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <div className="flex ml-auto mr-0 gap-2 text-muted-foreground text-sm">
+        {open && (
+          <button
+            onClick={() => {
+              generateGreeting();
+            }}
+          >
+            re-analyze ({limits.remaining})
+          </button>
+        )}
+        <button
+          onClick={() => {
+            setOpen((prev) => !prev);
+          }}
         >
-          <p className="whitespace-pre-wrap">
-            {greeting.role === "assistant"
-              ? (greeting.content as string)
-              : "Thinking..."}
-          </p>
-          <p>
-            Remaining prompts: {limits.remaining} <br />
-            Reset: {new Date(limits.reset!).toLocaleTimeString()}
-          </p>
-          <div className="flex ml-auto mr-0 gap-2">
-            {/* <button
-              className="opacity-50 text-xs"
-              onClick={() => {
-                generateGreeting(analyzePrompt);
-              }}
-            >
-              analyze my money
-            </button> */}
-            <button
-              className="opacity-50 text-xs"
-              onClick={() => {
-                generateGreeting();
-              }}
-            >
-              re-analyze
-            </button>
-            {/* <button
-              className="text-xs"
-              onClick={() => {
-                setOpen(false);
-              }}
-            >
-              dismiss
-            </button> */}
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          {open ? "minimize" : "show ai"}
+        </button>
+      </div>
+    </div>
   );
 }
