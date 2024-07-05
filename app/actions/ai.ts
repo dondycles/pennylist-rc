@@ -9,7 +9,7 @@ import { createClient } from "@/lib/supabase/server";
 
 const ratelimit = new Ratelimit({
   redis: kv,
-  limiter: Ratelimit.slidingWindow(3, "30s"),
+  limiter: Ratelimit.slidingWindow(10, "10s"),
 });
 
 export async function continueConversation(
@@ -49,4 +49,14 @@ export async function saveLastStream(text: string) {
       last_ai_stream: text,
     })
     .eq("id", id as string);
+}
+
+export async function getLastStream() {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("lists")
+    .select("last_ai_stream")
+    .single();
+  if (error) return { error: error.message };
+  return { data };
 }

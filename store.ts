@@ -3,21 +3,25 @@ import { create } from "zustand";
 
 export type ListState = {
   currentTotal: number;
-  setCurrentTotal: (total: number) => void;
   sort: {
     asc: boolean;
     by: "created_at" | "amount";
   };
-  setSort: (asc: boolean, by: "created_at" | "amount") => void;
   hideAmounts: boolean;
-  toggleHideAmounts: () => void;
   dailyTotalDays: number;
-  setDailyTotalDays: (days: number) => void;
   showLogs: boolean;
   showBreakdown: boolean;
   showDailyTotal: boolean;
   showMonthlyTotal: boolean;
   monthlyTotalBy: "last" | "avg";
+  showAIDialog: boolean;
+  lastAIOutput: string | null;
+  setLastAIOutput: (ai: string) => void;
+  setShowAIDialog: () => void;
+  setCurrentTotal: (total: number) => void;
+  setSort: (asc: boolean, by: "created_at" | "amount") => void;
+  toggleHideAmounts: () => void;
+  setDailyTotalDays: (days: number) => void;
   setMonthlyTotalBy: (by: "last" | "avg") => void;
   setShowLogs: () => void;
   setShowBreakdown: () => void;
@@ -42,6 +46,8 @@ export const useListState = create<ListState>()(
       showLogs: true,
       showMonthlyTotal: true,
       monthlyTotalBy: "last",
+      lastAIOutput: null,
+      setLastAIOutput: (ai) => set(() => ({ lastAIOutput: ai })),
       setMonthlyTotalBy: (by) => set(() => ({ monthlyTotalBy: by })),
       setShowLogs: () => set({ showLogs: !get().showLogs }),
       setShowBreakdown: () => set({ showBreakdown: !get().showBreakdown }),
@@ -50,6 +56,8 @@ export const useListState = create<ListState>()(
         set({ showMonthlyTotal: !get().showMonthlyTotal }),
       currentTotal: 0,
       setCurrentTotal: (total) => set({ currentTotal: total }),
+      showAIDialog: false,
+      setShowAIDialog: () => set({ showAIDialog: !get().showAIDialog }),
     }),
     { name: "list-page" },
   ),

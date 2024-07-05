@@ -3,7 +3,13 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 // Icons
-import { ArrowDown, ArrowUp, Equal, Plus } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  BotMessageSquare,
+  Equal,
+  Plus,
+} from "lucide-react";
 import { TbCurrencyPeso } from "react-icons/tb";
 
 // Importing utility functions
@@ -47,6 +53,12 @@ import Scrollable from "@/components/scrollable";
 import FormsDrawer from "./forms/forms-drawer";
 import { calculateListChartsData } from "@/lib/hooks";
 import Chat from "./ai";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+} from "./ui/dialog";
 
 export default function List({ list }: { list: User }) {
   let _ = require("lodash");
@@ -211,10 +223,24 @@ export default function List({ list }: { list: User }) {
           />
         </div>
         {list.email && (
-          <Chat
-            moneys={JSON.stringify(differences)}
-            listname={list.email.replace("@pennylist.com", "")}
-          />
+          <Dialog
+            open={listState.showAIDialog}
+            onOpenChange={listState.setShowAIDialog}
+          >
+            <DialogContent className="p-2">
+              <DialogHeader className="flex flex-row gap-1 items-center">
+                Hi, I am Pendong! <BotMessageSquare />
+              </DialogHeader>
+              <DialogDescription>
+                I am here to manage your richness.
+              </DialogDescription>
+              <Chat
+                moneys={JSON.stringify(differences)}
+                listname={list.email.replace("@pennylist.com", "")}
+                close={listState.setShowAIDialog}
+              />
+            </DialogContent>
+          </Dialog>
         )}
       </motion.div>
       {/* edit money form */}
@@ -242,7 +268,6 @@ export default function List({ list }: { list: User }) {
           />
         }
       />
-      <Separator />
 
       {/* moneys list */}
       {total === 0 ? (

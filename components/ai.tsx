@@ -2,9 +2,15 @@
 
 import { type CoreMessage } from "ai";
 import { useEffect, useState } from "react";
-import { continueConversation, saveLastStream } from "@/app/actions/ai";
+import {
+  continueConversation,
+  getLastStream,
+  saveLastStream,
+} from "@/app/actions/ai";
 import { readStreamableValue } from "ai/rsc";
 import { AnimatePresence, motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import { Button } from "./ui/button";
 // Force the page to be dynamic and allow streaming responses up to 30 seconds
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
@@ -12,13 +18,14 @@ export const maxDuration = 30;
 export default function Chat({
   listname,
   moneys,
+  close,
 }: {
   listname: string;
   moneys: string;
+  close: () => void;
 }) {
+  const [useLastStream, setUseLastStream] = useState(true);
   const [messages, setMessages] = useState<CoreMessage[]>([]);
-  const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const [limits, setLimits] = useState<{
     remaining: number | null;
     reset: number | null;
@@ -30,6 +37,7 @@ export default function Chat({
   });
 
   const generateGreeting = async () => {
+    setUseLastStream(false);
     const newMessages: CoreMessage[] = [
       ...messages,
       {
@@ -49,7 +57,9 @@ export default function Chat({
       newMessages,
       listname,
     );
+
     setLimits(limiter);
+
     for await (const content of readStreamableValue(stream)) {
       setMessages([
         ...newMessages,
@@ -59,59 +69,67 @@ export default function Chat({
         },
       ]);
     }
+
     const finishedText = await text;
-    saveLastStream(finishedText as string);
+
+    await saveLastStream(finishedText as string);
+    setUseLastStream(true);
   };
 
-  const greeting = messages.toReversed()[0];
+  const { refetch: regenarate, isLoading: isGenerating } = useQuery({
+    queryKey: ["ai", listname],
+    queryFn: async () => await generateGreeting(),
+    enabled: !useLastStream,
+  });
 
-  useEffect(() => {
-    if (!mounted) return;
-    generateGreeting();
-  }, [mounted]);
+  const {
+    data: last,
+    error: lastStreamError,
+    isLoading: isLoadingLast,
+  } = useQuery({
+    queryKey: ["last-stream", listname],
+    queryFn: async () => {
+      const data = await getLastStream();
+      if (!data.data?.last_ai_stream) {
+        regenarate();
+      }
+      return data;
+    },
+    enabled: useLastStream,
+  });
 
-  useEffect(() => {
-    if (!mounted && !open) return;
-    if (messages[0]?.content.length > 0) setOpen(true);
-  }, [messages, mounted]);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const latestStream = messages.toReversed()[0];
+  const lastStream = last?.data?.last_ai_stream;
 
   return (
     <div className="space-y-2">
       <AnimatePresence>
-        {open && (
-          <motion.div
-            transition={{ type: "spring", duration: 0.5, bounce: 0.5 }}
-            className="text-muted-foreground text-sm h-fit rounded-lg flex flex-col gap-2"
-          >
-            <p className="whitespace-pre-wrap">
-              {greeting.role === "assistant"
-                ? (greeting.content as string)
+        <motion.div
+          transition={{ type: "spring", duration: 0.5, bounce: 0.5 }}
+          className="text-muted-foreground text-sm h-fit rounded-lg flex flex-col gap-2"
+        >
+          <p className="whitespace-pre-wrap">
+            {useLastStream
+              ? (lastStream as string)
+              : latestStream?.role === "assistant"
+                ? (latestStream.content as string)
                 : "Thinking..."}
-            </p>
-          </motion.div>
-        )}
+          </p>
+        </motion.div>
       </AnimatePresence>
-      <div className="flex ml-auto mr-0 gap-2 text-muted-foreground text-sm">
-        {open && (
-          <button
-            onClick={() => {
-              generateGreeting();
-            }}
-          >
-            re-analyze ({limits.remaining})
-          </button>
-        )}
-        <button
+      <div className="flex ml-auto mr-0 gap-2 text-muted-foreground text-sm justify-center">
+        <Button
+          disabled={isGenerating}
+          variant={"ghost"}
           onClick={() => {
-            setOpen((prev) => !prev);
+            regenarate();
           }}
         >
-          {open ? "minimize" : "show ai"}
-        </button>
+          Reload {!useLastStream && limits.remaining}
+        </Button>
+        <Button disabled={isGenerating} variant={"ghost"} onClick={close}>
+          Close
+        </Button>
       </div>
     </div>
   );
