@@ -26,6 +26,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "./ui/form";
+import { ScrollArea } from "./ui/scroll-area";
 // Force the page to be dynamic and allow streaming responses up to 30 seconds
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
@@ -103,6 +104,7 @@ export default function Chat({
     mutationKey: ["ai", listname],
     mutationFn: async (type: "analyze" | "input") => {
       await generateAi(type);
+      form.reset;
       return "";
     },
   });
@@ -142,7 +144,7 @@ export default function Chat({
         listState.setShowAIDialog();
       }}
     >
-      <DialogContent className="p-2 gap-2 ">
+      <DialogContent className="p-2 gap-2 h-fit">
         <DialogHeader>
           <DialogTitle className="flex flex-row gap-1 items-center">
             Hi, I am Pendong! <BotMessageSquare />
@@ -154,20 +156,22 @@ export default function Chat({
         </DialogHeader>
 
         <div className="space-y-2">
-          <AnimatePresence>
-            <motion.div
-              transition={{ type: "spring", duration: 0.5, bounce: 0.5 }}
-              className="text-muted-foreground text-sm h-fit rounded-lg flex flex-col gap-2"
-            >
-              <p className="whitespace-pre-wrap">
-                {useLastStream
-                  ? (lastStream as string)
-                  : latestStream?.role === "assistant"
-                    ? (latestStream.content as string)
-                    : "Thinking..."}
-              </p>
-            </motion.div>
-          </AnimatePresence>
+          <ScrollArea className="h-[50dvh]">
+            <AnimatePresence>
+              <motion.div
+                transition={{ type: "spring", duration: 0.5, bounce: 0.5 }}
+                className="text-muted-foreground text-sm h-fit rounded-lg flex flex-col gap-2"
+              >
+                <p className="whitespace-pre-wrap">
+                  {useLastStream
+                    ? (lastStream as string)
+                    : latestStream?.role === "assistant"
+                      ? (latestStream.content as string)
+                      : "Thinking..."}
+                </p>
+              </motion.div>
+            </AnimatePresence>
+          </ScrollArea>
           <div className="flex ml-auto mr-0 gap-2 text-muted-foreground text-sm justify-center">
             <Button
               disabled={isAiGenerating}
