@@ -58,6 +58,7 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
+  DialogTitle,
 } from "./ui/dialog";
 
 export default function List({ list }: { list: User }) {
@@ -228,12 +229,16 @@ export default function List({ list }: { list: User }) {
             onOpenChange={listState.setShowAIDialog}
           >
             <DialogContent className="p-2">
-              <DialogHeader className="flex flex-row gap-1 items-center">
-                Hi, I am Pendong! <BotMessageSquare />
+              <DialogHeader>
+                <DialogTitle className="flex flex-row gap-1 items-center">
+                  Hi, I am Pendong! <BotMessageSquare />
+                </DialogTitle>
+
+                <DialogDescription>
+                  I am here to manage your richness.
+                </DialogDescription>
               </DialogHeader>
-              <DialogDescription>
-                I am here to manage your richness.
-              </DialogDescription>
+
               <Chat
                 moneys={JSON.stringify(differences)}
                 listname={list.email.replace("@pennylist.com", "")}

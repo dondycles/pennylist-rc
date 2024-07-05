@@ -78,7 +78,10 @@ export default function Chat({
 
   const { refetch: regenarate, isLoading: isGenerating } = useQuery({
     queryKey: ["ai", listname],
-    queryFn: async () => await generateGreeting(),
+    queryFn: async () => {
+      await generateGreeting();
+      return "";
+    },
     enabled: !useLastStream,
   });
 
