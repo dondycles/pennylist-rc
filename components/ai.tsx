@@ -9,7 +9,7 @@ import {
 } from "@/app/actions/ai";
 import { readStreamableValue } from "ai/rsc";
 import { AnimatePresence, motion } from "framer-motion";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Button } from "./ui/button";
 import {
   Dialog,
@@ -21,17 +21,25 @@ import {
 import { BotMessageSquare } from "lucide-react";
 import { useListState } from "@/store";
 import { useToast } from "./ui/use-toast";
+import { Input } from "./ui/input";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "./ui/form";
 // Force the page to be dynamic and allow streaming responses up to 30 seconds
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
+const askAiSchema = z.object({
+  question: z.string().max(44, { message: "Max of 44 characters only." }),
+});
 
 export default function Chat({
   listname,
-  moneys,
+  diffs,
   close,
 }: {
   listname: string;
-  moneys: string;
+  diffs: string;
   close: () => void;
 }) {
   const listState = useListState();
@@ -48,27 +56,23 @@ export default function Chat({
     limit: null,
   });
   const { toast } = useToast();
-  const generateAi = async () => {
+  const form = useForm<z.infer<typeof askAiSchema>>({
+    resolver: zodResolver(askAiSchema),
+    defaultValues: {
+      question: "",
+    },
+  });
+
+  const generateAi = async (type: "analyze" | "input", input?: string) => {
     setUseLastStream(false);
     setIsAiGenerating(true);
-    const newMessages: CoreMessage[] = [
-      ...messages,
-      {
-        content:
-          "Say hello to the owner of this list called: " +
-          listname +
-          ". Then, uplift the user's mood and remind to save money. Lastly, Analyze the progress of my money: " +
-          moneys +
-          ". Show data, and emojis, format the texts.  Make it very short, add emojis, and random motivational qoutes. Example: Hello to the owner of this list: (list name)..., something like that.",
-        role: "system",
-      },
-    ];
-
-    setMessages(newMessages);
 
     const { limiter, stream, text } = await continueConversation(
-      newMessages,
+      messages,
       listname,
+      diffs,
+      type,
+      input,
     );
 
     setLimits(limiter);
@@ -81,7 +85,7 @@ export default function Chat({
 
     for await (const content of readStreamableValue(stream)) {
       setMessages([
-        ...newMessages,
+        ...messages,
         {
           role: "assistant",
           content: content as string,
@@ -90,19 +94,17 @@ export default function Chat({
     }
 
     const finishedText = await text;
-
     await saveLastStream(finishedText as string);
     setUseLastStream(true);
     setIsAiGenerating(false);
   };
 
-  const { refetch: regenarate } = useQuery({
-    queryKey: ["ai", listname],
-    queryFn: async () => {
-      await generateAi();
+  const { mutate: regenarate } = useMutation({
+    mutationKey: ["ai", listname],
+    mutationFn: async (type: "analyze" | "input") => {
+      await generateAi(type);
       return "";
     },
-    enabled: !useLastStream && listState.showAIDialog,
   });
 
   const {
@@ -114,7 +116,7 @@ export default function Chat({
     queryFn: async () => {
       const data = await getLastStream();
       if (!data.data?.last_ai_stream) {
-        regenarate();
+        regenarate("analyze");
       }
       return data;
     },
@@ -140,7 +142,7 @@ export default function Chat({
         listState.setShowAIDialog();
       }}
     >
-      <DialogContent className="p-2">
+      <DialogContent className="p-2 gap-2 ">
         <DialogHeader>
           <DialogTitle className="flex flex-row gap-1 items-center">
             Hi, I am Pendong! <BotMessageSquare />
@@ -171,7 +173,7 @@ export default function Chat({
               disabled={isAiGenerating}
               variant={"ghost"}
               onClick={() => {
-                regenarate();
+                regenarate("analyze");
               }}
             >
               Reload ({limits.remaining})
@@ -181,6 +183,33 @@ export default function Chat({
             </Button>
           </div>
         </div>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit((values: z.infer<typeof askAiSchema>) =>
+              generateAi("input", values.question),
+            )}
+            className="flex gap-2"
+          >
+            <FormField
+              control={form.control}
+              name="question"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormControl>
+                    <Input
+                      placeholder="Ask Pendong about your wealth."
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" disabled={isAiGenerating}>
+              Ask
+            </Button>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

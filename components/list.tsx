@@ -218,7 +218,7 @@ export default function List({ list }: { list: User }) {
         </div>
         {list.email && (
           <Chat
-            moneys={JSON.stringify(differences)}
+            diffs={JSON.stringify(differences)}
             listname={list.email.replace("@pennylist.com", "")}
             close={listState.setShowAIDialog}
           />

@@ -13,8 +13,11 @@ const ratelimit = new Ratelimit({
 });
 
 export async function continueConversation(
-  messages: CoreMessage[],
+  lastMessages: CoreMessage[],
   listname: string,
+  diffs: string,
+  type: "input" | "analyze",
+  input?: string,
 ) {
   const { remaining, reset, limit } = await ratelimit.limit(
     listname ?? "no-list",
@@ -25,14 +28,28 @@ export async function continueConversation(
     reset,
     limit,
   };
-
   if (remaining === 0)
     return { stream: createStreamableValue("Limit exceeded!").value, limiter };
+
+  const messages: CoreMessage[] = [
+    ...lastMessages,
+    {
+      content:
+        (type === "analyze" &&
+          "Say hello to the owner of this list called: " +
+            listname +
+            ". Then, uplift the user's mood and remind to save money. Lastly, Analyze the progress of my money: " +
+            diffs +
+            ". Show data, and emojis, format the texts.  Make it very short, add emojis, and random motivational qoutes. Example: Hello to the owner of this list: (list name)..., something like that.") ||
+        (type === "input" && input) ||
+        "Hello!",
+      role: "system",
+    },
+  ];
 
   const result = await streamText({
     model: openai("gpt-3.5-turbo"),
     messages,
-    presencePenalty: 1,
   });
 
   const stream = createStreamableValue(result.textStream);
