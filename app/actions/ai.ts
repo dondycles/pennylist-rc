@@ -9,7 +9,7 @@ import { createClient } from "@/lib/supabase/server";
 
 const ratelimit = new Ratelimit({
   redis: kv,
-  limiter: Ratelimit.slidingWindow(10, "10s"),
+  limiter: Ratelimit.slidingWindow(3, "10s"),
 });
 
 export async function continueConversation(

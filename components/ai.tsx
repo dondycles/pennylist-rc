@@ -73,6 +73,12 @@ export default function Chat({
 
     setLimits(limiter);
 
+    if (limiter.remaining === 0) {
+      setUseLastStream(true);
+      setIsAiGenerating(false);
+      return;
+    }
+
     for await (const content of readStreamableValue(stream)) {
       setMessages([
         ...newMessages,
@@ -168,7 +174,7 @@ export default function Chat({
                 regenarate();
               }}
             >
-              Reload {!useLastStream && limits.remaining}
+              Reload ({limits.remaining})
             </Button>
             <Button disabled={isAiGenerating} variant={"ghost"} onClick={close}>
               Close
