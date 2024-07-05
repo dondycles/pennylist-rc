@@ -53,13 +53,6 @@ import Scrollable from "@/components/scrollable";
 import FormsDrawer from "./forms/forms-drawer";
 import { calculateListChartsData } from "@/lib/hooks";
 import Chat from "./ai";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "./ui/dialog";
 
 export default function List({ list }: { list: User }) {
   let _ = require("lodash");
@@ -224,28 +217,11 @@ export default function List({ list }: { list: User }) {
           />
         </div>
         {list.email && (
-          <Dialog
-            open={listState.showAIDialog}
-            onOpenChange={listState.setShowAIDialog}
-          >
-            <DialogContent className="p-2">
-              <DialogHeader>
-                <DialogTitle className="flex flex-row gap-1 items-center">
-                  Hi, I am Pendong! <BotMessageSquare />
-                </DialogTitle>
-
-                <DialogDescription>
-                  I am here to manage your richness.
-                </DialogDescription>
-              </DialogHeader>
-
-              <Chat
-                moneys={JSON.stringify(differences)}
-                listname={list.email.replace("@pennylist.com", "")}
-                close={listState.setShowAIDialog}
-              />
-            </DialogContent>
-          </Dialog>
+          <Chat
+            moneys={JSON.stringify(differences)}
+            listname={list.email.replace("@pennylist.com", "")}
+            close={listState.setShowAIDialog}
+          />
         )}
       </motion.div>
       {/* edit money form */}

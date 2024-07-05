@@ -4,6 +4,7 @@ import "./globals.css";
 import QueryProvider from "@/components/query-provider";
 import { UseDefaultURL } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/toaster";
 
 const raleway = Raleway({
   subsets: ["latin"],
@@ -78,6 +79,7 @@ export default function RootLayout({
             {children}
           </ThemeProvider>
         </QueryProvider>
+        <Toaster />
       </body>
     </html>
   );
