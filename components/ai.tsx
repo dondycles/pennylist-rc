@@ -27,6 +27,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "./ui/form";
 import { ScrollArea } from "./ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 // Force the page to be dynamic and allow streaming responses up to 30 seconds
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
@@ -46,6 +47,7 @@ export default function Chat({
   const listState = useListState();
   const [useLastStream, setUseLastStream] = useState(true);
   const [isAiGenerating, setIsAiGenerating] = useState(false);
+  const [askAiMode, setAskAiMode] = useState(false);
   const [messages, setMessages] = useState<CoreMessage[]>([]);
   const [limits, setLimits] = useState<{
     remaining: number | null;
@@ -145,7 +147,7 @@ export default function Chat({
       }}
     >
       <DialogContent className="p-2 gap-2 h-fit">
-        <DialogHeader>
+        <DialogHeader className="sr-only">
           <DialogTitle className="flex flex-row gap-1 items-center">
             Hi, I am Pendong! <BotMessageSquare />
           </DialogTitle>
@@ -155,8 +157,12 @@ export default function Chat({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-2">
-          <ScrollArea className="h-[50dvh]">
+        <Tabs className="flex flex-col gap-2" defaultValue="analyze">
+          <TabsList className="w-fit mx-auto p-1 rounded-lg">
+            <TabsTrigger value="analyze">Analyze</TabsTrigger>
+            <TabsTrigger value="ask">Ask</TabsTrigger>
+          </TabsList>
+          <ScrollArea className="max-h-[50dvh]">
             <AnimatePresence>
               <motion.div
                 transition={{ type: "spring", duration: 0.5, bounce: 0.5 }}
@@ -172,48 +178,70 @@ export default function Chat({
               </motion.div>
             </AnimatePresence>
           </ScrollArea>
-          <div className="flex ml-auto mr-0 gap-2 text-muted-foreground text-sm justify-center">
-            <Button
-              disabled={isAiGenerating}
-              variant={"ghost"}
-              onClick={() => {
-                regenarate("analyze");
-              }}
-            >
-              Reload ({limits.remaining})
-            </Button>
-            <Button disabled={isAiGenerating} variant={"ghost"} onClick={close}>
-              Close
-            </Button>
-          </div>
-        </div>
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit((values: z.infer<typeof askAiSchema>) =>
-              generateAi("input", values.question),
-            )}
-            className="flex gap-2"
-          >
-            <FormField
-              control={form.control}
-              name="question"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormControl>
-                    <Input
-                      placeholder="Ask Pendong about your wealth."
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit" disabled={isAiGenerating}>
-              Ask
-            </Button>
-          </form>
-        </Form>
+          <TabsContent value="ask" className="gap-2 flex flex-col">
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(
+                  (values: z.infer<typeof askAiSchema>) =>
+                    generateAi("input", values.question),
+                )}
+                className="flex flex-col gap-2 justify-center items-center"
+              >
+                <FormField
+                  control={form.control}
+                  name="question"
+                  render={({ field }) => (
+                    <FormItem className="flex-1 w-full">
+                      <FormControl>
+                        <Input
+                          placeholder="Ask Pendong about your wealth."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className=" text-muted-foreground ">
+                  <Button
+                    variant={"ghost"}
+                    type="submit"
+                    disabled={isAiGenerating}
+                  >
+                    Ask
+                  </Button>
+                  <Button
+                    disabled={isAiGenerating}
+                    variant={"ghost"}
+                    onClick={close}
+                  >
+                    Close
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </TabsContent>
+          <TabsContent value="analyze">
+            <div className="flex gap-2 text-muted-foreground text-sm justify-center">
+              <Button
+                disabled={isAiGenerating}
+                variant={"ghost"}
+                onClick={() => {
+                  regenarate("analyze");
+                }}
+              >
+                Analyze {!useLastStream && `(${limits.remaining ?? 0})`}
+              </Button>
+              <Button
+                disabled={isAiGenerating}
+                variant={"ghost"}
+                onClick={close}
+              >
+                Close
+              </Button>
+            </div>
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );
