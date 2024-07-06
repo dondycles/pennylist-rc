@@ -8,7 +8,7 @@ export type ListState = {
     by: "created_at" | "amount";
   };
   hideAmounts: boolean;
-  dailyTotalDays: number;
+  dailyProgressDays: number;
   showLogs: boolean;
   showBreakdown: boolean;
   monthlyTotalBy: "last" | "avg";
@@ -19,7 +19,7 @@ export type ListState = {
   setCurrentTotal: (total: number) => void;
   setSort: (asc: boolean, by: "created_at" | "amount") => void;
   toggleHideAmounts: () => void;
-  setDailyTotalDays: (days: number) => void;
+  setDailyProgressDays: (days: number) => void;
   setMonthlyTotalBy: (by: "last" | "avg") => void;
   setShowLogs: () => void;
   setShowBreakdown: () => void;
@@ -35,8 +35,8 @@ export const useListState = create<ListState>()(
       setSort: (asc, by) => set(() => ({ sort: { asc, by } })),
       hideAmounts: false,
       toggleHideAmounts: () => set({ hideAmounts: !get().hideAmounts }),
-      dailyTotalDays: 28,
-      setDailyTotalDays: (days) => set(() => ({ dailyTotalDays: days })),
+      dailyProgressDays: 28,
+      setDailyProgressDays: (days) => set(() => ({ dailyProgressDays: days })),
       showBreakdown: true,
       showLogs: true,
       monthlyTotalBy: "last",

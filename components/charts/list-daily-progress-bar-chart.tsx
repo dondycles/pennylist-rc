@@ -67,7 +67,7 @@ export default function DailyProgressBarChart({
   const listState = useListState();
 
   const slicedDailyTotal = dailyProgress.slice(
-    dailyProgress.length - listState.dailyTotalDays,
+    dailyProgress.length - listState.dailyProgressDays,
     dailyProgress.length,
   );
 
@@ -140,23 +140,23 @@ export default function DailyProgressBarChart({
 
   const getDifference = () => {
     const difference =
-      (listState.dailyTotalDays === 7 && differences.value.week) ||
-      (listState.dailyTotalDays === 14 && differences.value.twoWeek) ||
-      (listState.dailyTotalDays === 21 && differences.value.threeWeek) ||
-      (listState.dailyTotalDays === 28 && differences.value.fourWeek) ||
-      (listState.dailyTotalDays === 365 && differences.value.threeSixFive) ||
+      (listState.dailyProgressDays === 7 && differences.value.week) ||
+      (listState.dailyProgressDays === 14 && differences.value.twoWeek) ||
+      (listState.dailyProgressDays === 21 && differences.value.threeWeek) ||
+      (listState.dailyProgressDays === 28 && differences.value.fourWeek) ||
+      (listState.dailyProgressDays === 365 && differences.value.threeSixFive) ||
       "0";
 
     const direction =
-      (listState.dailyTotalDays === 7 &&
+      (listState.dailyProgressDays === 7 &&
         `${differences.isUp.week ? "up" : "down" || "equal"}`) ||
-      (listState.dailyTotalDays === 14 &&
+      (listState.dailyProgressDays === 14 &&
         `${differences.isUp.twoWeek ? "up" : "down" || "equal"}`) ||
-      (listState.dailyTotalDays === 21 &&
+      (listState.dailyProgressDays === 21 &&
         `${differences.isUp.threeWeek ? "up" : "down" || "equal"}`) ||
-      (listState.dailyTotalDays === 28 &&
+      (listState.dailyProgressDays === 28 &&
         `${differences.isUp.fourWeek ? "up" : "down" || "equal"}`) ||
-      (listState.dailyTotalDays === 365 &&
+      (listState.dailyProgressDays === 365 &&
         `${differences.isUp.threeSixFive ? "up" : "down" || "equal"}`) ||
       0;
 
@@ -185,7 +185,7 @@ export default function DailyProgressBarChart({
         <div className="flex items-start justify-between">
           <div className="flex  flex-row justify-between items-center">
             <CardTitle className="flex items-center gap-1 py-1 font-bold">
-              Daily Total
+              Daily Progress
             </CardTitle>
           </div>
           <DropdownMenu>
@@ -194,55 +194,55 @@ export default function DailyProgressBarChart({
               className={` duration-500 ease-in-out transition-all`}
             >
               <Button variant={"outline"}>
-                Last {listState.dailyTotalDays} days
+                Last {listState.dailyProgressDays} days
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuCheckboxItem
-                checked={listState.dailyTotalDays === 7}
+                checked={listState.dailyProgressDays === 7}
                 onClick={(e) => {
                   e.stopPropagation();
-                  listState.setDailyTotalDays(7);
+                  listState.setDailyProgressDays(7);
                 }}
               >
                 7 days
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
-                checked={listState.dailyTotalDays === 14}
+                checked={listState.dailyProgressDays === 14}
                 onClick={(e) => {
                   e.stopPropagation();
 
-                  listState.setDailyTotalDays(14);
+                  listState.setDailyProgressDays(14);
                 }}
               >
                 14 days
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
-                checked={listState.dailyTotalDays === 21}
+                checked={listState.dailyProgressDays === 21}
                 onClick={(e) => {
                   e.stopPropagation();
 
-                  listState.setDailyTotalDays(21);
+                  listState.setDailyProgressDays(21);
                 }}
               >
                 21 days
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
-                checked={listState.dailyTotalDays === 28}
+                checked={listState.dailyProgressDays === 28}
                 onClick={(e) => {
                   e.stopPropagation();
 
-                  listState.setDailyTotalDays(28);
+                  listState.setDailyProgressDays(28);
                 }}
               >
                 28 days
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
-                checked={listState.dailyTotalDays === 365}
+                checked={listState.dailyProgressDays === 365}
                 onClick={(e) => {
                   e.stopPropagation();
 
-                  listState.setDailyTotalDays(365);
+                  listState.setDailyProgressDays(365);
                 }}
               >
                 365 days
@@ -255,7 +255,7 @@ export default function DailyProgressBarChart({
         className={`p-2 flex-1 w-full aspect-square  transition-all duration-500 ease-in-out opacity-100 flex flex-col`}
       >
         <Badge className="text-sm block w-fit px-1" variant={"secondary"}>
-          {getDifference()} from past {listState.dailyTotalDays} days
+          {getDifference()} from past {listState.dailyProgressDays} days
         </Badge>
         <ResponsiveContainer className={"flex-1"} width="100%" height="100%">
           <AreaChart accessibilityLayer data={slicedDailyTotal}>
