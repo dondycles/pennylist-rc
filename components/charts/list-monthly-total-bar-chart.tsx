@@ -9,28 +9,22 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { UsePhpPesoWSign, toMonthWord } from "@/lib/utils";
 import { useListState } from "@/store";
-import { ChevronDown } from "lucide-react";
 import {
   Bar,
   BarChart,
-  Brush,
+  CartesianGrid,
   Cell,
   ResponsiveContainer,
   Tooltip,
   XAxis,
 } from "recharts";
-import { motion } from "framer-motion";
 export default function MonthlyTotalBarChart({
   monthlyTotal,
-  open,
-  toggleOpen,
 }: {
   monthlyTotal: {
     total: number;
     date: string;
   }[];
-  open: boolean;
-  toggleOpen: () => void;
 }) {
   const listState = useListState();
 
@@ -79,132 +73,92 @@ export default function MonthlyTotalBarChart({
 
     return null;
   };
-  // const CustomTooltipMonthlyTotal = (any: any) => {
-  //   return (
-  //     <div className="rounded-lg  p-2  text-sm backdrop-blur bg-foreground/75 text-background">
-  //       {JSON.stringify(any)}
-  //     </div>
-  //   );
 
-  //   return null;
-  // };
   return (
-    <motion.div
-      initial={false}
-      transition={{
-        type: "spring",
-        duration: 0.5,
-        stiffness: 100,
-        damping: 12,
-      }}
-      animate={open ? { height: 296 } : { height: 42 }}
+    <Card
+      className={
+        "overflow-hidden rounded-lg shadow-none w-full aspect-square flex flex-col"
+      }
     >
-      <Card className={"overflow-hidden rounded-lg shadow-none h-full"}>
-        <CardHeader className="px-2 py-2">
-          <button
-            onClick={toggleOpen}
-            className="flex items-start justify-between"
-          >
-            <div className="flex  flex-row justify-between items-center">
-              <CardTitle className="flex items-center gap-1 py-1">
-                <p className="font-bold">Monthly Total</p>
-                <motion.div
-                  transition={{
-                    type: "spring",
-                    duration: 0.5,
-                    stiffness: 100,
-                  }}
-                  animate={open ? { rotate: 180 } : { rotate: 0 }}
-                >
-                  <ChevronDown className={"size-4"} />
-                </motion.div>
-              </CardTitle>
-            </div>
+      <CardHeader className="px-2 py-2">
+        <div className="flex flex-row items-start justify-between">
+          <div className="flex  flex-row justify-between items-center">
+            <CardTitle className="flex items-center gap-1 py-1 font-bold">
+              Monthly Total
+            </CardTitle>
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              asChild
+              className={` duration-500 ease-in-out transition-all `}
+            >
+              <Button variant={"outline"}>
+                by {listState.monthlyTotalBy} record
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuCheckboxItem
+                checked={listState.monthlyTotalBy === "last"}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  listState.setMonthlyTotalBy("last");
+                }}
+              >
+                last record
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={listState.monthlyTotalBy === "avg"}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  listState.setMonthlyTotalBy("avg");
+                }}
+              >
+                average
+              </DropdownMenuCheckboxItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </CardHeader>
+      <CardContent
+        className={`p-2 flex-1 w-full transition-all duration-500 ease-in-out opacity-100`}
+      >
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart accessibilityLayer data={monthlyTotal}>
+            <CartesianGrid vertical={false} stroke="hsl(var(--muted))" />
+            <XAxis
+              stroke="hsl(var(--muted-foreground))"
+              fontSize={10}
+              tickLine={false}
+              axisLine={false}
+              tickMargin={6}
+              dataKey="date"
+              tickFormatter={(value: string) =>
+                Number(new Date(value).getMonth()) === new Date().getMonth()
+                  ? "This month"
+                  : toMonthWord(value)
+              }
+            />
 
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                asChild
-                className={` duration-500 ease-in-out transition-all ${
-                  open ? "opacity-100" : "pointer-events-none opacity-0"
-                }`}
-              >
-                <Button variant={"outline"}>
-                  by {listState.monthlyTotalBy} record
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuCheckboxItem
-                  checked={listState.monthlyTotalBy === "last"}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    listState.setMonthlyTotalBy("last");
+            <Tooltip content={CustomTooltipMonthlyTotal} />
+            <Bar
+              animationBegin={0}
+              dataKey="total"
+              fill="hsl(var(--foreground))"
+              radius={4}
+              className="bg-red-500"
+            >
+              {monthlyTotal?.map((e) => (
+                <Cell
+                  key={e.date}
+                  style={{
+                    fill: "hsl(var(--foreground))",
                   }}
-                >
-                  last record
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem
-                  checked={listState.monthlyTotalBy === "avg"}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    listState.setMonthlyTotalBy("avg");
-                  }}
-                >
-                  average
-                </DropdownMenuCheckboxItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </button>
-        </CardHeader>
-        <CardContent
-          className={`p-2 max-h-[200px] h-screen w-full transition-all duration-500 ease-in-out opacity-100 ${!open && "pointer-events-none opacity-0"}`}
-        >
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={monthlyTotal} className="h-12">
-              <XAxis
-                stroke="hsl(var(--muted-foreground))"
-                fontSize={10}
-                tickLine={false}
-                axisLine={false}
-                dataKey="date"
-                tickFormatter={(value: string) =>
-                  Number(new Date(value).getMonth()) === new Date().getMonth()
-                    ? "This month"
-                    : toMonthWord(value)
-                }
-              />
-              {/* <YAxis
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={10}
-                  tickLine={false}
-                  tickFormatter={(value) => UsePhpPesoWSign(value, 0)}
-                  axisLine={false}
-                /> */}
-              <Tooltip content={CustomTooltipMonthlyTotal} />
-              <Brush
-                dataKey="total"
-                height={30}
-                stroke="hsl(var(--muted-foreground))"
-              />
-              <Bar
-                animationBegin={0}
-                dataKey="total"
-                fill="hsl(var(--foreground))"
-                radius={[4, 4, 0, 0]}
-                className="bg-red-500"
-              >
-                {monthlyTotal?.map((e) => (
-                  <Cell
-                    key={e.date}
-                    style={{
-                      fill: "hsl(var(--foreground))",
-                    }}
-                  />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-    </motion.div>
+                />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
   );
 }

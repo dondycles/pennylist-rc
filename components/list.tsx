@@ -314,21 +314,18 @@ export default function List({ list }: { list: User }) {
         >
           <Separator className="mt-14" />
           {/* bars */}
-          {dailyTotal ? (
-            <DailyTotalBarChart
-              differences={differences}
-              open={listState.showDailyTotal}
-              toggleOpen={() => listState.setShowDailyTotal()}
-              dailyTotal={dailyTotal}
-            />
-          ) : null}
-          {monthlyTotal ? (
-            <MonthlyTotalBarChart
-              open={listState.showMonthlyTotal}
-              toggleOpen={() => listState.setShowMonthlyTotal()}
-              monthlyTotal={monthlyTotal}
-            />
-          ) : null}
+          <div className="flex flex-col sm:flex-row gap-2">
+            {dailyTotal ? (
+              <DailyTotalBarChart
+                differences={differences}
+                dailyTotal={dailyTotal}
+              />
+            ) : null}
+            {monthlyTotal ? (
+              <MonthlyTotalBarChart monthlyTotal={monthlyTotal} />
+            ) : null}
+          </div>
+
           {/* pie */}
           {moneys?.data ? (
             <TotalBreakdownPieChart
