@@ -3,17 +3,11 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 // Icons
-import {
-  ArrowDown,
-  ArrowUp,
-  BotMessageSquare,
-  Equal,
-  Plus,
-} from "lucide-react";
+import { ArrowDown, ArrowUp, Equal, Plus } from "lucide-react";
 import { TbCurrencyPeso } from "react-icons/tb";
 
 // Importing utility functions
-import { AsteriskNumber, UsePhpPeso } from "@/lib/utils";
+import { AsteriskNumber, toMonthWord, UsePhpPeso } from "@/lib/utils";
 
 // Importing actions
 import { getMoneys, getTotal } from "@/app/actions/moneys";
@@ -31,7 +25,7 @@ import EditMoneyForm from "./forms/edit-money-form";
 import Money from "./list-money";
 import TotalBreakdownPieChart from "./charts/list-total-breakdown-pie-chart";
 import LogsTable from "./charts/list-logs-table";
-import DailyTotalBarChart from "./charts/list-daily-total-bar-chart";
+import DailyTotalBarChart from "./charts/list-daily-progress-bar-chart";
 import MonthlyTotalBarChart from "./charts/list-monthly-total-bar-chart";
 
 // Importing types
@@ -100,12 +94,13 @@ export default function List({ list }: { list: User }) {
     enabled: list ? true : false,
   });
 
-  const { dailyTotal, monthlyTotal, differences } = calculateListChartsData({
-    listState: listState,
-    logs: logs?.data ?? [],
-    logsLoading: logsLoading,
-    total: total,
-  });
+  const { dailyTotal, monthlyTotal, differences, dailyProgress } =
+    calculateListChartsData({
+      listState: listState,
+      logs: logs?.data ?? [],
+      logsLoading: logsLoading,
+      total: total,
+    });
 
   const refetch = () => {
     refetchMoneys();
@@ -318,14 +313,13 @@ export default function List({ list }: { list: User }) {
             {dailyTotal ? (
               <DailyTotalBarChart
                 differences={differences}
-                dailyTotal={dailyTotal}
+                dailyProgress={dailyProgress}
               />
             ) : null}
             {monthlyTotal ? (
               <MonthlyTotalBarChart monthlyTotal={monthlyTotal} />
             ) : null}
           </div>
-
           {/* pie */}
           {moneys?.data ? (
             <TotalBreakdownPieChart

@@ -18,13 +18,24 @@ import {
   AreaChart,
   Area,
 } from "recharts";
-export default function DailyTotalBarChart({
-  dailyTotal,
+export default function DailyProgressBarChart({
+  dailyProgress,
   differences,
 }: {
-  dailyTotal: {
+  dailyProgress: {
+    expenses: {
+      amount: number;
+      reason: string;
+    }[];
+    gains: {
+      amount: number;
+      reason: string;
+    }[];
     date: string;
-    total: number;
+    expensesSum: number;
+    gainsSum: number;
+    gainOrLoss: number;
+    currentTotal: number;
   }[];
   differences: {
     value: {
@@ -55,16 +66,16 @@ export default function DailyTotalBarChart({
 }) {
   const listState = useListState();
 
-  const slicedDailyTotal = dailyTotal.slice(
-    dailyTotal.length - listState.dailyTotalDays,
-    dailyTotal.length,
+  const slicedDailyTotal = dailyProgress.slice(
+    dailyProgress.length - listState.dailyTotalDays,
+    dailyProgress.length,
   );
 
   const CustomTooltipDailyTotal = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
-      const value = Number(payload[0]?.value);
-      const predValue = Number(
-        dailyTotal.find(
+      const total = Number(payload[0]?.value);
+      const predTotal = Number(
+        dailyProgress.find(
           (day) =>
             day.date ===
             new Date(
@@ -72,16 +83,18 @@ export default function DailyTotalBarChart({
                 new Date(payload[0].payload.date).getDate() - 1,
               ),
             ).toDateString(),
-        )?.total,
+        )?.currentTotal,
       );
-      const difference = isNaN(((value - predValue) / value) * 100)
+      const difference = isNaN(((total - predTotal) / total) * 100)
         ? 0
-        : ((value - predValue) / value) * 100;
+        : ((total - predTotal) / total) * 100;
+      const gainOrLoss = payload[0].payload.gainOrLoss;
       return (
         <div className="rounded-lg  p-2  text-sm bg-foreground text-background">
-          <p> {payload[0].payload.date}</p>
-          <p>{UsePhpPesoWSign(value)}</p>
-          <p>
+          <p className="text-muted-foreground">{payload[0].payload.date}</p>
+          <p>Total: {UsePhpPesoWSign(total)}</p>
+          <p className="text-muted-foreground">
+            Total is{" "}
             <span
               className={
                 difference === 0
@@ -94,7 +107,13 @@ export default function DailyTotalBarChart({
               {difference.toFixed(1)}%{" "}
             </span>
             {difference === 0 ? "equal" : difference > 0 ? "up" : "down"} than
-            last day
+            previous day
+          </p>
+          <p
+            hidden={gainOrLoss === 0}
+            className={gainOrLoss > 0 ? "text-green-500" : "text-red-400"}
+          >
+            {gainOrLoss > 0 ? "Gained " : "Lost "} {UsePhpPesoWSign(gainOrLoss)}
           </p>
         </div>
       );
@@ -102,6 +121,22 @@ export default function DailyTotalBarChart({
 
     return null;
   };
+
+  const gradientOffset = () => {
+    const dataMax = Math.max(...dailyProgress.map((i) => i.gainOrLoss));
+    const dataMin = Math.min(...dailyProgress.map((i) => i.gainOrLoss));
+
+    if (dataMax <= 0) {
+      return 0;
+    }
+    if (dataMin >= 0) {
+      return 1;
+    }
+
+    return dataMax / (dataMax - dataMin);
+  };
+
+  const off = gradientOffset();
 
   const getDifference = () => {
     const difference =
@@ -243,14 +278,14 @@ export default function DailyTotalBarChart({
             <Tooltip content={CustomTooltipDailyTotal} />
             <Area
               animationBegin={0}
-              dataKey="total"
+              dataKey="currentTotal"
               fill="hsl(var(--muted-foreground))"
               stroke="hsl(var(--primary))"
               radius={4}
               className="bg-red-500"
-              type="bump"
+              type="step"
             >
-              {dailyTotal.map((e) => (
+              {dailyProgress.map((e) => (
                 <Cell
                   key={e.date}
                   style={{
@@ -259,6 +294,21 @@ export default function DailyTotalBarChart({
                 />
               ))}
             </Area>
+            <defs>
+              <linearGradient id="splitColor" x1="0" y1="0" x2="0" y2="1">
+                <stop offset={off} stopColor="#448844" stopOpacity={1} />
+                <stop offset={off} stopColor="#884444" stopOpacity={1} />
+              </linearGradient>
+            </defs>
+            <Area
+              stackId="c"
+              dataKey="gainOrLoss"
+              fill="url(#splitColor)"
+              stroke="hsl(var(--primary))"
+              radius={4}
+              fillOpacity={1}
+              type="step"
+            />
           </AreaChart>
         </ResponsiveContainer>
       </CardContent>

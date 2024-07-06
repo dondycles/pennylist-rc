@@ -18,35 +18,26 @@ export const calculateListChartsData = ({
     const groupedByDate: {
       [key: string]: number;
     } = {};
-
     logs?.toReversed().forEach((log) => {
       const date = new Date(log.created_at).toDateString();
-
       const total = Number(log.changes?.to.total);
-
       // sets the log's date as the key, and overwrites its total to most recent reocrd if there are many records in that date
       groupedByDate[date] = total;
     });
-
     const eachDayTotal: { date: string; total: number }[] = [];
     const currentDate = new Date();
     let lastTotal = 0;
-
     // sets the current date back based on the days parameter
     currentDate.setDate(currentDate.getDate() - 365);
-
     for (let i = 0; i <= 365; i++) {
       const day = currentDate.toDateString();
-
       if (i === 365) {
         lastTotal = total;
       } else if (groupedByDate[day] !== undefined) {
         // if this date has total, set it to lastTotal so the next dates that does not have total will get that total as well to fill up the bars
         lastTotal = groupedByDate[day];
       }
-
       eachDayTotal.push({ date: day, total: lastTotal });
-
       // sets the date to the next day
       currentDate.setDate(currentDate.getDate() + 1);
     }
@@ -258,9 +249,127 @@ export const calculateListChartsData = ({
       },
     };
   };
+
+  const getDailyProgress = () => {
+    if (logsLoading) return [];
+    const groupedByDate: {
+      [key: string]: {
+        expenses: { amount: number; reason: string }[];
+        gains: { amount: number; reason: string }[];
+        date: string;
+        expensesSum: number;
+        gainsSum: number;
+        gainOrLoss: number;
+        currentTotal: number;
+      };
+    } = {};
+
+    let arrayOfChanges: { amount: number; reason: string }[] = [];
+    logs.toReversed().forEach((log) => {
+      const changesInAmount =
+        Number(log.changes?.to.amount) - Number(log.changes?.from.amount);
+
+      const date = new Date(log.created_at).toDateString();
+      if (!groupedByDate[date]) {
+        arrayOfChanges = [];
+      }
+      arrayOfChanges.push({
+        amount: changesInAmount ?? 0,
+        reason: log.reason!,
+      });
+      const expensesMinusGain =
+        _.sum(arrayOfChanges.map((a) => a.amount)) > 0
+          ? null
+          : _.sum(arrayOfChanges.map((a) => a.amount));
+      const gainsMinusExpenses =
+        _.sum(arrayOfChanges.map((a) => a.amount)) < 0
+          ? null
+          : _.sum(arrayOfChanges.map((a) => a.amount));
+      groupedByDate[date] = {
+        expenses: arrayOfChanges.filter((t) => t.amount !== 0 && t.amount < 0),
+        gains: arrayOfChanges.filter((t) => t.amount !== 0 && t.amount > 0),
+        date: date,
+        expensesSum: _.sum(
+          arrayOfChanges
+            .filter((t) => t.amount !== 0 && t.amount < 0)
+            .map((t) => t.amount),
+        ),
+        gainsSum: _.sum(
+          arrayOfChanges
+            .filter((t) => t.amount !== 0 && t.amount > 0)
+            .map((t) => t.amount),
+        ),
+        gainOrLoss: expensesMinusGain ?? gainsMinusExpenses,
+        currentTotal: Number(log.changes?.to.total),
+      };
+    });
+    const currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() - 365);
+    let lastData: {
+      expenses: {
+        amount: number;
+        reason: string;
+      }[];
+      gains: {
+        amount: number;
+        reason: string;
+      }[];
+      date: string;
+      expensesSum: number;
+      gainsSum: number;
+      gainOrLoss: number;
+      currentTotal: number;
+    } = {
+      expenses: [],
+      gains: [],
+      date: "",
+      expensesSum: 0,
+      gainsSum: 0,
+      gainOrLoss: 0,
+      currentTotal: 0,
+    };
+
+    const eachDayData: {
+      expenses: {
+        amount: number;
+        reason: string;
+      }[];
+      gains: {
+        amount: number;
+        reason: string;
+      }[];
+      date: string;
+      expensesSum: number;
+      gainsSum: number;
+      gainOrLoss: number;
+      currentTotal: number;
+    }[] = [];
+
+    for (let i = 0; i <= 365; i++) {
+      const day = currentDate.toDateString();
+      if (groupedByDate[day] !== undefined) {
+        // if this date has total, set it to lastTotal so the next dates that does not have total will get that total as well to fill up the bars
+        lastData = groupedByDate[day];
+      } else {
+        // if no data, resets everything except total
+        lastData.gainOrLoss = 0;
+        lastData.expenses = [];
+        lastData.gains = [];
+        lastData.date = day;
+        lastData.expensesSum = 0;
+        lastData.gainsSum = 0;
+      }
+      eachDayData.push({ ...lastData });
+      // sets the date to the next day
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return eachDayData;
+  };
   return {
     dailyTotal: getDailyTotal(),
     monthlyTotal: getMonthlyTotal(),
     differences: getDifferences(),
+    dailyProgress: getDailyProgress(),
   };
 };
