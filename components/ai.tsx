@@ -47,7 +47,6 @@ export default function Chat({
   const listState = useListState();
   const [useLastStream, setUseLastStream] = useState(true);
   const [isAiGenerating, setIsAiGenerating] = useState(false);
-  const [askAiMode, setAskAiMode] = useState(false);
   const [messages, setMessages] = useState<CoreMessage[]>([]);
   const [limits, setLimits] = useState<{
     remaining: number | null;
@@ -83,6 +82,7 @@ export default function Chat({
     if (limiter.remaining === 0) {
       setUseLastStream(true);
       setIsAiGenerating(false);
+      form.reset();
       return;
     }
 
@@ -100,22 +100,18 @@ export default function Chat({
     await saveLastStream(finishedText as string);
     setUseLastStream(true);
     setIsAiGenerating(false);
+    form.reset();
   };
 
   const { mutate: regenarate } = useMutation({
     mutationKey: ["ai", listname],
     mutationFn: async (type: "analyze" | "input") => {
       await generateAi(type);
-      form.reset;
       return "";
     },
   });
 
-  const {
-    data: last,
-    error: lastStreamError,
-    isLoading: isLoadingLast,
-  } = useQuery({
+  const { data: last } = useQuery({
     queryKey: ["last-stream", listname],
     queryFn: async () => {
       const data = await getLastStream();
