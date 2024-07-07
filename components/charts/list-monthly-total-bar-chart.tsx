@@ -166,7 +166,7 @@ export default function MonthlyTotalBarChart({
         className={`p-2 flex-1 w-full transition-all duration-500 ease-in-out opacity-100`}
       >
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart accessibilityLayer data={monthlyTotal}>
+          <ComposedChart data={monthlyTotal}>
             <CartesianGrid vertical={false} stroke="hsl(var(--muted))" />
             <XAxis
               stroke="hsl(var(--muted-foreground))"
