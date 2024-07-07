@@ -46,21 +46,23 @@ export default function MonthlyTotalBarChart({
         : ((value - predValue) / value) * 100;
       return (
         <div className="rounded-lg  p-2  text-sm bg-foreground text-background">
-          <p>
+          <p className="text-muted-foreground">
             {toMonthWord(payload[0].payload.date as string)}{" "}
             {new Date(payload[0].payload.date).getFullYear()}
           </p>
-          <p>{UsePhpPesoWSign(payload[0]?.value)}</p>
+          <p className="font-black font-anton">
+            {UsePhpPesoWSign(payload[0]?.value)}
+          </p>
 
           <p>
             <span
-              className={
+              className={`font-black font-anton ${
                 difference === 0
                   ? "text-muted-foreground"
                   : difference > 0
                     ? "text-green-500"
                     : "text-red-400"
-              }
+              }`}
             >
               {difference.toFixed(1)}%{" "}
             </span>
@@ -140,21 +142,28 @@ export default function MonthlyTotalBarChart({
             />
 
             <Tooltip content={CustomTooltipMonthlyTotal} />
+            <defs>
+              <linearGradient id="totalColor" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset={"5%"}
+                  stopColor="hsl(var(--muted-foreground))"
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset={"95%"}
+                  stopColor="hsl(var(--muted-foreground))"
+                  stopOpacity={0.1}
+                />
+              </linearGradient>
+            </defs>
             <Bar
               animationBegin={0}
               dataKey="total"
-              fill="hsl(var(--foreground))"
+              fill="url(#totalColor)"
               radius={4}
               className="bg-red-500"
             >
-              {monthlyTotal?.map((e) => (
-                <Cell
-                  key={e.date}
-                  style={{
-                    fill: "hsl(var(--foreground))",
-                  }}
-                />
-              ))}
+              {monthlyTotal?.map((e) => <Cell key={e.date} />)}
             </Bar>
           </BarChart>
         </ResponsiveContainer>

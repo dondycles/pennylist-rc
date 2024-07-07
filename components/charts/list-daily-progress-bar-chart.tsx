@@ -9,14 +9,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { UsePhpPesoWSign, toMonthWord } from "@/lib/utils";
 import { useListState } from "@/store";
+import { ArrowDown, ArrowUp } from "lucide-react";
 import {
-  Cell,
   ResponsiveContainer,
   XAxis,
   Tooltip,
   CartesianGrid,
-  AreaChart,
   Area,
+  ComposedChart,
+  Bar,
+  Curve,
+  Cell,
 } from "recharts";
 export default function DailyProgressBarChart({
   dailyProgress,
@@ -66,7 +69,7 @@ export default function DailyProgressBarChart({
 }) {
   const listState = useListState();
 
-  const slicedDailyTotal = dailyProgress.slice(
+  const slicedDailyProgress = dailyProgress.slice(
     dailyProgress.length - listState.dailyProgressDays,
     dailyProgress.length,
   );
@@ -75,7 +78,7 @@ export default function DailyProgressBarChart({
     if (active && payload && payload.length) {
       const total = Number(payload[0]?.value);
       const predTotal = Number(
-        dailyProgress.find(
+        slicedDailyProgress.find(
           (day) =>
             day.date ===
             new Date(
@@ -90,31 +93,52 @@ export default function DailyProgressBarChart({
         : ((total - predTotal) / total) * 100;
       const gainOrLoss = payload[0].payload.gainOrLoss;
       return (
-        <div className="rounded-lg  p-2  text-sm bg-foreground text-background">
+        <div className="rounded-lg  p-2  text-sm bg-foreground text-background max-w-[200px] flex flex-col gap-2">
           <p className="text-muted-foreground">{payload[0].payload.date}</p>
-          <p>Total: {UsePhpPesoWSign(total)}</p>
-          <p className="text-muted-foreground">
-            Total is{" "}
-            <span
-              className={
-                difference === 0
-                  ? "text-muted-foreground"
-                  : difference > 0
-                    ? "text-green-500"
-                    : "text-red-400"
-              }
-            >
-              {difference.toFixed(1)}%{" "}
-            </span>
-            {difference === 0 ? "equal" : difference > 0 ? "up" : "down"} than
-            previous day
-          </p>
-          <p
-            hidden={gainOrLoss === 0}
-            className={gainOrLoss > 0 ? "text-green-500" : "text-red-400"}
-          >
-            {gainOrLoss > 0 ? "Gained " : "Lost "} {UsePhpPesoWSign(gainOrLoss)}
-          </p>
+          <div className="flex flex-row gap-1">
+            <div className="size-4 bg-gradient-to-t from-muted-foreground/25 to-muted-foreground rounded shrink-0" />
+            <p className="whitespace-pre-wrap">
+              Total:
+              <span className="font-anton font-black">
+                {UsePhpPesoWSign(total)}
+              </span>{" "}
+              (
+              <span
+                className={`font-anton font-black ${
+                  difference === 0
+                    ? "text-muted-foreground"
+                    : difference > 0
+                      ? "text-green-500"
+                      : "text-red-400"
+                }`}
+              >
+                {difference.toFixed(1)}%{" "}
+              </span>
+              {difference === 0 ? "equal " : difference > 0 ? "up " : "down "}
+              than previous day)
+            </p>
+          </div>
+          <div hidden={gainOrLoss === 0} className={`flex flex-row gap-1`}>
+            <div
+              className={`size-4 rounded shrink-0 ${gainOrLoss > 0 ? "from-green-500 to-muted-foreground/25 bg-gradient-to-b" : "from-red-400 to-muted-foreground/25 bg-gradient-to-t"}`}
+            />
+            <p className="flex flex-row gap-1 items-center">
+              {gainOrLoss > 0 ? (
+                <>
+                  <ArrowUp size={12} />
+                  Gained
+                </>
+              ) : (
+                <>
+                  <ArrowDown size={12} />
+                  Lost
+                </>
+              )}{" "}
+              <span className="font-anton font-black">
+                {UsePhpPesoWSign(gainOrLoss)}
+              </span>
+            </p>
+          </div>
         </div>
       );
     }
@@ -123,8 +147,16 @@ export default function DailyProgressBarChart({
   };
 
   const gradientOffset = () => {
-    const dataMax = Math.max(...dailyProgress.map((i) => i.gainOrLoss));
-    const dataMin = Math.min(...dailyProgress.map((i) => i.gainOrLoss));
+    const dataMax = Math.max(
+      ...slicedDailyProgress
+        .filter((i) => i.gainOrLoss !== 0)
+        .map((i) => i.gainOrLoss),
+    );
+    const dataMin = Math.min(
+      ...slicedDailyProgress
+        .filter((i) => i.gainOrLoss !== 0)
+        .map((i) => i.gainOrLoss),
+    );
 
     if (dataMax <= 0) {
       return 0;
@@ -132,7 +164,6 @@ export default function DailyProgressBarChart({
     if (dataMin >= 0) {
       return 1;
     }
-
     return dataMax / (dataMax - dataMin);
   };
 
@@ -258,7 +289,7 @@ export default function DailyProgressBarChart({
           {getDifference()} from past {listState.dailyProgressDays} days
         </Badge>
         <ResponsiveContainer className={"flex-1"} width="100%" height="100%">
-          <AreaChart accessibilityLayer data={slicedDailyTotal}>
+          <ComposedChart accessibilityLayer data={slicedDailyProgress}>
             <CartesianGrid vertical={false} stroke="hsl(var(--muted))" />
             <XAxis
               stroke="hsl(var(--muted-foreground))"
@@ -276,40 +307,47 @@ export default function DailyProgressBarChart({
               }
             />
             <Tooltip content={CustomTooltipDailyTotal} />
-            <Area
+            <defs>
+              <linearGradient id="totalColor" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset={"5%"}
+                  stopColor="hsl(var(--muted-foreground))"
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset={"95%"}
+                  stopColor="hsl(var(--muted-foreground))"
+                  stopOpacity={0.1}
+                />
+              </linearGradient>
+            </defs>
+            <Bar
               animationBegin={0}
               dataKey="currentTotal"
-              fill="hsl(var(--muted-foreground))"
-              stroke="hsl(var(--primary))"
+              fill="url(#totalColor)"
+              strokeWidth={0.5}
               radius={4}
-              className="bg-red-500"
               type="step"
-            >
-              {dailyProgress.map((e) => (
-                <Cell
-                  key={e.date}
-                  style={{
-                    fill: "hsl(var(--foreground))",
-                  }}
-                />
-              ))}
-            </Area>
+            />
             <defs>
               <linearGradient id="splitColor" x1="0" y1="0" x2="0" y2="1">
-                <stop offset={off} stopColor="#448844" stopOpacity={1} />
-                <stop offset={off} stopColor="#884444" stopOpacity={1} />
+                <stop offset={0} stopColor="#448844" stopOpacity={1} />
+                <stop offset={off} stopColor="#448844" stopOpacity={0.2} />
+
+                <stop offset={off} stopColor="#884444" stopOpacity={0.2} />
+                <stop offset={1} stopColor="#884444" stopOpacity={1} />
               </linearGradient>
             </defs>
             <Area
               stackId="c"
               dataKey="gainOrLoss"
               fill="url(#splitColor)"
-              stroke="hsl(var(--primary))"
-              radius={4}
+              stroke="hsl(var(--muted-foreground))"
+              strokeWidth={0.5}
               fillOpacity={1}
-              type="step"
+              type="monotone"
             />
-          </AreaChart>
+          </ComposedChart>
         </ResponsiveContainer>
       </CardContent>
     </Card>
