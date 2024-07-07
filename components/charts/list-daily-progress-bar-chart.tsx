@@ -1,12 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -16,7 +10,7 @@ import {
 import { Progress } from "@/lib/hooks";
 import { UsePhpPesoWSign, toMonthWord } from "@/lib/utils";
 import { useListState } from "@/store";
-import { ArrowDown, ArrowUp, MousePointerClick } from "lucide-react";
+import { MousePointerClick } from "lucide-react";
 import {
   ResponsiveContainer,
   XAxis,
@@ -26,25 +20,9 @@ import {
   ComposedChart,
   Bar,
   Line,
-  Legend,
 } from "recharts";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/dialog";
-import { useState } from "react";
-import { ScrollArea } from "../ui/scroll-area";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../ui/table";
+
+import { Table, TableBody, TableCell, TableRow } from "../ui/table";
 export default function DailyProgressBarChart({
   dailyProgress,
   differences,
@@ -78,7 +56,6 @@ export default function DailyProgressBarChart({
   };
 }) {
   const listState = useListState();
-  const [viewProgress, setViewProgress] = useState<Progress | null>(null);
 
   const slicedDailyProgress = dailyProgress.slice(
     dailyProgress.length - listState.dailyProgressDays,
@@ -89,56 +66,48 @@ export default function DailyProgressBarChart({
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       const total = Number(payload[0]?.value);
-      const predTotal = Number(
-        slicedDailyProgress.find(
-          (day) =>
-            day.date ===
-            new Date(
-              new Date().setDate(new Date(data.date).getDate() - 1),
-            ).toDateString(),
-        )?.currentTotal,
-      );
-      const difference = isNaN(((total - predTotal) / total) * 100)
-        ? 0
-        : ((total - predTotal) / total) * 100;
       const gainOrLoss = data.gainOrLoss;
       const gainSum = data.gainsSum;
       const expensesSum = data.expensesSum;
       return (
-        <div className="rounded-lg p-2 text-sm bg-foreground text-background  flex flex-col gap-2">
+        <div className="rounded-lg p-2 text-sm bg-muted flex flex-col gap-2  border shadow-lg">
           <p className="text-muted-foreground">{data.date}</p>
-
-          <Table className="text-xs">
-            <TableBody>
-              <TableRow>
-                <TableCell>Gain</TableCell>
-                <TableCell className="font-anton font-black">
-                  {UsePhpPesoWSign(gainSum)}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Loss</TableCell>
-                <TableCell className="font-anton font-black">
-                  {UsePhpPesoWSign(expensesSum)}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Difference</TableCell>
-                <TableCell className="font-anton font-black">
-                  {UsePhpPesoWSign(gainOrLoss)}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Current total</TableCell>
-                <TableCell className="font-anton font-black">
-                  {UsePhpPesoWSign(total)}
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-          <div className="text-xs text-muted-foreground flex flex-row gap-1 items-center justify-center">
-            Click the bar to view details.
-            <MousePointerClick />
+          <div className="text-xs flex flex-col gap-2">
+            <div className="flex flex-row gap-2">
+              <div className="flex items-center gap-1">
+                <div className="bg-green-500/50 w-3 h-1" /> Gain
+              </div>
+              <div className="font-anton font-black">
+                {UsePhpPesoWSign(gainSum)}
+              </div>
+            </div>
+            <div className="flex flex-row gap-2">
+              <div className="flex items-center gap-1">
+                <div className="bg-red-500/50 w-3 h-1" />
+                Loss
+              </div>
+              <div className="font-anton font-black">
+                {UsePhpPesoWSign(expensesSum)}
+              </div>
+            </div>
+            <div className="flex flex-row gap-2">
+              <div className="flex items-center gap-1">
+                <div className="bg-gradient-to-b from-green-500 to-red-400 size-3 rounded" />
+                Difference
+              </div>
+              <div className="font-anton font-black">
+                {UsePhpPesoWSign(gainOrLoss)}
+              </div>
+            </div>
+            <div className="flex flex-row gap-2">
+              <div className="flex items-center gap-1">
+                <div className="bg-gradient-to-b from-primary to-transparent size-3 rounded" />
+                Current Total
+              </div>
+              <div className="font-anton font-black">
+                {UsePhpPesoWSign(total)}
+              </div>
+            </div>
           </div>
         </div>
       );
@@ -210,7 +179,7 @@ export default function DailyProgressBarChart({
   return (
     <Card
       className={
-        "overflow-hidden rounded-lg shadow-none w-full aspect-square flex flex-col"
+        "overflow-hidden rounded-lg shadow-none w-full aspect-[3/5] flex flex-col"
       }
     >
       <CardHeader className="p-2 m-0">
@@ -284,7 +253,7 @@ export default function DailyProgressBarChart({
         </div>
       </CardHeader>
       <CardContent
-        className={`flex-1 w-full aspect-square  transition-all duration-500 ease-in-out opacity-100 flex flex-col px-2 pb-2`}
+        className={`flex-1 w-full aspect-square flex flex-col px-2 pb-2`}
       >
         <Badge className="text-sm block w-fit px-1" variant={"secondary"}>
           {getDifference()} from past {listState.dailyProgressDays} days
@@ -309,8 +278,8 @@ export default function DailyProgressBarChart({
             />
 
             <Tooltip
+              position={{ y: 50 }}
               offset={51}
-              position={{ y: -20 }}
               cursor={true}
               content={CustomTooltipDailyTotal}
             />
@@ -335,10 +304,6 @@ export default function DailyProgressBarChart({
               strokeWidth={0.5}
               radius={4}
               type="step"
-              onClick={(data: Progress) => {
-                setViewProgress(data);
-              }}
-              className="cursor-pointer"
             />
 
             <defs>
@@ -361,14 +326,14 @@ export default function DailyProgressBarChart({
               fillOpacity={1}
               dataKey="gainsSum"
               type="monotone"
-              stroke="#448888"
+              stroke="#448844"
               strokeWidth={2}
             />
             <Line
               fillOpacity={1}
               dataKey="expensesSum"
               type="monotone"
-              stroke="#884884"
+              stroke="#884444"
               strokeWidth={2}
             />
           </ComposedChart>
@@ -386,11 +351,11 @@ export default function DailyProgressBarChart({
           </div>
           <div className="space-y-2">
             <div className="flex flex-row gap-1 items-center">
-              <div className="w-4 h-[2px] bg-teal-500/75" />
+              <div className="w-4 h-[2px] bg-green-500/50" />
               <p className="text-muted-foreground">Gain</p>
             </div>
             <div className="flex flex-row gap-1 items-center">
-              <div className="w-4 h-[2px] bg-fuchsia-500/75" />
+              <div className="w-4 h-[2px] bg-red-400/50" />
               <p className="text-muted-foreground">Loss</p>
             </div>
           </div>
@@ -400,93 +365,6 @@ export default function DailyProgressBarChart({
           </p>
         </div>
       </CardContent>
-
-      <Dialog
-        open={viewProgress !== null}
-        onOpenChange={() => {
-          if (!viewProgress) return;
-          setViewProgress(null);
-        }}
-        modal={false}
-      >
-        {viewProgress && (
-          <DialogContent className="px-2 py-0 flex flex-col gap-2 h-[50dvh] overflow-auto outline-transparent">
-            <ScrollArea>
-              <div className="flex flex-col gap-2 py-4">
-                <DialogHeader className="m-0">
-                  <DialogTitle>Details</DialogTitle>
-                  <DialogDescription className="text-sm">
-                    More details on this date (
-                    {new Date(viewProgress?.date).toDateString()})
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="flex flex-col gap-8">
-                  {viewProgress.expenses.length !== 0 ? (
-                    <div className="flex flex-col gap-2 text-sm">
-                      <p className="text-muted-foreground">Expenses: </p>
-                      <div className="flex flex-col gap-2">
-                        {viewProgress.expenses.map((e, i) => {
-                          return (
-                            <div
-                              key={e.reason + i}
-                              className=" bg-red-400/5 border border-red-400 p-2 rounded-lg flex justify-between text-red-400"
-                            >
-                              <span className="truncate">{e.reason}</span>
-                              <span className="font-anton font-black shrink-0">
-                                {UsePhpPesoWSign(e.amount)}
-                              </span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                      <div className="text-red-400 flex justify-between p-2 ">
-                        <span className="truncate">Total: </span>{" "}
-                        <span className="font-black font-anton">
-                          {UsePhpPesoWSign(viewProgress.expensesSum)}
-                        </span>
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="text-xs text-muted-foreground text-center">
-                      No expenses on this date
-                    </p>
-                  )}
-                  {viewProgress.gains.length !== 0 ? (
-                    <div className="flex flex-col gap-2 text-sm ">
-                      <p className="text-muted-foreground">Gains: </p>
-                      <div className="flex flex-col gap-2">
-                        {viewProgress.gains.map((e, i) => {
-                          return (
-                            <div
-                              key={e.reason + i}
-                              className="p-2 rounded-lg flex justify-between text-green-600 border border-green-600 bg-green-600/5"
-                            >
-                              <span className="truncate">{e.reason}</span>
-                              <span className="font-anton font-black shrink-0">
-                                {UsePhpPesoWSign(e.amount)}
-                              </span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                      <div className="text-green-500 flex justify-between p-2 ">
-                        <span className="truncate">Total: </span>{" "}
-                        <span className="font-black font-anton">
-                          {UsePhpPesoWSign(viewProgress.gainsSum)}
-                        </span>
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="text-xs text-muted-foreground text-center">
-                      No gains on this date
-                    </p>
-                  )}
-                </div>
-              </div>
-            </ScrollArea>
-          </DialogContent>
-        )}
-      </Dialog>
     </Card>
   );
 }

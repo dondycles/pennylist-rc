@@ -9,6 +9,7 @@ import {
   CartesianGrid,
   Cell,
   ComposedChart,
+  Line,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -20,72 +21,52 @@ export default function MonthlyTotalBarChart({
 }) {
   const CustomTooltipMonthlyTotal = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
-      const currentTotal = Number(payload[0]?.value);
-      const previousTotal = Number(
-        monthlyTotal.find(
-          (day) =>
-            new Date(day.date).getMonth() ===
-            (new Date(payload[0].payload.date).getMonth() - 1 === -1
-              ? 11
-              : new Date(payload[0].payload.date).getMonth() - 1),
-        )?.currentTotal,
-      );
-      const difference = isNaN(
-        ((currentTotal - previousTotal) / currentTotal) * 100,
-      )
-        ? 0
-        : ((currentTotal - previousTotal) / currentTotal) * 100;
-      const gainOrLoss = payload[0].payload.gainOrLoss;
+      const data = payload[0].payload;
+      const total = Number(payload[0]?.value);
+      const gainOrLoss = data.gainOrLoss;
+      const gainSum = data.gainsSum;
+      const expensesSum = data.expensesSum;
       return (
-        <div className="rounded-lg p-2 text-sm bg-foreground text-background max-w-[200px] flex flex-col gap-2">
+        <div className="rounded-lg p-2 text-sm bg-muted flex flex-col gap-2  border shadow-lg">
           <p className="text-muted-foreground">
-            {toMonthWord(payload[0].payload.date as string)}{" "}
-            {new Date(payload[0].payload.date).getFullYear()}
+            {toMonthWord(data.date)} {new Date(data.date).getFullYear()}
           </p>
-          <p className="font-anton font-black">{UsePhpPesoWSign(gainOrLoss)}</p>
-          <div className="flex flex-row gap-1">
-            <div className="size-4 rounded bg-gradient-to-b from-muted-foreground to-muted-foreground/25 shrink-0" />
-            <p>
-              Total:{" "}
-              <span className="font-black font-anton">
-                {UsePhpPesoWSign(payload[0]?.value)}
-              </span>{" "}
-              (
-              <span
-                className={`font-black font-anton ${
-                  difference === 0
-                    ? "text-muted-foreground"
-                    : difference > 0
-                      ? "text-green-500"
-                      : "text-red-400"
-                }`}
-              >
-                {difference.toFixed(1)}%{" "}
-              </span>
-              {difference === 0 ? "equal" : difference > 0 ? "up" : "down"} than
-              last month)
-            </p>
-          </div>
-          <div hidden={gainOrLoss === 0} className={`flex flex-row gap-1`}>
-            <div
-              className={`size-4 rounded shrink-0 ${gainOrLoss > 0 ? "from-green-500 to-muted-foreground/25 bg-gradient-to-b" : "from-red-400 to-muted-foreground/25 bg-gradient-to-t"}`}
-            />
-            <p className="flex flex-row gap-1 items-center">
-              {gainOrLoss > 0 ? (
-                <>
-                  <ArrowUp size={12} />
-                  Gained
-                </>
-              ) : (
-                <>
-                  <ArrowDown size={12} />
-                  Lost
-                </>
-              )}{" "}
-              <span className="font-anton font-black">
+          <div className="text-xs flex flex-col gap-2">
+            <div className="flex flex-row gap-2">
+              <div className="flex items-center gap-1">
+                <div className="bg-green-500/50 w-3 h-1" /> Gain
+              </div>
+              <div className="font-anton font-black">
+                {UsePhpPesoWSign(gainSum)}
+              </div>
+            </div>
+            <div className="flex flex-row gap-2">
+              <div className="flex items-center gap-1">
+                <div className="bg-red-500/50 w-3 h-1" />
+                Loss
+              </div>
+              <div className="font-anton font-black">
+                {UsePhpPesoWSign(expensesSum)}
+              </div>
+            </div>
+            <div className="flex flex-row gap-2">
+              <div className="flex items-center gap-1">
+                <div className="bg-gradient-to-b from-green-500 to-red-400 size-3 rounded" />
+                Difference
+              </div>
+              <div className="font-anton font-black">
                 {UsePhpPesoWSign(gainOrLoss)}
-              </span>
-            </p>
+              </div>
+            </div>
+            <div className="flex flex-row gap-2">
+              <div className="flex items-center gap-1">
+                <div className="bg-gradient-to-b from-primary to-transparent size-3 rounded" />
+                Current Total
+              </div>
+              <div className="font-anton font-black">
+                {UsePhpPesoWSign(total)}
+              </div>
+            </div>
           </div>
         </div>
       );
@@ -120,7 +101,7 @@ export default function MonthlyTotalBarChart({
   return (
     <Card
       className={
-        "overflow-hidden rounded-lg shadow-none w-full aspect-square flex flex-col"
+        "overflow-hidden rounded-lg shadow-none w-full aspect-[3/5] flex flex-col"
       }
     >
       <CardHeader className="px-2 py-2">
@@ -130,42 +111,12 @@ export default function MonthlyTotalBarChart({
               Monthly Total
             </CardTitle>
           </div>
-          {/* <DropdownMenu>
-            <DropdownMenuTrigger
-              asChild
-              className={` duration-500 ease-in-out transition-all `}
-            >
-              <Button variant={"outline"}>
-                by {listState.monthlyTotalBy} record
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuCheckboxItem
-                checked={listState.monthlyTotalBy === "last"}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  listState.setMonthlyTotalBy("last");
-                }}
-              >
-                last record
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={listState.monthlyTotalBy === "avg"}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  listState.setMonthlyTotalBy("avg");
-                }}
-              >
-                average
-              </DropdownMenuCheckboxItem>
-            </DropdownMenuContent>
-          </DropdownMenu> */}
         </div>
       </CardHeader>
       <CardContent
-        className={`p-2 flex-1 w-full transition-all duration-500 ease-in-out opacity-100`}
+        className={`flex-1 w-full aspect-square flex flex-col px-2 pb-2`}
       >
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer className={"flex-1"} width="100%" height="100%">
           <ComposedChart data={monthlyTotal}>
             <CartesianGrid vertical={false} stroke="hsl(var(--muted))" />
             <XAxis
@@ -235,8 +186,48 @@ export default function MonthlyTotalBarChart({
               fillOpacity={1}
               type="monotone"
             />
+            <Line
+              fillOpacity={1}
+              dataKey="gainsSum"
+              type="monotone"
+              stroke="#448844"
+              strokeWidth={2}
+            />
+            <Line
+              fillOpacity={1}
+              dataKey="expensesSum"
+              type="monotone"
+              stroke="#884444"
+              strokeWidth={2}
+            />
           </ComposedChart>
         </ResponsiveContainer>
+        <div className="p-2 m-0 text-xs flex flex-wrap gap-2 justify-center shrink-0">
+          <div className="space-y-2">
+            <div className="flex flex-row gap-1">
+              <div className="size-4 rounded from-transparent to-primary bg-gradient-to-t" />
+              <p className="text-muted-foreground">Total</p>
+            </div>
+            <div className="flex flex-row gap-1">
+              <div className="size-4 rounded from-green-500/50 to-red-500/50  bg-gradient-to-b" />
+              <p className="text-muted-foreground">Difference</p>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="flex flex-row gap-1 items-center">
+              <div className="w-4 h-[2px] bg-green-500/50" />
+              <p className="text-muted-foreground">Gain</p>
+            </div>
+            <div className="flex flex-row gap-1 items-center">
+              <div className="w-4 h-[2px] bg-red-400/50" />
+              <p className="text-muted-foreground">Loss</p>
+            </div>
+          </div>
+          <p className="text-muted-foreground text-center">
+            *Difference is equal to gain minus loss and also equal to the
+            difference of current total from previous total.
+          </p>
+        </div>
       </CardContent>
     </Card>
   );
