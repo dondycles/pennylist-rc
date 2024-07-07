@@ -7,9 +7,10 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Progress } from "@/lib/hooks";
 import { UsePhpPesoWSign, toMonthWord } from "@/lib/utils";
 import { useListState } from "@/store";
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { ArrowDown, ArrowUp, MousePointerClick } from "lucide-react";
 import {
   ResponsiveContainer,
   XAxis,
@@ -18,28 +19,21 @@ import {
   Area,
   ComposedChart,
   Bar,
-  Curve,
-  Cell,
 } from "recharts";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
+import { useState } from "react";
+import { ScrollArea } from "../ui/scroll-area";
 export default function DailyProgressBarChart({
   dailyProgress,
   differences,
 }: {
-  dailyProgress: {
-    expenses: {
-      amount: number;
-      reason: string;
-    }[];
-    gains: {
-      amount: number;
-      reason: string;
-    }[];
-    date: string;
-    expensesSum: number;
-    gainsSum: number;
-    gainOrLoss: number;
-    currentTotal: number;
-  }[];
+  dailyProgress: Progress[];
   differences: {
     value: {
       yesterday: string;
@@ -68,6 +62,7 @@ export default function DailyProgressBarChart({
   };
 }) {
   const listState = useListState();
+  const [viewProgress, setViewProgress] = useState<Progress | null>(null);
 
   const slicedDailyProgress = dailyProgress.slice(
     dailyProgress.length - listState.dailyProgressDays,
@@ -93,7 +88,7 @@ export default function DailyProgressBarChart({
         : ((total - predTotal) / total) * 100;
       const gainOrLoss = payload[0].payload.gainOrLoss;
       return (
-        <div className="rounded-lg  p-2  text-sm bg-foreground text-background max-w-[200px] flex flex-col gap-2">
+        <div className="rounded-lg p-2 text-sm bg-foreground text-background max-w-[200px] flex flex-col gap-2">
           <p className="text-muted-foreground">{payload[0].payload.date}</p>
           <div className="flex flex-row gap-1">
             <div className="size-4 bg-gradient-to-t from-muted-foreground/25 to-muted-foreground rounded shrink-0" />
@@ -138,6 +133,10 @@ export default function DailyProgressBarChart({
                 {UsePhpPesoWSign(gainOrLoss)}
               </span>
             </p>
+          </div>
+          <div className="text-xs text-muted-foreground flex flex-row gap-1 items-center justify-center">
+            Click to view details.
+            <MousePointerClick />
           </div>
         </div>
       );
@@ -308,15 +307,15 @@ export default function DailyProgressBarChart({
             />
             <Tooltip content={CustomTooltipDailyTotal} />
             <defs>
-              <linearGradient id="totalColor" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id="dailyTotalColor" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset={"5%"}
-                  stopColor="hsl(var(--muted-foreground))"
+                  stopColor="hsl(var(--primary))"
                   stopOpacity={0.8}
                 />
                 <stop
                   offset={"95%"}
-                  stopColor="hsl(var(--muted-foreground))"
+                  stopColor="hsl(var(--primary))"
                   stopOpacity={0.1}
                 />
               </linearGradient>
@@ -324,24 +323,26 @@ export default function DailyProgressBarChart({
             <Bar
               animationBegin={0}
               dataKey="currentTotal"
-              fill="url(#totalColor)"
+              fill="url(#dailyTotalColor)"
               strokeWidth={0.5}
               radius={4}
               type="step"
+              onClick={(data: Progress) => setViewProgress(data)}
             />
-            <defs>
-              <linearGradient id="splitColor" x1="0" y1="0" x2="0" y2="1">
-                <stop offset={0} stopColor="#448844" stopOpacity={1} />
-                <stop offset={off} stopColor="#448844" stopOpacity={0.2} />
 
-                <stop offset={off} stopColor="#884444" stopOpacity={0.2} />
+            <defs>
+              <linearGradient id="dailySplitColor" x1="0" y1="0" x2="0" y2="1">
+                <stop offset={0} stopColor="#448844" stopOpacity={1} />
+                <stop offset={off} stopColor="#448844" stopOpacity={0.5} />
+
+                <stop offset={off} stopColor="#884444" stopOpacity={0.5} />
                 <stop offset={1} stopColor="#884444" stopOpacity={1} />
               </linearGradient>
             </defs>
             <Area
               stackId="c"
               dataKey="gainOrLoss"
-              fill="url(#splitColor)"
+              fill="url(#dailySplitColor)"
               stroke="hsl(var(--muted-foreground))"
               strokeWidth={0.5}
               fillOpacity={1}
@@ -350,6 +351,92 @@ export default function DailyProgressBarChart({
           </ComposedChart>
         </ResponsiveContainer>
       </CardContent>
+      <Dialog
+        open={viewProgress !== null}
+        onOpenChange={() => {
+          if (!viewProgress) return;
+          setViewProgress(null);
+        }}
+        modal={false}
+      >
+        {viewProgress && (
+          <DialogContent className="px-2 py-0 flex flex-col gap-2 h-[50dvh] overflow-auto">
+            <ScrollArea>
+              <div className="flex flex-col gap-2 py-2">
+                <DialogHeader className="m-0">
+                  <DialogTitle>Details</DialogTitle>
+                  <DialogDescription>
+                    More details on this date (
+                    {new Date(viewProgress?.date).toDateString()})
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="flex flex-col gap-8">
+                  {viewProgress.expenses.length !== 0 ? (
+                    <div className="flex flex-col gap-2 text-sm">
+                      <p className="text-muted-foreground">Expenses: </p>
+                      <div className="flex flex-col gap-2">
+                        {viewProgress.expenses.map((e, i) => {
+                          return (
+                            <div
+                              key={e.reason + i}
+                              className=" bg-red-400/5 border border-red-400 p-2 rounded-lg flex justify-between text-red-400"
+                            >
+                              <span className="truncate">{e.reason}</span>
+                              <span className="font-anton font-black shrink-0">
+                                {UsePhpPesoWSign(e.amount)}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div className="text-red-400 flex justify-between p-2 ">
+                        <span className="truncate">Total: </span>{" "}
+                        <span className="font-black font-anton">
+                          {UsePhpPesoWSign(viewProgress.expensesSum)}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground text-center">
+                      No expenses on this date
+                    </p>
+                  )}
+                  {viewProgress.gains.length !== 0 ? (
+                    <div className="flex flex-col gap-2 text-sm ">
+                      <p className="text-muted-foreground">Gains: </p>
+                      <div className="flex flex-col gap-2">
+                        {viewProgress.gains.map((e, i) => {
+                          return (
+                            <div
+                              key={e.reason + i}
+                              className="p-2 rounded-lg flex justify-between text-green-600 border border-green-600 bg-green-600/5"
+                            >
+                              <span className="truncate">{e.reason}</span>
+                              <span className="font-anton font-black shrink-0">
+                                {UsePhpPesoWSign(e.amount)}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div className="text-green-500 flex justify-between p-2 ">
+                        <span className="truncate">Total: </span>{" "}
+                        <span className="font-black font-anton">
+                          {UsePhpPesoWSign(viewProgress.gainsSum)}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground text-center">
+                      No gains on this date
+                    </p>
+                  )}
+                </div>
+              </div>
+            </ScrollArea>
+          </DialogContent>
+        )}
+      </Dialog>
     </Card>
   );
 }

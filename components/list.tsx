@@ -321,11 +321,7 @@ export default function List({ list }: { list: User }) {
           </div>
           {/* pie */}
           {moneys?.data ? (
-            <TotalBreakdownPieChart
-              open={listState.showBreakdown}
-              toggleOpen={() => listState.setShowBreakdown()}
-              moneys={moneys.data}
-            />
+            <TotalBreakdownPieChart moneys={moneys.data} />
           ) : null}
           {/* tables */}
           {logs?.data && (

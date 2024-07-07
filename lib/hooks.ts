@@ -1,7 +1,15 @@
 import { Database } from "@/database.types";
 import { ListState } from "@/store";
 var _ = require("lodash");
-
+export type Progress = {
+  expenses: { amount: number; reason: string; date: string }[];
+  gains: { amount: number; reason: string; date: string }[];
+  date: string;
+  expensesSum: number;
+  gainsSum: number;
+  gainOrLoss: number;
+  currentTotal: number;
+};
 export const calculateListChartsData = ({
   logsLoading,
   logs,
@@ -15,74 +23,76 @@ export const calculateListChartsData = ({
 }) => {
   const getDailyProgress = () => {
     if (logsLoading) return [];
+    // all data will be coming from logs, since logs has all the movements in money
+
+    // group each log by date, to also handle multiple logs in a single date.
     const groupedByDate: {
-      [key: string]: {
-        expenses: { amount: number; reason: string }[];
-        gains: { amount: number; reason: string }[];
-        date: string;
-        expensesSum: number;
-        gainsSum: number;
-        gainOrLoss: number;
-        currentTotal: number;
-      };
+      [key: string]: Progress;
     } = {};
 
-    let arrayOfChanges: { amount: number; reason: string }[] = [];
+    // a temporary array for multiple logs in a single date
+    let arrayOfLogsInASingleDate: {
+      amount: number;
+      reason: string;
+      date: string;
+    }[] = [];
+
     logs.toReversed().forEach((log) => {
+      //each log has a record of changes in a money, so it will be stored here for later use
       const changesInAmount =
         Number(log.changes?.to.amount) - Number(log.changes?.from.amount);
 
       const date = new Date(log.created_at).toDateString();
+
+      // checks if this date has no data
+      // if false, this means that this date is different from the previous iteration
       if (!groupedByDate[date]) {
-        arrayOfChanges = [];
+        // clears the temporary array so that it can be filled up again by this date
+        arrayOfLogsInASingleDate = [];
       }
-      arrayOfChanges.push({
+      // then, pushes the data of the current log
+      // if the previous iteration's date is similar to current, it just adds the data so it will become multiple logs for a single date
+      arrayOfLogsInASingleDate.push({
         amount: changesInAmount ?? 0,
         reason: log.reason!,
+        date: new Date(log.created_at).toDateString(),
       });
-      const expensesMinusGain =
-        _.sum(arrayOfChanges.map((a) => a.amount)) > 0
-          ? null
-          : _.sum(arrayOfChanges.map((a) => a.amount));
-      const gainsMinusExpenses =
-        _.sum(arrayOfChanges.map((a) => a.amount)) < 0
-          ? null
-          : _.sum(arrayOfChanges.map((a) => a.amount));
+
+      // gets all the expenses by filtering only the negative values
+      const expenses = arrayOfLogsInASingleDate.filter(
+        (t) => t.amount !== 0 && t.amount < 0,
+      );
+      // gets all the expenses by filtering only the positive values
+      const gains = arrayOfLogsInASingleDate.filter(
+        (t) => t.amount !== 0 && t.amount > 0,
+      );
+
+      const expensesSum = _.sum(expenses.map((t) => t.amount));
+      const gainsSum = _.sum(gains.map((t) => t.amount));
+
+      // this sums up the changes happened in this date. ex. (100 + -100 + -25)
+      // summing up all the positive and negative values
+      // if negative, then there is a loss since loss are more than gains
+      // if positive, then there is a gain since gains are more than loss
+      const gainOrLoss = _.sum(arrayOfLogsInASingleDate.map((a) => a.amount));
+
+      // saves the current date single/multiple logs.
+      // if current date has an existing data, it just gets the current data of the tempory array
       groupedByDate[date] = {
-        expenses: arrayOfChanges.filter((t) => t.amount !== 0 && t.amount < 0),
-        gains: arrayOfChanges.filter((t) => t.amount !== 0 && t.amount > 0),
+        expenses,
+        gains,
         date: date,
-        expensesSum: _.sum(
-          arrayOfChanges
-            .filter((t) => t.amount !== 0 && t.amount < 0)
-            .map((t) => t.amount),
-        ),
-        gainsSum: _.sum(
-          arrayOfChanges
-            .filter((t) => t.amount !== 0 && t.amount > 0)
-            .map((t) => t.amount),
-        ),
-        gainOrLoss: expensesMinusGain ?? gainsMinusExpenses,
+        expensesSum,
+        gainsSum,
+        gainOrLoss,
+        // currentTotal will always get the very last record in each day
         currentTotal: Number(log.changes?.to.total),
       };
     });
+
     const currentDate = new Date();
     currentDate.setDate(currentDate.getDate() - 365);
-    let lastData: {
-      expenses: {
-        amount: number;
-        reason: string;
-      }[];
-      gains: {
-        amount: number;
-        reason: string;
-      }[];
-      date: string;
-      expensesSum: number;
-      gainsSum: number;
-      gainOrLoss: number;
-      currentTotal: number;
-    } = {
+    let previousProgress: Progress = {
       expenses: [],
       gains: [],
       date: "",
@@ -92,37 +102,23 @@ export const calculateListChartsData = ({
       currentTotal: 0,
     };
 
-    const eachDayData: {
-      expenses: {
-        amount: number;
-        reason: string;
-      }[];
-      gains: {
-        amount: number;
-        reason: string;
-      }[];
-      date: string;
-      expensesSum: number;
-      gainsSum: number;
-      gainOrLoss: number;
-      currentTotal: number;
-    }[] = [];
+    const eachDayData: Progress[] = [];
 
     for (let i = 0; i <= 365; i++) {
       const day = currentDate.toDateString();
       if (groupedByDate[day] !== undefined) {
         // if this date has total, set it to lastTotal so the next dates that does not have total will get that total as well to fill up the bars
-        lastData = groupedByDate[day];
+        previousProgress = groupedByDate[day];
       } else {
         // if no data, resets everything except total
-        lastData.gainOrLoss = 0;
-        lastData.expenses = [];
-        lastData.gains = [];
-        lastData.date = day;
-        lastData.expensesSum = 0;
-        lastData.gainsSum = 0;
+        previousProgress.gainOrLoss = 0;
+        previousProgress.expenses = [];
+        previousProgress.gains = [];
+        previousProgress.date = day;
+        previousProgress.expensesSum = 0;
+        previousProgress.gainsSum = 0;
       }
-      eachDayData.push({ ...lastData });
+      eachDayData.push({ ...previousProgress });
       // sets the date to the next day
       currentDate.setDate(currentDate.getDate() + 1);
     }
@@ -134,6 +130,7 @@ export const calculateListChartsData = ({
     if (logsLoading) return [];
     const year = new Date().getFullYear();
     const month = new Date().getMonth();
+    const dailyProgress = getDailyProgress();
     const groupedByMonth: { total: number; date: string }[] = [];
 
     if (listState.monthlyTotalBy === "last") {
@@ -148,14 +145,14 @@ export const calculateListChartsData = ({
         let monthsTotal;
 
         if (month <= new Date().getMonth()) {
-          monthsTotal = getDailyProgress()?.findLast(
+          monthsTotal = dailyProgress?.findLast(
             (day) =>
               // gets data equal to month and year or last year at least
               new Date(day.date).getMonth() === month &&
               new Date(day.date).getFullYear() === year,
           );
         } else {
-          monthsTotal = getDailyProgress()?.findLast(
+          monthsTotal = dailyProgress?.findLast(
             (day) =>
               // gets data equal to month and year or last year at least
               new Date(day.date).getMonth() === month &&
@@ -173,7 +170,6 @@ export const calculateListChartsData = ({
         month += 1;
       }
     }
-
     if (listState.monthlyTotalBy === "avg") {
       let average = [0];
       // starts at +1 of the current month of last year
@@ -186,7 +182,7 @@ export const calculateListChartsData = ({
         let lastDay: string;
 
         if (month <= new Date().getMonth()) {
-          getDailyProgress()
+          dailyProgress
             .filter(
               (day) =>
                 new Date(day.date).getMonth() === month &&
@@ -200,7 +196,7 @@ export const calculateListChartsData = ({
               lastDay = day.date;
             });
         } else {
-          getDailyProgress()
+          dailyProgress
             .filter(
               (day) =>
                 new Date(day.date).getMonth() === month &&
@@ -225,24 +221,79 @@ export const calculateListChartsData = ({
         month += 1;
       }
     }
-    const sortedByMonth: {
-      total: number;
-      date: string;
-    }[] = [];
-    groupedByMonth.forEach((monthData, i) => {
-      if (new Date(monthData.date).getMonth() <= month) {
-        sortedByMonth[i] = {
-          total: monthData.total ?? 0,
-          date: new Date(monthData.date).toDateString(),
+    return groupedByMonth;
+  };
+
+  const getMonthlyProgress = () => {
+    if (logsLoading) return [];
+    const dailyProgress = getDailyProgress();
+    const year = new Date().getFullYear();
+    const month = new Date().getMonth();
+    const groupedByMonth: Progress[] = [];
+
+    {
+      // iterated by the number of months
+
+      // starts at +1 of the current month of last year
+      let month = new Date().getMonth() + 1;
+      for (let i = 0; i < 12; i++) {
+        // if its the last month back to first month of the current year
+        if (month === 12) month = 0;
+        // get the last data of the month
+        let monthProgress: Progress[] | undefined;
+
+        // if the current iteration of month is more than the current month, sets it back last year
+        if (month <= new Date().getMonth()) {
+          monthProgress = dailyProgress?.filter(
+            (day) =>
+              // gets data equal to month and year or last year at least
+              new Date(day.date).getMonth() === month &&
+              new Date(day.date).getFullYear() === year,
+          );
+        } else {
+          monthProgress = dailyProgress?.filter(
+            (day) =>
+              // gets data equal to month and year or last year at least
+              new Date(day.date).getMonth() === month &&
+              new Date(day.date).getFullYear() === year - 1,
+          );
+        }
+
+        const monthDate = monthProgress.findLast((m) => m)?.date;
+        const expenses = monthProgress.flatMap((m) => m.expenses);
+        const gains = monthProgress.flatMap((m) => m.gains);
+        const expensesSum = _.sum(expenses.map((e) => e.amount));
+        const gainsSum = _.sum(gains.map((g) => g.amount));
+        const gainOrLoss = _.add(gainsSum, expensesSum);
+        const lastTotal = monthProgress
+          .map((m) => m.currentTotal)
+          .findLast((m) => m);
+        console.log(lastTotal);
+        // console.log("expensesSum: ", expensesSum);
+        // console.log("gainsSum: ", gainsSum);
+
+        // // inserts the data to an object i or no. of month as the key
+        // groupedByMonth[i] = {
+        //   // if the i is equal to current month, gets the current total instead for more accuracy
+        //   currentTotal: i === month ? total : monthProgress?.!,
+        //   date: monthProgress?.date!,
+        // };
+
+        groupedByMonth[i] = {
+          currentTotal: lastTotal!,
+          date: monthDate!,
+          expenses,
+          expensesSum,
+          gainOrLoss,
+          gains,
+          gainsSum,
         };
-      } else {
-        sortedByMonth[i] = {
-          total: monthData.total ?? 0,
-          date: new Date(monthData.date).toDateString(),
-        };
+
+        month += 1;
       }
-    });
-    return sortedByMonth;
+    }
+
+    return groupedByMonth;
   };
 
   const getDifferences = () => {
@@ -336,8 +387,9 @@ export const calculateListChartsData = ({
     };
   };
 
+  getMonthlyProgress();
   return {
-    monthlyTotal: getMonthlyTotal(),
+    monthlyTotal: getMonthlyProgress(),
     differences: getDifferences(),
     dailyProgress: getDailyProgress(),
   };

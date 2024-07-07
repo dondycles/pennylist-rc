@@ -5,15 +5,10 @@ import { UsePhpPesoWSign } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Sector } from "recharts";
-import { motion } from "framer-motion";
 export default function TotalBreakdownPieChart({
   moneys,
-  open,
-  toggleOpen,
 }: {
   moneys: Omit<Database["public"]["Tables"]["moneys"]["Row"], "list">[];
-  open: boolean;
-  toggleOpen: () => void;
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const renderActiveShape = (props: any) => {

@@ -10,7 +10,6 @@ export type ListState = {
   hideAmounts: boolean;
   dailyProgressDays: number;
   showLogs: boolean;
-  showBreakdown: boolean;
   monthlyTotalBy: "last" | "avg";
   showAIDialog: boolean;
   lastAIOutput: string | null;
@@ -22,7 +21,6 @@ export type ListState = {
   setDailyProgressDays: (days: number) => void;
   setMonthlyTotalBy: (by: "last" | "avg") => void;
   setShowLogs: () => void;
-  setShowBreakdown: () => void;
 };
 
 export const useListState = create<ListState>()(
@@ -37,14 +35,12 @@ export const useListState = create<ListState>()(
       toggleHideAmounts: () => set({ hideAmounts: !get().hideAmounts }),
       dailyProgressDays: 28,
       setDailyProgressDays: (days) => set(() => ({ dailyProgressDays: days })),
-      showBreakdown: true,
       showLogs: true,
       monthlyTotalBy: "last",
       lastAIOutput: null,
       setLastAIOutput: (ai) => set(() => ({ lastAIOutput: ai })),
       setMonthlyTotalBy: (by) => set(() => ({ monthlyTotalBy: by })),
       setShowLogs: () => set({ showLogs: !get().showLogs }),
-      setShowBreakdown: () => set({ showBreakdown: !get().showBreakdown }),
       currentTotal: 0,
       setCurrentTotal: (total) => set({ currentTotal: total }),
       showAIDialog: false,
