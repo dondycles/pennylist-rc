@@ -201,7 +201,7 @@ export default function List({ list }: { list: User }) {
             }
             form={
               <AddMoneyForm
-                currentTotal={String(total)}
+                currentTotal={total}
                 close={() => {
                   setShowAddMoneyForm(false);
                   refetch();

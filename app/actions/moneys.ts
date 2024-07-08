@@ -8,7 +8,7 @@ type money = Database["public"]["Tables"]["moneys"]["Row"];
 export async function getTotal() {
   const supabase = createClient();
   const total = await supabase.rpc("getTotal");
-
+  console.log("total: ", total);
   return total;
 }
 
@@ -37,7 +37,7 @@ export async function getMoney(id: string) {
 
 export async function addMoney(
   money: Pick<money, "amount" | "name">,
-  currentTotal: string,
+  currentTotal: number,
 ) {
   const supabase = createClient();
 
@@ -57,7 +57,7 @@ export async function addMoney(
     to: {
       amount: String(money.amount),
       name: money.name,
-      total: String(currentTotal + money.amount),
+      total: String(Number(currentTotal) + Number(money.amount)),
     },
   });
 

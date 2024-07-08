@@ -30,7 +30,7 @@ export default function AddMoneyForm({
   currentTotal,
 }: {
   close: () => void;
-  currentTotal: string;
+  currentTotal: number;
 }) {
   const form = useForm<z.infer<typeof moneySchema>>({
     resolver: zodResolver(moneySchema),
