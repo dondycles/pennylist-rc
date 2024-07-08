@@ -48,7 +48,7 @@ export async function continueConversation(
   ];
 
   const result = await streamText({
-    model: openai("gpt-3.5-turbo"),
+    model: openai("gpt-4o-2024-05-13"),
     messages,
   });
 

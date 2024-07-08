@@ -38,10 +38,12 @@ const askAiSchema = z.object({
 export default function Chat({
   listname,
   diffs,
+  moneys,
   close,
 }: {
   listname: string;
   diffs: string;
+  moneys: string;
   close: () => void;
 }) {
   const listState = useListState();
@@ -126,6 +128,8 @@ export default function Chat({
   const latestStream = messages.toReversed()[0];
   const lastStream = last?.data?.last_ai_stream;
 
+  console.log(moneys);
+
   return (
     <Dialog
       open={listState.showAIDialog}
@@ -179,7 +183,10 @@ export default function Chat({
               <form
                 onSubmit={form.handleSubmit(
                   (values: z.infer<typeof askAiSchema>) =>
-                    generateAi("input", values.question),
+                    generateAi(
+                      "input",
+                      `${values.question}. These are the wealth data: ${diffs} ${moneys}. Please, your answer must only be about questioner's wealth and financial tips no matter what! Currency: Php. Please make sure your calculation for total is accurate!`,
+                    ),
                 )}
                 className="flex flex-col gap-2 justify-center items-center"
               >

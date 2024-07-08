@@ -53,7 +53,13 @@ export const signup = async (data: z.infer<typeof signUpSchema>) => {
     email,
     password,
   });
-  if (authError) return { authError: authError.message };
+  if (authError)
+    return {
+      authError:
+        authError.status === 422
+          ? "Unfortunately, the chosen listname is already taken."
+          : authError.message,
+    };
 
   const { error: dbError } = await supabase
     .from("lists")
@@ -70,7 +76,13 @@ export const login = async (data: z.infer<typeof logInSchema>) => {
       email: list,
       password,
     });
-  if (authError) return { authError: authError.message };
+  if (authError)
+    return {
+      authError:
+        authError.status === 400
+          ? "Invalid list credentials"
+          : authError.message,
+    };
 
   const { error: dbError } = await supabase
     .from("lists")

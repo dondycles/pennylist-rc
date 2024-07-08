@@ -264,16 +264,6 @@ export const calculateListChartsData = ({
       const lastTotal = monthProgress
         .map((m) => m.currentTotal)
         .findLast((m) => m);
-      console.log(lastTotal);
-      // console.log("expensesSum: ", expensesSum);
-      // console.log("gainsSum: ", gainsSum);
-
-      // // inserts the data to an object i or no. of month as the key
-      // groupedByMonth[i] = {
-      //   // if the i is equal to current month, gets the current total instead for more accuracy
-      //   currentTotal: i === month ? total : monthProgress?.!,
-      //   date: monthProgress?.date!,
-      // };
 
       groupedByMonth[i] = {
         currentTotal: lastTotal!,

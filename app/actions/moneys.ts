@@ -8,7 +8,6 @@ type money = Database["public"]["Tables"]["moneys"]["Row"];
 export async function getTotal() {
   const supabase = createClient();
   const total = await supabase.rpc("getTotal");
-  console.log("total: ", total);
   return total;
 }
 
