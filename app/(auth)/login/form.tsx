@@ -15,7 +15,9 @@ import {
 import { Input } from "@/components/ui/input";
 import Logo from "@/components/logo";
 import { login } from "@/app/actions/auth";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
+import { useTheme } from "next-themes";
 
 export const logInSchema = z.object({
   listname: z.string().min(1, { message: "Please input listname" }),
@@ -23,6 +25,9 @@ export const logInSchema = z.object({
 });
 
 export default function LoginForm() {
+  const [captchaToken, setCaptchaToken] = useState<string>();
+  const captcha = useRef<HCaptcha>(null);
+  const { theme } = useTheme();
   const [loggingIn, setLoggingIn] = useState(false);
   const form = useForm<z.infer<typeof logInSchema>>({
     resolver: zodResolver(logInSchema),
@@ -35,7 +40,7 @@ export default function LoginForm() {
   async function onSubmit(values: z.infer<typeof logInSchema>) {
     try {
       setLoggingIn(true);
-      const res = await login(values);
+      const res = await login(values, captchaToken!);
       if (res?.authError) {
         setLoggingIn(false);
         return form.setError("password", {
@@ -94,6 +99,16 @@ export default function LoginForm() {
           <Link href={"/signup"}>or Sign up</Link>
         </Button>
       </form>
+      <div className="mx-auto">
+        <HCaptcha
+          ref={captcha}
+          sitekey="faaacf4c-dea6-41ac-a842-6d460c2478de"
+          onVerify={(token) => {
+            setCaptchaToken(token);
+          }}
+          theme={theme}
+        />
+      </div>
     </Form>
   );
 }

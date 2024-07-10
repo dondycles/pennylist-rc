@@ -17,6 +17,7 @@ import { signup } from "@/app/actions/auth";
 import { useRef, useState } from "react";
 import { AlertCircle } from "lucide-react";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
+import { useTheme } from "next-themes";
 export const signUpSchema = z
   .object({
     listname: z
@@ -33,9 +34,10 @@ export const signUpSchema = z
   });
 
 export default function SignupForm() {
-  const [captchaToken, setCaptchaToken] = useState<string>();
   const [signingUp, setSigningUp] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string>();
   const captcha = useRef<HCaptcha>(null);
+  const { theme } = useTheme();
 
   const form = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
@@ -138,13 +140,16 @@ export default function SignupForm() {
           .
         </p>
       </form>
-      <HCaptcha
-        ref={captcha}
-        sitekey="faaacf4c-dea6-41ac-a842-6d460c2478de"
-        onVerify={(token) => {
-          setCaptchaToken(token);
-        }}
-      />
+      <div className="mx-auto">
+        <HCaptcha
+          ref={captcha}
+          sitekey="faaacf4c-dea6-41ac-a842-6d460c2478de"
+          onVerify={(token) => {
+            setCaptchaToken(token);
+          }}
+          theme={theme}
+        />
+      </div>
     </Form>
   );
 }

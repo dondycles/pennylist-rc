@@ -71,7 +71,10 @@ export const signup = async (
 
   if (dbError) return { dbError: dbError.message };
 };
-export const login = async (data: z.infer<typeof logInSchema>) => {
+export const login = async (
+  data: z.infer<typeof logInSchema>,
+  captchaToken: string,
+) => {
   const supabase = createClient();
   const list = `${data.listname}@pennylist.com`;
   const password = data.password;
@@ -79,6 +82,7 @@ export const login = async (data: z.infer<typeof logInSchema>) => {
     await supabase.auth.signInWithPassword({
       email: list,
       password,
+      options: { captchaToken },
     });
   if (authError)
     return {
