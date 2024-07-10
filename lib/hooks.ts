@@ -1,4 +1,5 @@
 import { Database } from "@/database.types";
+
 var _ = require("lodash");
 export type Progress = {
   expenses: { amount: number; reason: string; date: string }[];
@@ -277,4 +278,21 @@ export const calculateListChartsData = ({
     differences: getDifferences(),
     dailyProgress: getDailyProgress(),
   };
+};
+
+export const gradientOffset = (progress: Progress[]) => {
+  const dataMax = Math.max(
+    ...progress.filter((i) => i.gainOrLoss !== 0).map((i) => i.gainOrLoss),
+  );
+  const dataMin = Math.min(
+    ...progress.filter((i) => i.gainOrLoss !== 0).map((i) => i.gainOrLoss),
+  );
+
+  if (dataMax <= 0) {
+    return 0;
+  }
+  if (dataMin >= 0) {
+    return 1;
+  }
+  return dataMax / (dataMax - dataMin);
 };
