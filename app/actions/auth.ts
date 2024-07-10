@@ -44,7 +44,10 @@ export const logout = async () => {
   const { error } = await supabase.auth.signOut();
   if (error) return { error: error.message };
 };
-export const signup = async (data: z.infer<typeof signUpSchema>) => {
+export const signup = async (
+  data: z.infer<typeof signUpSchema>,
+  captchaToken: string,
+) => {
   const supabase = createClient();
   const email = `${data.listname}@pennylist.com`;
   const password = data.password;
@@ -52,6 +55,7 @@ export const signup = async (data: z.infer<typeof signUpSchema>) => {
   const { error: authError } = await supabase.auth.signUp({
     email,
     password,
+    options: { captchaToken },
   });
   if (authError)
     return {
