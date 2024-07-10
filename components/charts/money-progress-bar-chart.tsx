@@ -70,10 +70,18 @@ export default function ProgressBarChart({
 
             <defs>
               <linearGradient id="dailySplitColor" x1="0" y1="0" x2="0" y2="1">
-                <stop offset={0} stopColor="#448844" stopOpacity={1} />
-                <stop offset={off} stopColor="#448844" stopOpacity={0.5} />
-                <stop offset={off} stopColor="#884444" stopOpacity={0.5} />
-                <stop offset={1} stopColor="#884444" stopOpacity={1} />
+                <stop offset={0} stopColor="#44ff44" stopOpacity={1} />
+                <stop
+                  offset={off}
+                  stopColor="hsl(var(--primary))"
+                  stopOpacity={0.5}
+                />
+                <stop
+                  offset={off}
+                  stopColor="hsl(var(--primary))"
+                  stopOpacity={0.5}
+                />
+                <stop offset={1} stopColor="#ff4444" stopOpacity={1} />
               </linearGradient>
             </defs>
             <Area
@@ -86,16 +94,16 @@ export default function ProgressBarChart({
             />
             <Line
               fillOpacity={1}
-              dataKey="gainsSum"
+              dataKey="expensesSum"
               type="monotone"
-              stroke="#448844"
+              stroke="#884444"
               strokeWidth={2}
             />
             <Line
               fillOpacity={1}
-              dataKey="expensesSum"
+              dataKey="gainsSum"
               type="monotone"
-              stroke="#884444"
+              stroke="#448844"
               strokeWidth={2}
             />
           </ComposedChart>
