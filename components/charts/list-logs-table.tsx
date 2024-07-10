@@ -55,71 +55,73 @@ export default function LogsTable({
         <CardContent
           className={`w-full h-full overflow-auto p-0 opacity-100 duration-500 animate-all ease-in-out ${!open && "pointer-events-none opacity-0"}`}
         >
-          <ScrollArea className="h-full w-full p-2 pb-0">
-            <Table className="w-full h-full">
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-fit">Action</TableHead>
-                  <TableHead>Changes</TableHead>
-                  <TableHead>Reason</TableHead>
-                  <TableHead>Total</TableHead>
-                  <TableHead>Date</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {logs?.map((log) => {
-                  return (
-                    <TableRow key={log.id}>
-                      <TableCell
-                        className={`${log.type === "add" && "text-green-500"}
+          <div className="overflow-auto h-full w-full grid">
+            <ScrollArea className="h-full w-full p-2 pb-0">
+              <Table className="w-full h-full">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-fit">Action</TableHead>
+                    <TableHead>Changes</TableHead>
+                    <TableHead>Reason</TableHead>
+                    <TableHead>Total</TableHead>
+                    <TableHead>Date</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {logs?.map((log) => {
+                    return (
+                      <TableRow key={log.id}>
+                        <TableCell
+                          className={`${log.type === "add" && "text-green-500"}
                     ${log.type === "update" && "text-yellow-500"}
                     ${log.type === "delete" && "text-red-500"}
                     `}
-                      >
-                        {log.type}
-                      </TableCell>
-                      <TableCell>
-                        {log.type === "add" ? (
-                          <>
-                            {log.changes?.to.name} -{" "}
-                            {UsePhpPesoWSign(log.changes?.to.amount)}
-                          </>
-                        ) : (
-                          <div className="flex flex-col gap-2  w-fit">
-                            {log.changes?.from.name !==
-                              log.changes?.to.name && (
-                              <div className="flex flex-row ">
-                                <p className="flex-1">
-                                  {log.changes?.from.name} to{" "}
-                                  {log.changes?.to.name}
-                                </p>
-                              </div>
-                            )}
-                            {log.changes?.from.amount !==
-                              log.changes?.to.amount && (
-                              <div className="flex flex-row  ">
-                                <p className="flex-1 w-fit ">
-                                  {UsePhpPesoWSign(log.changes?.from.amount)} to{" "}
-                                  {UsePhpPesoWSign(log.changes?.to.amount)}
-                                </p>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </TableCell>
-                      <TableCell>{log.reason}</TableCell>
-                      <TableCell>
-                        {UsePhpPesoWSign(log.changes?.to.total)}
-                      </TableCell>
-                      <TableCell>
-                        {new Date(log.created_at).toLocaleString()}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </ScrollArea>
+                        >
+                          {log.type}
+                        </TableCell>
+                        <TableCell>
+                          {log.type === "add" ? (
+                            <>
+                              {log.changes?.to.name} -{" "}
+                              {UsePhpPesoWSign(log.changes?.to.amount)}
+                            </>
+                          ) : (
+                            <div className="flex flex-col gap-2  w-fit">
+                              {log.changes?.from.name !==
+                                log.changes?.to.name && (
+                                <div className="flex flex-row ">
+                                  <p className="flex-1">
+                                    {log.changes?.from.name} to{" "}
+                                    {log.changes?.to.name}
+                                  </p>
+                                </div>
+                              )}
+                              {log.changes?.from.amount !==
+                                log.changes?.to.amount && (
+                                <div className="flex flex-row  ">
+                                  <p className="flex-1 w-fit ">
+                                    {UsePhpPesoWSign(log.changes?.from.amount)}{" "}
+                                    to {UsePhpPesoWSign(log.changes?.to.amount)}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </TableCell>
+                        <TableCell>{log.reason}</TableCell>
+                        <TableCell>
+                          {UsePhpPesoWSign(log.changes?.to.total)}
+                        </TableCell>
+                        <TableCell>
+                          {new Date(log.created_at).toLocaleString()}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </ScrollArea>
+          </div>
         </CardContent>
       </Card>
     </motion.div>

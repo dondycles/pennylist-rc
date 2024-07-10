@@ -9,6 +9,7 @@ import { Toaster } from "@/components/ui/toaster";
 const raleway = Raleway({
   subsets: ["latin"],
   weight: ["500", "600", "700", "900"],
+  variable: "--font-raleway",
 });
 const anton = Readex_Pro({
   weight: ["400"],
@@ -68,7 +69,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${raleway.className} ${anton.variable} antialiased h-screen w-full bg-background`}
+        className={`${raleway.variable} ${anton.variable} antialiased font-raleway h-screen w-full bg-background`}
       >
         <QueryProvider>
           <ThemeProvider

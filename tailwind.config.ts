@@ -77,6 +77,7 @@ const config = {
       },
       fontFamily: {
         anton: ["var(--font-anton)"],
+        raleway: ["var(--font-raleway)"],
       },
     },
   },

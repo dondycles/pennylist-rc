@@ -18,7 +18,7 @@ export default async function Page() {
 
   if (!list)
     return (
-      <div className="w-full pt-32 h-full flex flex-col screen-x-padding gap-6">
+      <div className="w-full pt-8 sm:pt-16 md:pt-32  h-full flex flex-col screen-x-padding gap-6">
         <div className="flex flex-col items-center justify-center w-full gap-4 text-center max-w-[800px] mx-auto">
           <Logo zoom={8} className="h-16" strokeWidth={24} />
           <h1 className="text-5xl font-black xs:text-6xl">
