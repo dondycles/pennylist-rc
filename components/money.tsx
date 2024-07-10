@@ -7,7 +7,7 @@ import {
 } from "@/app/actions/moneys";
 import Scrollable from "@/components/scrollable";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AsteriskNumber, UsePhpPeso, UsePhpPesoWSign } from "@/lib/utils";
+import { UseAmountFormat } from "@/lib/utils";
 import { User } from "@supabase/supabase-js";
 import { useQuery } from "@tanstack/react-query";
 import { TbCurrencyPeso } from "react-icons/tb";
@@ -243,10 +243,10 @@ export default function Money({
           <div className="text-2xl sm:text-4xl font-anton flex flex-row items-center truncate -ml-1 sm:-ml-2">
             <TbCurrencyPeso className="shrink-0" />
             <p className="truncate font-bold ">
-              {" "}
-              {listState.hideAmounts
-                ? AsteriskNumber(money.data.amount ?? 0)
-                : UsePhpPeso(money.data.amount ?? 0)}
+              {UseAmountFormat(Number(money.data.amount ?? 0), {
+                hide: listState.hideAmounts,
+                sign: false,
+              })}
             </p>
           </div>
         </div>
@@ -326,9 +326,10 @@ export default function Money({
                   <p className="truncate">{money.data.name}</p>
                   <div className="font-semibold font-anton flex items-center">
                     <TbCurrencyPeso />
-                    {listState.hideAmounts
-                      ? AsteriskNumber(money.data.amount ?? 0)
-                      : UsePhpPeso(money.data.amount ?? 0)}
+                    {UseAmountFormat(Number(money.data.amount ?? 0), {
+                      hide: listState.hideAmounts,
+                      sign: false,
+                    })}
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -362,7 +363,12 @@ export default function Money({
         )}
         <p>
           {((Number(money.data.amount) / total) * 100).toFixed(2)}% of your
-          total money ({UsePhpPesoWSign(total)})
+          total money (
+          {UseAmountFormat(Number(total ?? 0), {
+            sign: true,
+            hide: listState.hideAmounts,
+          })}
+          )
         </p>
       </div>
 
