@@ -7,7 +7,7 @@ import { ArrowDown, ArrowUp, Equal, Plus } from "lucide-react";
 import { TbCurrencyPeso } from "react-icons/tb";
 
 // Importing utility functions
-import { AsteriskNumber, UsePhpPeso } from "@/lib/utils";
+import { UseAmountFormat } from "@/lib/utils";
 
 // Importing actions
 import { getMoneys, getTotal } from "@/app/actions/moneys";
@@ -95,7 +95,6 @@ export default function List({ list }: { list: User }) {
   });
 
   const { monthlyTotal, differences, dailyProgress } = calculateListChartsData({
-    listState: listState,
     logs: logs?.data ?? [],
     logsLoading: logsLoading,
     total: total,
@@ -145,9 +144,10 @@ export default function List({ list }: { list: User }) {
             <div className="text-2xl sm:text-4xl font-anton flex flex-row items-center truncate -ml-1 sm:-ml-2">
               <TbCurrencyPeso className="shrink-0" />
               <p className="truncate  font-bold">
-                {listState.hideAmounts
-                  ? AsteriskNumber(total)
-                  : UsePhpPeso(total)}
+                {UseAmountFormat(total ?? 0, {
+                  hide: listState.hideAmounts,
+                  sign: false,
+                })}
               </p>
               <TooltipProvider>
                 <Tooltip delayDuration={250}>

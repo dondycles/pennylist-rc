@@ -1,5 +1,5 @@
 import { Database } from "@/database.types";
-import { AsteriskNumber, UsePhpPeso } from "@/lib/utils";
+import { UseAmountFormat } from "@/lib/utils";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -82,9 +82,10 @@ export default function Money({
             <p className="truncate">{money.name}</p>
             <div className="font-semibold font-anton flex items-center">
               <TbCurrencyPeso />
-              {hideAmounts
-                ? AsteriskNumber(money.amount ?? 0)
-                : UsePhpPeso(money.amount ?? 0)}
+              {UseAmountFormat(money.amount ?? 0, {
+                hide: hideAmounts,
+                sign: false,
+              })}
             </div>
           </motion.div>
         </ContextMenuTrigger>
@@ -155,9 +156,11 @@ export default function Money({
             <p className="truncate">{money.name}</p>
             <div className="font-semibold font-anton flex items-center">
               <TbCurrencyPeso />
-              {hideAmounts
-                ? AsteriskNumber(money.amount ?? 0)
-                : UsePhpPeso(money.amount ?? 0)}
+
+              {UseAmountFormat(money.amount ?? 0, {
+                hide: hideAmounts,
+                sign: false,
+              })}
             </div>
           </div>
           <div className="flex gap-2">

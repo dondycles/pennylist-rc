@@ -5,25 +5,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-const PHPeso = new Intl.NumberFormat("en-US");
-
-export const UsePhpPeso = (number?: string | number) => {
-  return PHPeso.format(Number(number ?? 0));
-};
-
-export const UsePhpPesoWSign = (
-  number?: string | number,
-  decimals?: number,
-) => {
-  const formatted = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "PHP",
-    maximumFractionDigits: decimals ?? 2,
-  });
-
-  return formatted.format(Number(number ?? 0));
-};
-
 export const UseDefaultURL = () => {
   const defaultUrl = process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}`
@@ -57,4 +38,28 @@ export const toMonthWord = (date: string): string => {
   ];
 
   return monthNames[month];
+};
+
+export const UseAmountFormat = (
+  amount: number,
+  settings: { hide: boolean; decimals?: number; sign: boolean },
+) => {
+  const withSign = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "PHP",
+    maximumFractionDigits: settings?.decimals ?? 2,
+  });
+
+  const withoutSign = new Intl.NumberFormat("en-US", {
+    maximumFractionDigits: settings?.decimals ?? 2,
+  });
+
+  const numberString = amount.toString();
+  const asteriskString = "*".repeat(numberString.length);
+
+  return settings?.hide
+    ? asteriskString
+    : settings?.sign
+      ? withSign.format(amount)
+      : withoutSign.format(amount);
 };

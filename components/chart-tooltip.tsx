@@ -1,6 +1,8 @@
-import { UsePhpPesoWSign } from "@/lib/utils";
+import { UseAmountFormat } from "@/lib/utils";
+import { useListState } from "@/store";
 
 export default function ChartTooltip({ active, payload }: any) {
+  const listState = useListState();
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     const total = Number(payload[0]?.value);
@@ -16,7 +18,10 @@ export default function ChartTooltip({ active, payload }: any) {
               <div className="bg-green-500/50 w-3 h-1" /> Gain
             </div>
             <div className="font-anton font-black">
-              {UsePhpPesoWSign(gainSum)}
+              {UseAmountFormat(Number(gainSum ?? 0), {
+                hide: listState.hideAmounts,
+                sign: true,
+              })}
             </div>
           </div>
           <div className="flex flex-row gap-2">
@@ -25,7 +30,10 @@ export default function ChartTooltip({ active, payload }: any) {
               Loss
             </div>
             <div className="font-anton font-black">
-              {UsePhpPesoWSign(expensesSum)}
+              {UseAmountFormat(Number(expensesSum ?? 0), {
+                hide: listState.hideAmounts,
+                sign: true,
+              })}
             </div>
           </div>
           <div className="flex flex-row gap-2">
@@ -34,7 +42,10 @@ export default function ChartTooltip({ active, payload }: any) {
               Difference
             </div>
             <div className="font-anton font-black">
-              {UsePhpPesoWSign(gainOrLoss)}
+              {UseAmountFormat(Number(gainOrLoss ?? 0), {
+                hide: listState.hideAmounts,
+                sign: true,
+              })}
             </div>
           </div>
           <div className="flex flex-row gap-2">
@@ -43,7 +54,10 @@ export default function ChartTooltip({ active, payload }: any) {
               Current Total
             </div>
             <div className="font-anton font-black">
-              {UsePhpPesoWSign(total)}
+              {UseAmountFormat(Number(total ?? 0), {
+                hide: listState.hideAmounts,
+                sign: true,
+              })}
             </div>
           </div>
         </div>

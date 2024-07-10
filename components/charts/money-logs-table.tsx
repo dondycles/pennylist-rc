@@ -9,13 +9,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Database } from "@/database.types";
-import { UsePhpPesoWSign } from "@/lib/utils";
+import { UseAmountFormat } from "@/lib/utils";
+import { useListState } from "@/store";
 
 export default function LogsTable({
   logs,
 }: {
   logs: Database["public"]["Tables"]["logs"]["Row"][];
 }) {
+  const listState = useListState();
   return (
     <Card className="overflow-x-hidden rounded-lg shadow-none">
       <CardHeader className="px-2 py-3 m-0">
@@ -52,7 +54,10 @@ export default function LogsTable({
                         {log.type === "add" ? (
                           <>
                             {log?.changes?.to.name} -{" "}
-                            {UsePhpPesoWSign(log?.changes?.to.amount)}
+                            {UseAmountFormat(
+                              Number(log?.changes?.to.amount ?? 0),
+                              { hide: listState.hideAmounts, sign: true },
+                            )}
                           </>
                         ) : (
                           <div className="flex flex-col gap-2  w-fit">
@@ -69,8 +74,15 @@ export default function LogsTable({
                               log?.changes?.to.amount && (
                               <div className="flex flex-row  ">
                                 <p className="flex-1 w-fit ">
-                                  {UsePhpPesoWSign(log?.changes?.from.amount)}{" "}
-                                  to {UsePhpPesoWSign(log?.changes?.to.amount)}
+                                  {UseAmountFormat(
+                                    Number(log?.changes?.from.amount ?? 0),
+                                    { hide: listState.hideAmounts, sign: true },
+                                  )}{" "}
+                                  to{" "}
+                                  {UseAmountFormat(
+                                    Number(log?.changes?.to.amount ?? 0),
+                                    { hide: listState.hideAmounts, sign: true },
+                                  )}
                                 </p>
                               </div>
                             )}
@@ -79,7 +91,10 @@ export default function LogsTable({
                       </TableCell>
                       <TableCell>{log.reason}</TableCell>
                       <TableCell>
-                        {UsePhpPesoWSign(log?.changes?.to.total)}
+                        {UseAmountFormat(Number(log?.changes?.to.total ?? 0), {
+                          hide: listState.hideAmounts,
+                          sign: true,
+                        })}
                       </TableCell>
                       <TableCell>
                         {new Date(log.created_at).toLocaleString()}
