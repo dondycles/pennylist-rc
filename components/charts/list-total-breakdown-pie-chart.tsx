@@ -2,7 +2,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { Database } from "@/database.types";
 import { UsePhpPesoWSign } from "@/lib/utils";
-import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Sector } from "recharts";
 export default function TotalBreakdownPieChart({
@@ -10,7 +9,7 @@ export default function TotalBreakdownPieChart({
 }: {
   moneys: Omit<Database["public"]["Tables"]["moneys"]["Row"], "list">[];
 }) {
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(1);
   const renderActiveShape = (props: any) => {
     const {
       cx,

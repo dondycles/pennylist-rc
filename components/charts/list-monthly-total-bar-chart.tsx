@@ -27,10 +27,8 @@ export default function MonthlyTotalBarChart({
       const gainSum = data.gainsSum;
       const expensesSum = data.expensesSum;
       return (
-        <div className="rounded-lg p-2 text-sm bg-muted flex flex-col gap-2  border shadow-lg">
-          <p className="text-muted-foreground">
-            {toMonthWord(data.date)} {new Date(data.date).getFullYear()}
-          </p>
+        <div className="rounded-lg p-2 text-sm bg-muted flex flex-col gap-2  border shadow-lg max-w-[244px]">
+          <p className="text-muted-foreground">{data.date}</p>
           <div className="text-xs flex flex-col gap-2">
             <div className="flex flex-row gap-2">
               <div className="flex items-center gap-1">
@@ -68,6 +66,10 @@ export default function MonthlyTotalBarChart({
               </div>
             </div>
           </div>
+          <p className="text-muted-foreground text-[10px] leading-tight text-wrap text-justify">
+            Difference is equal to gain minus loss and also equal to the
+            difference of current total from previous total.
+          </p>
         </div>
       );
     }
@@ -100,9 +102,7 @@ export default function MonthlyTotalBarChart({
 
   return (
     <Card
-      className={
-        "overflow-hidden rounded-lg shadow-none w-full aspect-[3/5] flex flex-col"
-      }
+      className={"overflow-hidden rounded-lg shadow-none w-full flex flex-col"}
     >
       <CardHeader className="px-2 py-2">
         <div className="flex flex-row items-start justify-between">
@@ -202,32 +202,6 @@ export default function MonthlyTotalBarChart({
             />
           </ComposedChart>
         </ResponsiveContainer>
-        <div className="p-2 m-0 text-xs flex flex-wrap gap-2 justify-center shrink-0">
-          <div className="space-y-2">
-            <div className="flex flex-row gap-1">
-              <div className="size-4 rounded from-transparent to-primary bg-gradient-to-t" />
-              <p className="text-muted-foreground">Total</p>
-            </div>
-            <div className="flex flex-row gap-1">
-              <div className="size-4 rounded from-green-500/50 to-red-500/50  bg-gradient-to-b" />
-              <p className="text-muted-foreground">Difference</p>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <div className="flex flex-row gap-1 items-center">
-              <div className="w-4 h-[2px] bg-green-500/50" />
-              <p className="text-muted-foreground">Gain</p>
-            </div>
-            <div className="flex flex-row gap-1 items-center">
-              <div className="w-4 h-[2px] bg-red-400/50" />
-              <p className="text-muted-foreground">Loss</p>
-            </div>
-          </div>
-          <p className="text-muted-foreground text-center">
-            *Difference is equal to gain minus loss and also equal to the
-            difference of current total from previous total.
-          </p>
-        </div>
       </CardContent>
     </Card>
   );
