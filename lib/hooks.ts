@@ -1,5 +1,4 @@
 import { Database } from "@/database.types";
-import { ListState } from "@/store";
 var _ = require("lodash");
 export type Progress = {
   expenses: { amount: number; reason: string; date: string }[];
@@ -14,12 +13,10 @@ export const calculateListChartsData = ({
   logsLoading,
   logs,
   total,
-  listState,
 }: {
   logsLoading: boolean;
   logs: Database["public"]["Tables"]["logs"]["Row"][];
   total: number;
-  listState: ListState;
 }) => {
   const getDailyProgress = () => {
     if (logsLoading) return [];
@@ -124,104 +121,6 @@ export const calculateListChartsData = ({
     }
 
     return eachDayData;
-  };
-
-  const getMonthlyTotal = () => {
-    if (logsLoading) return [];
-    const year = new Date().getFullYear();
-    const month = new Date().getMonth();
-    const dailyProgress = getDailyProgress();
-    const groupedByMonth: { total: number; date: string }[] = [];
-
-    if (listState.monthlyTotalBy === "last") {
-      // iterated by the number of months
-
-      // starts at +1 of the current month of last year
-      let month = new Date().getMonth() + 1;
-      for (let i = 0; i < 12; i++) {
-        // if its the last month back to first month of the current year
-        if (month === 12) month = 0;
-        // get the last data of the month
-        let monthsTotal;
-
-        if (month <= new Date().getMonth()) {
-          monthsTotal = dailyProgress?.findLast(
-            (day) =>
-              // gets data equal to month and year or last year at least
-              new Date(day.date).getMonth() === month &&
-              new Date(day.date).getFullYear() === year,
-          );
-        } else {
-          monthsTotal = dailyProgress?.findLast(
-            (day) =>
-              // gets data equal to month and year or last year at least
-              new Date(day.date).getMonth() === month &&
-              new Date(day.date).getFullYear() === year - 1,
-          );
-        }
-
-        // inserts the data to an object i or no. of month as the key
-        groupedByMonth[i] = {
-          // if the i is equal to current month, gets the current total instead for more accuracy
-          total: i === month ? total : monthsTotal?.currentTotal!,
-          date: monthsTotal?.date!,
-        };
-
-        month += 1;
-      }
-    }
-    if (listState.monthlyTotalBy === "avg") {
-      let average = [0];
-      // starts at +1 of the current month of last year
-      let month = new Date().getMonth() + 1;
-      // iterated by the number of months
-      for (let i = 0; i < 12; i++) {
-        // if its the last month back to first month of the current year
-        if (month === 12) month = 0;
-        // gets the last Date
-        let lastDay: string;
-
-        if (month <= new Date().getMonth()) {
-          dailyProgress
-            .filter(
-              (day) =>
-                new Date(day.date).getMonth() === month &&
-                new Date(day.date).getFullYear() === year,
-            )
-            .map((day) => {
-              if (new Date(day.date).getDate() === 1) average = [0];
-              // pushes each day total but resets if its the first day
-              average.push(day.currentTotal);
-
-              lastDay = day.date;
-            });
-        } else {
-          dailyProgress
-            .filter(
-              (day) =>
-                new Date(day.date).getMonth() === month &&
-                new Date(day.date).getFullYear() === year - 1,
-            )
-            .map((day) => {
-              if (new Date(day.date).getDate() === 1) average = [0];
-              // pushes each day total but resets if its the first day
-              average.push(day.currentTotal);
-
-              lastDay = day.date;
-            });
-        }
-
-        // sets the data for (i)month
-        groupedByMonth[i] = {
-          total: !isNaN(_.mean(average.filter((avg) => avg !== 0)))
-            ? _.mean(average.filter((avg) => avg !== 0))
-            : 0,
-          date: lastDay!,
-        };
-        month += 1;
-      }
-    }
-    return groupedByMonth;
   };
 
   const getMonthlyProgress = () => {

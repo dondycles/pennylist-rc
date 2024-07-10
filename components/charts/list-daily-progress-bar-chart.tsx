@@ -279,7 +279,6 @@ export default function DailyProgressBarChart({
             />
 
             <Tooltip
-              position={{ y: 50 }}
               offset={51}
               cursor={true}
               content={CustomTooltipDailyTotal}

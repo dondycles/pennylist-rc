@@ -1,10 +1,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/lib/hooks";
 import { UsePhpPesoWSign, toMonthWord } from "@/lib/utils";
 import {
+  Area,
   Bar,
   BarChart,
   Brush,
+  CartesianGrid,
   Cell,
+  ComposedChart,
+  Line,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -12,66 +17,99 @@ import {
 export default function ProgressBarChart({
   progress,
 }: {
-  progress: { date: string; total: number }[];
+  progress: Progress[];
 }) {
   const CustomTooltipDailyTotal = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
-      const value = Number(isNaN(payload[0]?.value) ? 0 : payload[0]?.value);
-      const predValue = Number(
-        progress.find(
-          (day) =>
-            day.date ===
-            new Date(
-              new Date().setDate(
-                new Date(payload[0].payload.date).getDate() - 1,
-              ),
-            ).toDateString(),
-        )?.total,
-      );
-      const difference = isNaN(((value - predValue) / value) * 100)
-        ? 0
-        : ((value - predValue) / value) * 100;
+      const data = payload[0].payload;
+      const total = Number(payload[0]?.value);
+      const gainOrLoss = data.gainOrLoss;
+      const gainSum = data.gainsSum;
+      const expensesSum = data.expensesSum;
       return (
-        <div className="rounded-lg  p-2  text-sm bg-foreground text-background">
-          <p> {payload[0].payload.date}</p>
-          <p>{UsePhpPesoWSign(value)}</p>
-          <p>
-            <span
-              className={
-                difference === 0
-                  ? "text-muted-foreground"
-                  : difference > 0
-                    ? "text-green-500"
-                    : "text-red-400"
-              }
-            >
-              {difference.toFixed(1)}%{" "}
-            </span>
-            {difference === 0 ? "equal" : difference > 0 ? "up" : "down"} than
-            last day
+        <div className="rounded-lg p-2 text-sm bg-muted flex flex-col gap-2  border shadow-lg max-w-[244px]">
+          <p className="text-muted-foreground">{data.date}</p>
+          <div className="text-xs flex flex-col gap-2">
+            <div className="flex flex-row gap-2">
+              <div className="flex items-center gap-1">
+                <div className="bg-green-500/50 w-3 h-1" /> Gain
+              </div>
+              <div className="font-anton font-black">
+                {UsePhpPesoWSign(gainSum)}
+              </div>
+            </div>
+            <div className="flex flex-row gap-2">
+              <div className="flex items-center gap-1">
+                <div className="bg-red-500/50 w-3 h-1" />
+                Loss
+              </div>
+              <div className="font-anton font-black">
+                {UsePhpPesoWSign(expensesSum)}
+              </div>
+            </div>
+            <div className="flex flex-row gap-2">
+              <div className="flex items-center gap-1">
+                <div className="bg-gradient-to-b from-green-500 to-red-400 size-3 rounded" />
+                Difference
+              </div>
+              <div className="font-anton font-black">
+                {UsePhpPesoWSign(gainOrLoss)}
+              </div>
+            </div>
+            <div className="flex flex-row gap-2">
+              <div className="flex items-center gap-1">
+                <div className="bg-gradient-to-b from-primary to-transparent size-3 rounded" />
+                Current Total
+              </div>
+              <div className="font-anton font-black">
+                {UsePhpPesoWSign(total)}
+              </div>
+            </div>
+          </div>
+          <p className="text-muted-foreground text-[10px] leading-tight text-wrap text-justify">
+            Difference is equal to gain minus loss and also equal to the
+            difference of current total from previous total.
           </p>
         </div>
       );
     }
 
-    // return <div className="bg-black">{JSON.stringify(any)}</div>;
-
     return null;
   };
+  const gradientOffset = () => {
+    const dataMax = Math.max(
+      ...progress.filter((i) => i.gainOrLoss !== 0).map((i) => i.gainOrLoss),
+    );
+    const dataMin = Math.min(
+      ...progress.filter((i) => i.gainOrLoss !== 0).map((i) => i.gainOrLoss),
+    );
+
+    if (dataMax <= 0) {
+      return 0;
+    }
+    if (dataMin >= 0) {
+      return 1;
+    }
+    return dataMax / (dataMax - dataMin);
+  };
+
+  const off = gradientOffset();
 
   return (
-    <Card className="shadow-none rounded-lg">
+    <Card className="overflow-hidden rounded-lg shadow-none w-full flex flex-col">
       <CardHeader className="px-2 py-3">
         <CardTitle className="font-bold">Progress (Last 28 days)</CardTitle>
       </CardHeader>
-      <CardContent className="p-2 h-fit w-full">
-        <ResponsiveContainer width="100%" height={200}>
-          <BarChart data={progress} className="h-12">
+      <CardContent className="flex-1 w-full aspect-square flex flex-col px-2 pb-2">
+        <ResponsiveContainer className={"flex-1"} width="100%" height="100%">
+          <ComposedChart accessibilityLayer data={progress}>
+            <CartesianGrid vertical={false} stroke="hsl(var(--muted))" />
             <XAxis
               stroke="hsl(var(--muted-foreground))"
               fontSize={10}
               tickLine={false}
               axisLine={false}
+              tickMargin={6}
               dataKey="date"
               tickFormatter={(value) =>
                 new Date(value).toDateString() === new Date().toDateString()
@@ -81,36 +119,66 @@ export default function ProgressBarChart({
                     : new Date(value).getDate().toString()
               }
             />
-            {/* <YAxis
-        stroke="hsl(var(--muted-foreground))"
-        fontSize={10}
-        tickLine={false}
-        tickFormatter={(value) => UsePhpPesoWSign(value, 0)}
-        axisLine={false}
-      /> */}
-            <Tooltip content={CustomTooltipDailyTotal} />
-            <Brush
-              dataKey="total"
-              height={30}
-              stroke="hsl(var(--muted-foreground))"
+
+            <Tooltip
+              offset={51}
+              cursor={true}
+              content={CustomTooltipDailyTotal}
             />
+            <defs>
+              <linearGradient id="dailyTotalColor" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset={"5%"}
+                  stopColor="hsl(var(--primary))"
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset={"95%"}
+                  stopColor="hsl(var(--primary))"
+                  stopOpacity={0.1}
+                />
+              </linearGradient>
+            </defs>
             <Bar
               animationBegin={0}
-              dataKey="total"
-              fill="hsl(var(--foreground))"
-              radius={[4, 4, 0, 0]}
-              className="bg-red-500"
-            >
-              {progress.map((e) => (
-                <Cell
-                  key={e.date}
-                  style={{
-                    fill: "hsl(var(--foreground))",
-                  }}
-                />
-              ))}
-            </Bar>
-          </BarChart>
+              dataKey="currentTotal"
+              fill="url(#dailyTotalColor)"
+              strokeWidth={0.5}
+              radius={4}
+              type="step"
+            />
+
+            <defs>
+              <linearGradient id="dailySplitColor" x1="0" y1="0" x2="0" y2="1">
+                <stop offset={0} stopColor="#448844" stopOpacity={1} />
+                <stop offset={off} stopColor="#448844" stopOpacity={0.5} />
+                <stop offset={off} stopColor="#884444" stopOpacity={0.5} />
+                <stop offset={1} stopColor="#884444" stopOpacity={1} />
+              </linearGradient>
+            </defs>
+            <Area
+              dataKey="gainOrLoss"
+              fill="url(#dailySplitColor)"
+              stroke="hsl(var(--muted-foreground))"
+              strokeWidth={0.5}
+              fillOpacity={1}
+              type="monotone"
+            />
+            <Line
+              fillOpacity={1}
+              dataKey="gainsSum"
+              type="monotone"
+              stroke="#448844"
+              strokeWidth={2}
+            />
+            <Line
+              fillOpacity={1}
+              dataKey="expensesSum"
+              type="monotone"
+              stroke="#884444"
+              strokeWidth={2}
+            />
+          </ComposedChart>
         </ResponsiveContainer>
       </CardContent>
     </Card>

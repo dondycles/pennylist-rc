@@ -33,6 +33,7 @@ import {
 import { Button } from "@/components/ui/button";
 import ProgressBarChart from "./charts/money-progress-bar-chart";
 import FormsDrawer from "./forms/forms-drawer";
+import { Progress } from "@/lib/hooks";
 
 export default function Money({
   list,
@@ -41,6 +42,7 @@ export default function Money({
   list: User;
   moneyId: string;
 }) {
+  let _ = require("lodash");
   const [openPalette, setOpenPalette] = useState(false);
   const [openEditForm, setOpenEditForm] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
@@ -86,33 +88,108 @@ export default function Money({
   };
 
   const getProgress = () => {
-    if (!logs) return [];
-    let groupedByDate: { [key: string]: number } = {};
+    if (moneyLoading) return [];
+    // all data will be coming from logs, since logs has all the movements in money
 
-    logs.toReversed().forEach((log) => {
+    // group each log by date, to also handle multiple logs in a single date.
+    const groupedByDate: {
+      [key: string]: Progress;
+    } = {};
+
+    // a temporary array for multiple logs in a single date
+    let arrayOfLogsInASingleDate: {
+      amount: number;
+      reason: string;
+      date: string;
+    }[] = [];
+
+    logs?.toReversed().forEach((log) => {
+      //each log has a record of changes in a money, so it will be stored here for later use
+      const changesInAmount =
+        Number(log.changes?.to.amount) - Number(log.changes?.from.amount);
+
       const date = new Date(log.created_at).toDateString();
-      groupedByDate[date] = Number(log.changes?.to.amount);
+
+      // checks if this date has no data
+      // if false, this means that this date is different from the previous iteration
+      if (!groupedByDate[date]) {
+        // clears the temporary array so that it can be filled up again by this date
+        arrayOfLogsInASingleDate = [];
+      }
+      // then, pushes the data of the current log
+      // if the previous iteration's date is similar to current, it just adds the data so it will become multiple logs for a single date
+      arrayOfLogsInASingleDate.push({
+        amount: changesInAmount ?? 0,
+        reason: log.reason!,
+        date: new Date(log.created_at).toDateString(),
+      });
+
+      // gets all the expenses by filtering only the negative values
+      const expenses = arrayOfLogsInASingleDate.filter(
+        (t) => t.amount !== 0 && t.amount < 0,
+      );
+      // gets all the expenses by filtering only the positive values
+      const gains = arrayOfLogsInASingleDate.filter(
+        (t) => t.amount !== 0 && t.amount > 0,
+      );
+
+      const expensesSum = _.sum(expenses.map((t) => t.amount));
+      const gainsSum = _.sum(gains.map((t) => t.amount));
+
+      // this sums up the changes happened in this date. ex. (100 + -100 + -25)
+      // summing up all the positive and negative values
+      // if negative, then there is a loss since loss are more than gains
+      // if positive, then there is a gain since gains are more than loss
+      const gainOrLoss = _.sum(arrayOfLogsInASingleDate.map((a) => a.amount));
+
+      // saves the current date single/multiple logs.
+      // if current date has an existing data, it just gets the current data of the tempory array
+      groupedByDate[date] = {
+        expenses,
+        gains,
+        date: date,
+        expensesSum,
+        gainsSum,
+        gainOrLoss,
+        // currentTotal will always get the very last record in each day
+        currentTotal: Number(log.changes?.to.amount),
+      };
     });
 
-    let eachDayTotal: { date: string; total: number }[] = [];
     const currentDate = new Date();
-    let lastTotal = 0;
-
     currentDate.setDate(currentDate.getDate() - 28);
+    let previousProgress: Progress = {
+      expenses: [],
+      gains: [],
+      date: "",
+      expensesSum: 0,
+      gainsSum: 0,
+      gainOrLoss: 0,
+      currentTotal: 0,
+    };
+
+    const eachDayData: Progress[] = [];
 
     for (let i = 0; i <= 28; i++) {
       const day = currentDate.toDateString();
-
       if (groupedByDate[day] !== undefined) {
         // if this date has total, set it to lastTotal so the next dates that does not have total will get that total as well to fill up the bars
-        lastTotal = groupedByDate[day];
+        previousProgress = groupedByDate[day];
+      } else {
+        // if no data, resets everything except total
+        previousProgress.gainOrLoss = 0;
+        previousProgress.expenses = [];
+        previousProgress.gains = [];
+        previousProgress.date = day;
+        previousProgress.expensesSum = 0;
+        previousProgress.gainsSum = 0;
       }
-
-      eachDayTotal.push({ date: day, total: lastTotal });
+      eachDayData.push({ ...previousProgress });
+      // sets the date to the next day
       currentDate.setDate(currentDate.getDate() + 1);
     }
 
-    return eachDayTotal;
+    return eachDayData;
   };
   const progress = getProgress();
 
