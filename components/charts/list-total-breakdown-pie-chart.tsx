@@ -92,7 +92,7 @@ export default function TotalBreakdownPieChart({
         "overflow-hidden rounded-lg shadow-none w-full aspect-square flex flex-col"
       }
     >
-      <CardHeader className="px-2 py-2">
+      <CardHeader className="p-2 mb-2 border-b">
         <div className="flex items-start justify-between">
           <div className="flex  flex-row justify-between items-center">
             <CardTitle className="flex items-center gap-1 py-1 text-muted-foreground font-normal text-sm">
