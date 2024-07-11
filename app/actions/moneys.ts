@@ -32,6 +32,7 @@ export async function getMoney(id: string) {
     )
     .eq("id", id)
     .order("created_at", { ascending: false, referencedTable: "logs" })
+    .limit(100, { referencedTable: "logs" })
     .single();
   return moneys;
 }

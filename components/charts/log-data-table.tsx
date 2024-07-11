@@ -34,13 +34,7 @@ import {
 
 import { Button } from "../ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Columns,
-  History,
-  ScrollText,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, Columns, ScrollText } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CaretSortIcon } from "@radix-ui/react-icons";
 import { Separator } from "../ui/separator";
@@ -84,7 +78,7 @@ export default function LogsDataTable<TData, TValue>({
     <Card className="rounded-lg shadow-none">
       <CardHeader className="p-2 border-b">
         <CardTitle className="flex items-center gap-1 py-1 text-muted-foreground font-normal text-sm">
-          <ScrollText size={20} /> Logs
+          <ScrollText size={20} /> Logs (Last 100)
         </CardTitle>
       </CardHeader>
       <CardContent className="p-2 grid">
@@ -231,6 +225,10 @@ export default function LogsDataTable<TData, TValue>({
         >
           <ChevronLeft size={20} />
         </Button>
+        <p className="text-xs text-muted-foreground">
+          Page {table.getState().pagination.pageIndex + 1} of{" "}
+          {table.getPageCount()}
+        </p>
         <Button
           variant="outline"
           size="icon"

@@ -27,7 +27,8 @@ export async function getLogs() {
   const { error, data } = await supabase
     .from("logs")
     .select("*, moneys(name,color,id)")
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(100);
 
   if (error) return { error: error.message };
   return { data };
