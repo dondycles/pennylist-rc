@@ -106,7 +106,7 @@ export default function DailyProgressBarChart({
     <Card
       className={"overflow-hidden rounded-lg shadow-none w-full flex flex-col"}
     >
-      <CardHeader className="p-2 m-0">
+      <CardHeader className="p-2 border-b mb-2">
         <div className="flex items-start justify-between">
           <div className="flex  flex-row justify-between items-center">
             <CardTitle className="flex items-center gap-1 py-1 text-muted-foreground font-normal text-sm">
@@ -114,12 +114,27 @@ export default function DailyProgressBarChart({
               Daily Progress
             </CardTitle>
           </div>
+        </div>
+      </CardHeader>
+      <CardContent
+        className={`flex-1 w-full aspect-square flex flex-col gap-2 px-2 pb-2`}
+      >
+        <div className="flex gap-2 justify-between">
+          <Badge
+            className="text-xs w-fit  justify-center gap-1  text-muted-foreground"
+            variant={"secondary"}
+          >
+            {getDifference()} from past {listState.dailyProgressDays} days
+          </Badge>
           <DropdownMenu>
             <DropdownMenuTrigger
               asChild
               className={` duration-500 ease-in-out transition-all`}
             >
-              <Button variant={"outline"}>
+              <Button
+                className="font-normal text-muted-foreground"
+                variant={"outline"}
+              >
                 Last {listState.dailyProgressDays} days
               </Button>
             </DropdownMenuTrigger>
@@ -176,13 +191,7 @@ export default function DailyProgressBarChart({
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-      </CardHeader>
-      <CardContent
-        className={`flex-1 w-full aspect-square flex flex-col px-2 pb-2`}
-      >
-        <Badge className="text-sm block w-fit px-1" variant={"secondary"}>
-          {getDifference()} from past {listState.dailyProgressDays} days
-        </Badge>
+
         <ResponsiveContainer className={"flex-1"} width="100%" height="100%">
           <ComposedChart accessibilityLayer data={slicedDailyProgress}>
             <CartesianGrid vertical={false} stroke="hsl(var(--muted))" />

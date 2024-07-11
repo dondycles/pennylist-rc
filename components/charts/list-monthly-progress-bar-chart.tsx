@@ -26,7 +26,7 @@ export default function MonthlyProgressBarChart({
     <Card
       className={"overflow-hidden rounded-lg shadow-none w-full flex flex-col"}
     >
-      <CardHeader className="px-2 py-2">
+      <CardHeader className="px-2 py-2 border-b mb-2">
         <div className="flex flex-row items-start justify-between">
           <div className="flex  flex-row justify-between items-center">
             <CardTitle className="flex items-center gap-1 py-1 text-muted-foreground font-normal text-sm">

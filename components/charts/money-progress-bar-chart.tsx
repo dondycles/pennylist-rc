@@ -22,7 +22,7 @@ export default function ProgressBarChart({
 
   return (
     <Card className="overflow-hidden rounded-lg shadow-none w-full flex flex-col">
-      <CardHeader className="p-2">
+      <CardHeader className="p-2 border-b mb-2">
         <CardTitle className="flex items-center gap-1 py-1 text-muted-foreground font-normal text-sm">
           <CalendarDays size={20} />
           Progress (Last 28 days)

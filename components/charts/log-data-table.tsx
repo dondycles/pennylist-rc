@@ -81,7 +81,7 @@ export default function LogsDataTable<TData, TValue>({
   }, [filterBy, table]);
   return (
     <Card className="rounded-lg shadow-none">
-      <CardHeader className="p-2">
+      <CardHeader className="p-2 border-b">
         <CardTitle className="flex items-center gap-1 py-1 text-muted-foreground font-normal text-sm">
           <ScrollText size={20} /> Logs
         </CardTitle>
