@@ -26,7 +26,7 @@ export async function getLogs() {
   const supabase = createClient();
   const { error, data } = await supabase
     .from("logs")
-    .select("*")
+    .select("*, moneys(name,color,id)")
     .order("created_at", { ascending: false });
 
   if (error) return { error: error.message };

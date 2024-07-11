@@ -24,7 +24,6 @@ import AddMoneyForm from "./forms/add-money-form";
 import EditMoneyForm from "./forms/edit-money-form";
 import Money from "./list-money";
 import TotalBreakdownPieChart from "./charts/list-total-breakdown-pie-chart";
-import LogsTable from "./charts/list-logs-table";
 import DailyProgressBarChart from "./charts/list-daily-progress-bar-chart";
 import MonthlyTotalBarChart from "./charts/list-monthly-total-bar-chart";
 
@@ -47,6 +46,8 @@ import Scrollable from "@/components/scrollable";
 import FormsDrawer from "./forms/forms-drawer";
 import { calculateListChartsData } from "@/lib/hooks";
 import Chat from "./ai";
+import ListLogDataTable from "./charts/list-log-data-table";
+import { columns } from "./charts/list-log-columns";
 
 export default function List({ list }: { list: User }) {
   let _ = require("lodash");
@@ -94,11 +95,12 @@ export default function List({ list }: { list: User }) {
     enabled: list ? true : false,
   });
 
-  const { monthlyTotal, differences, dailyProgress } = calculateListChartsData({
-    logs: logs?.data ?? [],
-    logsLoading: logsLoading,
-    total: total,
-  });
+  const { monthlyTotal, differences, dailyProgress, modifiedLogs } =
+    calculateListChartsData({
+      logs: logs?.data ?? [],
+      logsLoading: logsLoading,
+      total: total,
+    });
 
   const refetch = () => {
     refetchMoneys();
@@ -325,12 +327,8 @@ export default function List({ list }: { list: User }) {
             <TotalBreakdownPieChart moneys={moneys.data} />
           ) : null}
           {/* tables */}
-          {logs?.data && (
-            <LogsTable
-              open={listState.showLogs}
-              toggleOpen={() => listState.setShowLogs()}
-              logs={logs?.data}
-            />
+          {modifiedLogs && (
+            <ListLogDataTable columns={columns} data={modifiedLogs} />
           )}
         </motion.div>
       ) : null}

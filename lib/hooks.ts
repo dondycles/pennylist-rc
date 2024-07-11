@@ -10,13 +10,22 @@ export type Progress = {
   gainOrLoss: number;
   currentTotal: number;
 };
+
+type Logs = Database["public"]["Tables"]["logs"]["Row"];
+type Moneys = Database["public"]["Tables"]["moneys"]["Row"];
+
+export interface ModifiedLogs extends Logs {
+  total?: number;
+  moneys?: Pick<Moneys, "name" | "color" | "id"> | null;
+}
+
 export const calculateListChartsData = ({
   logsLoading,
   logs,
   total,
 }: {
   logsLoading: boolean;
-  logs: Database["public"]["Tables"]["logs"]["Row"][];
+  logs: ModifiedLogs[];
   total: number;
 }) => {
   const getDailyProgress = () => {
@@ -272,11 +281,21 @@ export const calculateListChartsData = ({
     };
   };
 
+  const getModifiedLogs = () => {
+    // this is just for adding the "total"
+    const modifiedLogs: ModifiedLogs[] = [];
+    logs.forEach((log) => {
+      modifiedLogs.push({ ...log, total: Number(log.changes?.to.total ?? 0) });
+    });
+    return modifiedLogs;
+  };
+
   getMonthlyProgress();
   return {
     monthlyTotal: getMonthlyProgress(),
     differences: getDifferences(),
     dailyProgress: getDailyProgress(),
+    modifiedLogs: getModifiedLogs(),
   };
 };
 
