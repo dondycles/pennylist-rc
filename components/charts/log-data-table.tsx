@@ -216,7 +216,11 @@ export default function LogsDataTable<TData, TValue>({
           </TableBody>
         </Table>
       </CardContent>
-      <CardFooter className="p-2 justify-between">
+      <CardFooter className="p-2 justify-center gap-2">
+        <p className="text-xs text-muted-foreground">
+          Page {table.getState().pagination.pageIndex + 1} of{" "}
+          {table.getPageCount()}
+        </p>
         <Button
           variant="outline"
           size="icon"
@@ -225,10 +229,7 @@ export default function LogsDataTable<TData, TValue>({
         >
           <ChevronLeft size={20} />
         </Button>
-        <p className="text-xs text-muted-foreground">
-          Page {table.getState().pagination.pageIndex + 1} of{" "}
-          {table.getPageCount()}
-        </p>
+
         <Button
           variant="outline"
           size="icon"
