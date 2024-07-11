@@ -43,6 +43,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CaretSortIcon } from "@radix-ui/react-icons";
+import { Separator } from "../ui/separator";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
@@ -88,7 +89,7 @@ export default function LogsDataTable<TData, TValue>({
       </CardHeader>
       <CardContent className="p-2 grid">
         <div className="flex flex-row flex-wrap gap-2 mb-2">
-          <div className="flex items-center flex-1">
+          <div className="flex items-center flex-1 border rounded-md shadow-sm">
             <Input
               placeholder={`Filter by ${
                 filterBy === "money_name"
@@ -103,16 +104,18 @@ export default function LogsDataTable<TData, TValue>({
               onChange={(event) =>
                 table.getColumn(filterBy)?.setFilterValue(event.target.value)
               }
-              className="rounded-r-none"
+              className="rounded-r-none border-none py-1 h-8 z-10"
             />
+            <Separator orientation="vertical" className="z-0" />
             <DropdownMenu>
-              <DropdownMenuTrigger className="border border-l-0 py-[9.5px] rounded-r-md px-2">
+              <DropdownMenuTrigger className=" rounded-r-md px-2">
                 <CaretSortIcon className="text-muted-foreground" />
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
                 side="bottom"
                 className="text-muted-foreground"
+                sideOffset={14}
               >
                 {table
                   .getAllColumns()
