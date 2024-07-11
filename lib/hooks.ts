@@ -17,6 +17,7 @@ type Moneys = Database["public"]["Tables"]["moneys"]["Row"];
 export interface ModifiedLogs extends Logs {
   total?: number;
   moneys?: Pick<Moneys, "name" | "color" | "id"> | null;
+  money_name?: string;
 }
 
 export const calculateListChartsData = ({
@@ -285,14 +286,18 @@ export const calculateListChartsData = ({
     // this is just for adding the "total"
     const modifiedLogs: ModifiedLogs[] = [];
     logs.forEach((log) => {
-      modifiedLogs.push({ ...log, total: Number(log.changes?.to.total ?? 0) });
+      modifiedLogs.push({
+        ...log,
+        total: Number(log.changes?.to.total ?? 0),
+        money_name: log.moneys?.name,
+      });
     });
     return modifiedLogs;
   };
 
   getMonthlyProgress();
   return {
-    monthlyTotal: getMonthlyProgress(),
+    monthlyProgress: getMonthlyProgress(),
     differences: getDifferences(),
     dailyProgress: getDailyProgress(),
     modifiedLogs: getModifiedLogs(),

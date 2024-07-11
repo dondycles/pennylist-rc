@@ -1,4 +1,3 @@
-import { Database } from "@/database.types";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -35,17 +34,20 @@ import {
 
 import { Button } from "../ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft, ChevronRight, Columns, Columns2 } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Columns,
+  History,
+  ScrollText,
+} from "lucide-react";
 import { useEffect, useState } from "react";
-import { UseAmountFormat } from "@/lib/utils";
-import { useListState } from "@/store";
 import { CaretSortIcon } from "@radix-ui/react-icons";
-
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
-export default function ListLogDataTable<TData, TValue>({
+export default function LogsDataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
@@ -69,7 +71,6 @@ export default function ListLogDataTable<TData, TValue>({
       columnVisibility,
     },
   });
-
   useEffect(() => {
     table
       .getAllColumns()
@@ -80,14 +81,22 @@ export default function ListLogDataTable<TData, TValue>({
   }, [filterBy, table]);
   return (
     <Card className="rounded-lg shadow-none">
-      <CardHeader className="p-2 py-3">
-        <CardTitle className="font-bold">Logs</CardTitle>
+      <CardHeader className="p-2">
+        <CardTitle className="flex items-center gap-1 py-1 text-muted-foreground font-normal text-sm">
+          <ScrollText size={20} /> Logs
+        </CardTitle>
       </CardHeader>
       <CardContent className="p-2 grid">
         <div className="flex flex-row flex-wrap gap-2 mb-2">
           <div className="flex items-center flex-1">
             <Input
-              placeholder={`Filter by ${filterBy}`}
+              placeholder={`Filter by ${
+                filterBy === "money_name"
+                  ? "money"
+                  : filterBy === "created_at"
+                    ? "date added"
+                    : filterBy
+              }`}
               value={
                 (table.getColumn(filterBy)?.getFilterValue() as string) ?? ""
               }
@@ -116,7 +125,11 @@ export default function ListLogDataTable<TData, TValue>({
                         checked={filterBy === column.id}
                         onCheckedChange={() => setFilterBy(column.id)}
                       >
-                        {column.id}
+                        {column.id === "money_name"
+                          ? "money"
+                          : column.id === "created_at"
+                            ? "date added"
+                            : column.id}
                       </DropdownMenuCheckboxItem>
                     );
                   })}
@@ -146,7 +159,11 @@ export default function ListLogDataTable<TData, TValue>({
                         column.toggleVisibility(!!value)
                       }
                     >
-                      {column.id}
+                      {column.id === "money_name"
+                        ? "money"
+                        : column.id === "created_at"
+                          ? "date added"
+                          : column.id}
                     </DropdownMenuCheckboxItem>
                   );
                 })}

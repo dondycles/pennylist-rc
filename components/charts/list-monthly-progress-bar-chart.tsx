@@ -14,12 +14,13 @@ import {
   XAxis,
 } from "recharts";
 import ChartTooltip from "../chart-tooltip";
-export default function MonthlyTotalBarChart({
-  monthlyTotal,
+import { CalendarRange } from "lucide-react";
+export default function MonthlyProgressBarChart({
+  monthlyProgress,
 }: {
-  monthlyTotal: Progress[];
+  monthlyProgress: Progress[];
 }) {
-  const off = gradientOffset(monthlyTotal);
+  const off = gradientOffset(monthlyProgress);
 
   return (
     <Card
@@ -28,8 +29,9 @@ export default function MonthlyTotalBarChart({
       <CardHeader className="px-2 py-2">
         <div className="flex flex-row items-start justify-between">
           <div className="flex  flex-row justify-between items-center">
-            <CardTitle className="flex items-center gap-1 py-1 font-bold">
-              Monthly Total
+            <CardTitle className="flex items-center gap-1 py-1 text-muted-foreground font-normal text-sm">
+              <CalendarRange size={20} />
+              Monthly Progress
             </CardTitle>
           </div>
         </div>
@@ -38,7 +40,7 @@ export default function MonthlyTotalBarChart({
         className={`flex-1 w-full aspect-square flex flex-col px-2 pb-2`}
       >
         <ResponsiveContainer className={"flex-1"} width="100%" height="100%">
-          <ComposedChart data={monthlyTotal}>
+          <ComposedChart data={monthlyProgress}>
             <CartesianGrid vertical={false} stroke="hsl(var(--muted))" />
             <XAxis
               stroke="hsl(var(--muted-foreground))"
@@ -82,7 +84,7 @@ export default function MonthlyTotalBarChart({
               radius={4}
               className="bg-red-500"
             >
-              {monthlyTotal?.map((e) => <Cell key={e.date} />)}
+              {monthlyProgress?.map((e) => <Cell key={e.date} />)}
             </Bar>
             <defs>
               <linearGradient

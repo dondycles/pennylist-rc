@@ -1,16 +1,7 @@
 "use client";
 
-import { Database } from "@/database.types";
 import { ColumnDef } from "@tanstack/react-table";
-import {
-  ArrowUp,
-  ArrowDown,
-  Plus,
-  Pencil,
-  Trash,
-  PencilLine,
-} from "lucide-react";
-
+import { ArrowUp, ArrowDown, Plus, Trash, PencilLine } from "lucide-react";
 import { toMonthWord, UseAmountFormat } from "@/lib/utils";
 import { ModifiedLogs } from "@/lib/hooks";
 import { useListState } from "@/store";
@@ -18,7 +9,7 @@ import { Badge } from "../ui/badge";
 
 type LogCols = ModifiedLogs;
 
-export const columns: ColumnDef<LogCols>[] = [
+export const logsColumns: ColumnDef<LogCols>[] = [
   {
     accessorKey: "type",
     header: "Action",
@@ -39,7 +30,7 @@ export const columns: ColumnDef<LogCols>[] = [
     },
   },
   {
-    accessorKey: "money",
+    accessorKey: "money_name",
     header: "Money",
     cell: ({ row }) => {
       return (
@@ -52,7 +43,7 @@ export const columns: ColumnDef<LogCols>[] = [
             backgroundColor: row.original.moneys?.color + "20",
           }}
         >
-          {row.original.moneys?.name}
+          {row.original.money_name}
         </Badge>
       );
     },
@@ -132,10 +123,14 @@ export const columns: ColumnDef<LogCols>[] = [
     accessorKey: "total",
     header: "Overall Total",
     cell: ({ row }) => {
-      return UseAmountFormat(row.original.total ?? 0, {
-        hide: useListState.getState().hideAmounts,
-        sign: true,
-      });
+      return (
+        <span className="font-anton font-black">
+          {UseAmountFormat(row.original.total ?? 0, {
+            hide: useListState.getState().hideAmounts,
+            sign: true,
+          })}
+        </span>
+      );
     },
   },
   {

@@ -22,6 +22,7 @@ import {
   Line,
 } from "recharts";
 import ChartTooltip from "../chart-tooltip";
+import { CalendarDays } from "lucide-react";
 
 export default function DailyProgressBarChart({
   dailyProgress,
@@ -108,7 +109,8 @@ export default function DailyProgressBarChart({
       <CardHeader className="p-2 m-0">
         <div className="flex items-start justify-between">
           <div className="flex  flex-row justify-between items-center">
-            <CardTitle className="flex items-center gap-1 py-1 font-bold">
+            <CardTitle className="flex items-center gap-1 py-1 text-muted-foreground font-normal text-sm">
+              <CalendarDays size={20} />
               Daily Progress
             </CardTitle>
           </div>

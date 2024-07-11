@@ -11,7 +11,6 @@ import { UseAmountFormat } from "@/lib/utils";
 import { User } from "@supabase/supabase-js";
 import { useQuery } from "@tanstack/react-query";
 import { TbCurrencyPeso } from "react-icons/tb";
-import LogsTable from "./charts/money-logs-table";
 import { Check, Palette, Pencil, Trash, X } from "lucide-react";
 import {
   Popover,
@@ -33,7 +32,9 @@ import {
 import { Button } from "@/components/ui/button";
 import ProgressBarChart from "./charts/money-progress-bar-chart";
 import FormsDrawer from "./forms/forms-drawer";
-import { Progress } from "@/lib/hooks";
+import { ModifiedLogs, Progress } from "@/lib/hooks";
+import LogsDataTable from "./charts/log-data-table";
+import { logsColumns } from "./charts/log-columns";
 
 export default function Money({
   list,
@@ -68,8 +69,20 @@ export default function Money({
     queryFn: async () => await getTotal(),
   });
 
-  const logs = money?.data?.logs;
   const total = totalData?.data ?? 0;
+  const getModifiedLogs = () => {
+    // this is just for adding the "total"
+    const modifiedLogs: ModifiedLogs[] = [];
+    money?.data?.logs?.forEach((log) => {
+      modifiedLogs.push({
+        ...log,
+        total: Number(log.changes?.to.total ?? 0),
+        money_name: log.moneys?.name,
+      });
+    });
+    return modifiedLogs;
+  };
+  const logs = getModifiedLogs();
   const lastUpdate = logs?.toReversed().findLast((log) => log)?.created_at;
 
   const handleSetColor = async (color: string) => {
@@ -191,6 +204,7 @@ export default function Money({
 
     return eachDayData;
   };
+
   const progress = getProgress();
 
   if (moneyError || money?.error || totalError || totalData?.error)
@@ -377,7 +391,7 @@ export default function Money({
           {progress.length !== 0 ? (
             <ProgressBarChart progress={progress} />
           ) : null}
-          {logs && <LogsTable logs={logs} />}
+          {logs && <LogsDataTable data={logs} columns={logsColumns} />}
         </>
       ) : null}
     </Scrollable>

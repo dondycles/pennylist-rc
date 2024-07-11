@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Database } from "@/database.types";
 import { UseAmountFormat } from "@/lib/utils";
 import { useListState } from "@/store";
+import { PieChartIcon } from "lucide-react";
 import { useState } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Sector } from "recharts";
 export default function TotalBreakdownPieChart({
@@ -94,8 +95,8 @@ export default function TotalBreakdownPieChart({
       <CardHeader className="px-2 py-2">
         <div className="flex items-start justify-between">
           <div className="flex  flex-row justify-between items-center">
-            <CardTitle className="flex items-center gap-1 py-1 font-bold">
-              Total Breakdown
+            <CardTitle className="flex items-center gap-1 py-1 text-muted-foreground font-normal text-sm">
+              <PieChartIcon size={20} /> Total Breakdown
             </CardTitle>
           </div>
         </div>

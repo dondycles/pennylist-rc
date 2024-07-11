@@ -25,7 +25,6 @@ import EditMoneyForm from "./forms/edit-money-form";
 import Money from "./list-money";
 import TotalBreakdownPieChart from "./charts/list-total-breakdown-pie-chart";
 import DailyProgressBarChart from "./charts/list-daily-progress-bar-chart";
-import MonthlyTotalBarChart from "./charts/list-monthly-total-bar-chart";
 
 // Importing types
 import type { Database } from "@/database.types";
@@ -46,8 +45,9 @@ import Scrollable from "@/components/scrollable";
 import FormsDrawer from "./forms/forms-drawer";
 import { calculateListChartsData } from "@/lib/hooks";
 import Chat from "./ai";
-import ListLogDataTable from "./charts/list-log-data-table";
-import { columns } from "./charts/list-log-columns";
+import LogsDataTable from "./charts/log-data-table";
+import { logsColumns } from "./charts/log-columns";
+import MonthlyProgressBarChart from "./charts/list-monthly-progress-bar-chart";
 
 export default function List({ list }: { list: User }) {
   let _ = require("lodash");
@@ -95,7 +95,7 @@ export default function List({ list }: { list: User }) {
     enabled: list ? true : false,
   });
 
-  const { monthlyTotal, differences, dailyProgress, modifiedLogs } =
+  const { monthlyProgress, differences, dailyProgress, modifiedLogs } =
     calculateListChartsData({
       logs: logs?.data ?? [],
       logsLoading: logsLoading,
@@ -197,9 +197,14 @@ export default function List({ list }: { list: User }) {
             title="Add money"
             desc="Add money by stating the name or its source and the amount."
             trigger={
-              <Button size={"icon"} className="rounded-full shrink-0">
-                <Plus />
-              </Button>
+              <motion.div
+                transition={{ type: "spring", duration: 0.5, bounce: 0.5 }}
+                whileTap={{ scale: 0.8 }}
+              >
+                <Button size={"icon"} className="rounded-full shrink-0">
+                  <Plus />
+                </Button>
+              </motion.div>
             }
             form={
               <AddMoneyForm
@@ -318,8 +323,8 @@ export default function List({ list }: { list: User }) {
                 dailyProgress={dailyProgress}
               />
             ) : null}
-            {monthlyTotal ? (
-              <MonthlyTotalBarChart monthlyTotal={monthlyTotal} />
+            {monthlyProgress ? (
+              <MonthlyProgressBarChart monthlyProgress={monthlyProgress} />
             ) : null}
           </div>
           {/* pie */}
@@ -328,7 +333,7 @@ export default function List({ list }: { list: User }) {
           ) : null}
           {/* tables */}
           {modifiedLogs && (
-            <ListLogDataTable columns={columns} data={modifiedLogs} />
+            <LogsDataTable columns={logsColumns} data={modifiedLogs} />
           )}
         </motion.div>
       ) : null}

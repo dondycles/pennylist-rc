@@ -12,6 +12,7 @@ import {
   XAxis,
 } from "recharts";
 import ChartTooltip from "../chart-tooltip";
+import { CalendarDays } from "lucide-react";
 export default function ProgressBarChart({
   progress,
 }: {
@@ -21,8 +22,11 @@ export default function ProgressBarChart({
 
   return (
     <Card className="overflow-hidden rounded-lg shadow-none w-full flex flex-col">
-      <CardHeader className="px-2 py-3">
-        <CardTitle className="font-bold">Progress (Last 28 days)</CardTitle>
+      <CardHeader className="p-2">
+        <CardTitle className="flex items-center gap-1 py-1 text-muted-foreground font-normal text-sm">
+          <CalendarDays size={20} />
+          Progress (Last 28 days)
+        </CardTitle>
       </CardHeader>
       <CardContent className="flex-1 w-full aspect-square flex flex-col px-2 pb-2">
         <ResponsiveContainer className={"flex-1"} width="100%" height="100%">

@@ -27,7 +27,9 @@ export async function getMoney(id: string) {
   const supabase = createClient();
   const moneys = await supabase
     .from("moneys")
-    .select("id,amount,name,created_at,color,updated_at, logs(*)")
+    .select(
+      "id,amount,name,created_at,color,updated_at, logs(*, moneys(id,name,color))",
+    )
     .eq("id", id)
     .order("created_at", { ascending: false, referencedTable: "logs" })
     .single();
