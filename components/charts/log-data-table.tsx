@@ -106,8 +106,8 @@ export default function LogsDataTable<TData, TValue>({
               className="rounded-r-none"
             />
             <DropdownMenu>
-              <DropdownMenuTrigger className="border border-l-0 py-[9.5px] rounded-r-md px-4">
-                <CaretSortIcon />
+              <DropdownMenuTrigger className="border border-l-0 py-[9.5px] rounded-r-md px-2">
+                <CaretSortIcon className="text-muted-foreground" />
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"

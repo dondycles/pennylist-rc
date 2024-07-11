@@ -101,10 +101,10 @@ export const logsColumns: ColumnDef<LogCols>[] = [
             {past.name} to {current.name}
           </div>
           <div
-            className={`font-anton font-black truncate ${difference.rawAmount > 0 ? "text-green-500" : "text-red-400"}`}
+            className={`font-anton font-black truncate ${difference.rawAmount < 0 ? "text-green-500" : "text-red-400"}`}
             hidden={past.rawAmount === current.rawAmount}
           >
-            {difference.rawAmount > 0
+            {difference.rawAmount < 0
               ? "+" + difference.formattedAmount
               : "-" + difference.formattedAmount}
           </div>
@@ -155,7 +155,7 @@ export const logsColumns: ColumnDef<LogCols>[] = [
       const date = String(getValue());
       return (
         <span className="whitespace-nowrap text-muted-foreground text-xs">
-          {toMonthWord(date)}. {new Date(date).getDay()},{" "}
+          {toMonthWord(date)}. {new Date(date).getDate()},{" "}
           {new Date(date).getFullYear()} at{" "}
           {new Date(date).toLocaleTimeString()}
         </span>
