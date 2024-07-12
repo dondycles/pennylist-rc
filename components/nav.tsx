@@ -12,7 +12,7 @@ import {
   LogOut,
   Settings,
 } from "lucide-react";
-import { logout } from "@/app/actions/auth";
+import { logout } from "@/app/_actions/auth";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { useListState } from "@/store";

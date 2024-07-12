@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Logo from "@/components/logo";
-import { signup } from "@/app/actions/auth";
+import { signup } from "@/app/_actions/auth";
 import { useRef, useState } from "react";
 import { AlertCircle } from "lucide-react";
 import HCaptcha from "@hcaptcha/react-hcaptcha";

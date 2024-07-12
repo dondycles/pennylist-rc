@@ -295,7 +295,6 @@ export const calculateListChartsData = ({
     return modifiedLogs;
   };
 
-  getMonthlyProgress();
   return {
     monthlyProgress: getMonthlyProgress(),
     differences: getDifferences(),

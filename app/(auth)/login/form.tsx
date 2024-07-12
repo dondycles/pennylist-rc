@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Logo from "@/components/logo";
-import { login } from "@/app/actions/auth";
+import { login } from "@/app/_actions/auth";
 import { useRef, useState } from "react";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { useTheme } from "next-themes";

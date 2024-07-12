@@ -9,7 +9,7 @@ import {
   ContextMenuSubTrigger,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import { deleteMoney, setColor } from "@/app/actions/moneys";
+import { deleteMoney, setColor } from "@/app/_actions/moneys";
 import { useState } from "react";
 import { TbCurrencyPeso } from "react-icons/tb";
 import { Check, Info, Palette, Pencil, Trash, X } from "lucide-react";

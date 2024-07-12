@@ -6,7 +6,7 @@ import {
   continueConversation,
   getLastStream,
   saveLastStream,
-} from "@/app/actions/ai";
+} from "@/app/_actions/ai";
 import { readStreamableValue } from "ai/rsc";
 import { AnimatePresence, motion } from "framer-motion";
 import { useMutation, useQuery } from "@tanstack/react-query";

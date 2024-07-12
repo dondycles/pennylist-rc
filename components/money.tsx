@@ -4,7 +4,7 @@ import {
   getMoney,
   getTotal,
   setColor,
-} from "@/app/actions/moneys";
+} from "@/app/_actions/moneys";
 import Scrollable from "@/components/scrollable";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UseAmountFormat } from "@/lib/utils";

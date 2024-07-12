@@ -4,7 +4,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 
 // Actions
-import { addMoney } from "@/app/actions/moneys";
+import { addMoney } from "@/app/_actions/moneys";
 
 // Components
 import { Button } from "@/components/ui/button";

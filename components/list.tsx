@@ -10,8 +10,8 @@ import { TbCurrencyPeso } from "react-icons/tb";
 import { UseAmountFormat } from "@/lib/utils";
 
 // Importing actions
-import { getMoneys, getTotal } from "@/app/actions/moneys";
-import { getLogs } from "@/app/actions/logs";
+import { getMoneys, getTotal } from "@/app/_actions/moneys";
+import { getLogs } from "@/app/_actions/logs";
 
 // Importing UI components
 import { Button } from "@/components/ui/button";

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { editMoney } from "@/app/actions/moneys";
+import { editMoney } from "@/app/_actions/moneys";
 import { Button } from "@/components/ui/button";
 import {
   Form,
