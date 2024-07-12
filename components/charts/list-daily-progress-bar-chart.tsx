@@ -7,7 +7,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { gradientOffset, Progress } from "@/lib/hooks";
+import { gradientOffset } from "@/lib/hooks";
 import { toMonthWord } from "@/lib/utils";
 import { useListState } from "@/store";
 

@@ -27,9 +27,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "__tests__/home.test.jsx",
-    "jest.config.js",
-    "jest.setup.js"
+    "types.d.ts",
+    "database.types.ts"
   ],
   "exclude": ["node_modules", "public/sw.js"]
 }
