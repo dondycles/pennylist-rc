@@ -44,7 +44,6 @@ import { Badge } from "@/components/ui/badge";
 import Scrollable from "@/components/scrollable";
 import FormsDrawer from "./forms/forms-drawer";
 import { calculateListChartsData } from "@/lib/hooks";
-import Chat from "./ai";
 import LogsDataTable from "./charts/log-data-table";
 import { logsColumns } from "./charts/log-columns";
 import MonthlyProgressBarChart from "./charts/list-monthly-progress-bar-chart";
@@ -216,14 +215,6 @@ export default function List({ list }: { list: User }) {
             }
           />
         </div>
-        {list.email && (
-          <Chat
-            diffs={JSON.stringify(differences, null, 2)}
-            moneys={JSON.stringify(moneys, null, 2)}
-            listname={list.email.replace("@pennylist.com", "")}
-            close={listState.setShowAIDialog}
-          />
-        )}
       </motion.div>
       {/* edit money form */}
       <FormsDrawer

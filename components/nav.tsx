@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import {
   ArrowDownNarrowWide,
   ArrowUpNarrowWide,
-  BotMessageSquare,
   CalendarCheck,
   Eye,
   EyeOff,
@@ -42,7 +41,7 @@ export default function Nav() {
       layout
       transition={{ type: "spring", duration: 0.5, bounce: 0.5 }}
       animate={
-        pathname !== "/list" ? { width: 36 * 4 + 10 } : { width: 36 * 3 + 10 }
+        pathname !== "/list" ? { width: 36 * 3 + 10 } : { width: 36 * 2 + 10 }
       }
       className={`fixed bottom-4 left-1/2 -translate-x-1/2 rounded-lg shadow-lg border bg-background p-1 flex justify-end`}
     >
@@ -67,18 +66,7 @@ export default function Nav() {
           )}
         </AnimatePresence>
       </motion.div>
-      <motion.div
-        transition={{ type: "spring", duration: 0.5, bounce: 0.5 }}
-        whileTap={{ scale: 0.8 }}
-      >
-        <Button
-          onClick={listState.setShowAIDialog}
-          size={"icon"}
-          variant={"ghost"}
-        >
-          <BotMessageSquare size={20} />
-        </Button>
-      </motion.div>
+
       <motion.div
         transition={{ type: "spring", duration: 0.5, bounce: 0.5 }}
         whileTap={{ scale: 0.8 }}
