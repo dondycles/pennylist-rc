@@ -5,6 +5,7 @@ import QueryProvider from "@/components/query-provider";
 import { UseDefaultURL } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
+import ListProvider from "@/components/auth-provider";
 
 const raleway = Raleway({
   subsets: ["latin"],
@@ -72,13 +73,15 @@ export default function RootLayout({
         className={`${raleway.variable} ${anton.variable} antialiased font-raleway h-screen w-full bg-background`}
       >
         <QueryProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            disableTransitionOnChange
-          >
-            {children}
-          </ThemeProvider>
+          <ListProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              disableTransitionOnChange
+            >
+              {children}
+            </ThemeProvider>
+          </ListProvider>
         </QueryProvider>
         <Toaster />
       </body>

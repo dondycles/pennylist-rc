@@ -6,9 +6,7 @@ import {
   setColor,
 } from "@/app/_actions/moneys";
 import Scrollable from "@/components/scrollable";
-import { Skeleton } from "@/components/ui/skeleton";
 import { UseAmountFormat } from "@/lib/utils";
-import { User } from "@supabase/supabase-js";
 import { useQuery } from "@tanstack/react-query";
 import { TbCurrencyPeso } from "react-icons/tb";
 import { Check, Palette, Pencil, Trash, X } from "lucide-react";
@@ -30,34 +28,31 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import ProgressBarChart from "./charts/money-progress-bar-chart";
-import FormsDrawer from "./forms/forms-drawer";
+import ProgressBarChart from "@/components/charts/money-progress-bar-chart";
+import FormsDrawer from "@/components/forms/forms-drawer";
 import { ModifiedLogs, Progress } from "@/lib/hooks";
-import LogsDataTable from "./charts/log-data-table";
-import { logsColumns } from "./charts/log-columns";
+import LogsDataTable from "@/components/charts/log-data-table";
+import { logsColumns } from "@/components/charts/log-columns";
+import { useListDataContext } from "@/components/auth-provider";
+import SkeletonLoading from "@/components/skeleton";
 
-export default function Money({
-  list,
-  moneyId,
-}: {
-  list: User;
-  moneyId: string;
-}) {
+export default function MoneyPage({ params }: { params: { id: string } }) {
+  const { list, isLoading } = useListDataContext();
+  const listState = useListState();
   let _ = require("lodash");
   const [openPalette, setOpenPalette] = useState(false);
   const [openEditForm, setOpenEditForm] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
   const [isPending, setIsPending] = useState(false);
-  const listState = useListState();
   const {
     data: money,
     isLoading: moneyLoading,
     error: moneyError,
     refetch: refetchMoney,
   } = useQuery({
-    queryKey: ["money", moneyId, list.id],
-    queryFn: async () => await getMoney(moneyId),
-    enabled: list !== undefined,
+    queryKey: ["money", params.id, list?.id],
+    queryFn: async () => await getMoney(params.id),
+    enabled: list !== undefined && !isLoading,
   });
 
   const {
@@ -66,9 +61,9 @@ export default function Money({
     refetch: refetchTotal,
     error: totalError,
   } = useQuery({
-    queryKey: ["total", list.id],
+    queryKey: ["total", list?.id],
     queryFn: async () => await getTotal(),
-    enabled: list !== undefined,
+    enabled: list !== undefined && !isLoading,
   });
 
   const total = totalData?.data ?? 0;
@@ -220,17 +215,7 @@ export default function Money({
         </div>
       </main>
     );
-  if (moneyLoading || totalLoading)
-    return (
-      <main className="w-full h-full">
-        <div className=" max-w-[800px] mx-auto px-2 flex flex-col justify-start gap-2 mb-[5.5rem]">
-          <Skeleton className="w-full h-24  max-w-[800px] mt-2" />
-          <Skeleton className="w-full max-w-[800px] h-10 mt-8" />
-          <Skeleton className="w-full max-w-[800px] h-10" />
-          <Skeleton className="w-full max-w-[800px] h-10" />
-        </div>
-      </main>
-    );
+  if (moneyLoading || totalLoading || isLoading) return <SkeletonLoading />;
   if (!money?.data)
     return (
       <main className="w-full h-full p-2">

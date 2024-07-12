@@ -20,17 +20,16 @@ import { Button } from "@/components/ui/button";
 import { useListState } from "@/store";
 
 // Importing custom components
-import AddMoneyForm from "./forms/add-money-form";
-import EditMoneyForm from "./forms/edit-money-form";
-import Money from "./list-money";
-import TotalBreakdownPieChart from "./charts/list-total-breakdown-pie-chart";
-import DailyProgressBarChart from "./charts/list-daily-progress-bar-chart";
+import AddMoneyForm from "@/components/forms/add-money-form";
+import EditMoneyForm from "@/components/forms/edit-money-form";
+import Money from "@/components/list-money";
+import TotalBreakdownPieChart from "@/components/charts/list-total-breakdown-pie-chart";
+import DailyProgressBarChart from "@/components/charts/list-daily-progress-bar-chart";
 
 // Importing types
 import type { Database } from "@/database.types";
-import type { User } from "@supabase/supabase-js";
+
 import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
 
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -42,13 +41,16 @@ import {
 } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import Scrollable from "@/components/scrollable";
-import FormsDrawer from "./forms/forms-drawer";
+import FormsDrawer from "@/components/forms/forms-drawer";
 import { calculateListChartsData } from "@/lib/hooks";
-import LogsDataTable from "./charts/log-data-table";
-import { logsColumns } from "./charts/log-columns";
-import MonthlyProgressBarChart from "./charts/list-monthly-progress-bar-chart";
+import LogsDataTable from "@/components/charts/log-data-table";
+import { logsColumns } from "@/components/charts/log-columns";
+import MonthlyProgressBarChart from "@/components/charts/list-monthly-progress-bar-chart";
+import { useListDataContext } from "@/components/auth-provider";
+import SkeletonLoading from "@/components/skeleton";
 
-export default function List({ list }: { list: User | undefined }) {
+export default function ListPage() {
+  const { list, isLoading } = useListDataContext();
   const listState = useListState();
   const [animated, setAnimated] = useState(false);
   const [showAddMoneyForm, setShowAddMoneyForm] = useState(false);
@@ -68,7 +70,7 @@ export default function List({ list }: { list: User | undefined }) {
   } = useQuery({
     queryKey: ["moneys", listState.sort, list?.id],
     queryFn: async () => await getMoneys(listState.sort),
-    enabled: list !== undefined,
+    enabled: list !== undefined && !isLoading,
   });
 
   const {
@@ -78,7 +80,7 @@ export default function List({ list }: { list: User | undefined }) {
   } = useQuery({
     queryKey: ["total", list?.id],
     queryFn: async () => await getTotal(),
-    enabled: list !== undefined,
+    enabled: list !== undefined && !isLoading,
   });
 
   const total = totalData?.data ?? 0;
@@ -91,7 +93,7 @@ export default function List({ list }: { list: User | undefined }) {
   } = useQuery({
     queryKey: ["logs", list?.id],
     queryFn: async () => await getLogs(),
-    enabled: list !== undefined,
+    enabled: list !== undefined && !isLoading,
   });
 
   const { monthlyProgress, differences, dailyProgress, modifiedLogs } =
@@ -107,7 +109,7 @@ export default function List({ list }: { list: User | undefined }) {
     refetchTotal();
   };
 
-  const loaded = !moneysLoading && !logsLoading && !totalLoading;
+  const loaded = !moneysLoading && !logsLoading && !totalLoading && !isLoading;
 
   if (moneys?.error || moneysError || logsError || logs?.error)
     return (
@@ -121,17 +123,7 @@ export default function List({ list }: { list: User | undefined }) {
       </main>
     );
 
-  if (!loaded)
-    return (
-      <main className="w-full h-full">
-        <div className=" max-w-[800px] mx-auto px-2 flex flex-col justify-start gap-2 mb-[5.5rem]">
-          <Skeleton className="w-full h-24  max-w-[800px] mt-2" />
-          <Skeleton className="w-full max-w-[800px] h-10 mt-8" />
-          <Skeleton className="w-full max-w-[800px] h-10" />
-          <Skeleton className="w-full max-w-[800px] h-10" />
-        </div>
-      </main>
-    );
+  if (!loaded) return <SkeletonLoading />;
 
   return (
     <Scrollable>
@@ -140,7 +132,7 @@ export default function List({ list }: { list: User | undefined }) {
         <div className="mt-2 border rounded-lg p-4 flex flex-row gap-4 items-center justify-between shadow-lg">
           <div className="flex flex-col min-w-0">
             <p className="text-muted-foreground text-xs flex items-center gap-1 w-fit">
-              Total Money of {list?.email?.replace("@pennylist.com", "")}
+              Total Money of {list?.listname}
             </p>
             <div className="text-2xl sm:text-4xl font-anton flex flex-row items-center truncate -ml-1 sm:-ml-2">
               <TbCurrencyPeso className="shrink-0" />

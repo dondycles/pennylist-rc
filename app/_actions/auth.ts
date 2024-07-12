@@ -1,12 +1,11 @@
 "use server";
-
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { logInSchema } from "../(auth)/login/form";
 import { signUpSchema } from "../(auth)/signup/form";
 import { z } from "zod";
 
-export const changePassword = async (password: string, id: string) => {
+export const changeListPassword = async (password: string, id: string) => {
   const supabase = createClient();
   const listId = (await supabase.auth.getUser()).data.user?.id;
   if (!listId || !id) return { error: { message: "List id not found!" } };
@@ -28,8 +27,7 @@ export const changePassword = async (password: string, id: string) => {
 
   return { success: "Password changed" };
 };
-
-export const deleteMyAccount = async (id: string) => {
+export const deleteList = async (id: string) => {
   const supabase = createClient(process.env.SUPABASE_SECRET);
   const { error: dbError } = await supabase.from("lists").delete().eq("id", id);
   if (dbError) return { error: dbError.message };
@@ -38,11 +36,12 @@ export const deleteMyAccount = async (id: string) => {
 
   redirect("/login");
 };
-
 export const logout = async () => {
   const supabase = createClient();
   const { error } = await supabase.auth.signOut();
   if (error) return { error: error.message };
+
+  redirect("/login");
 };
 export const signup = async (
   data: z.infer<typeof signUpSchema>,
@@ -112,4 +111,10 @@ export const changeListName = async (listname: string) => {
   });
   if (dbError) return { error: dbError?.message };
   return { success: "List name changed!" };
+};
+export const getList = async () => {
+  const supabase = createClient();
+  const { data, error } = await supabase.from("lists").select("*").single();
+  if (error) return { error: error.message };
+  return { list: data };
 };
