@@ -68,6 +68,7 @@ export default function SignupForm() {
       console.log(error);
     }
   }
+
   return (
     <Form {...form}>
       <form

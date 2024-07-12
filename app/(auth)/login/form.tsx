@@ -41,6 +41,7 @@ export default function LoginForm() {
     try {
       setLoggingIn(true);
       const res = await login(values, captchaToken!);
+
       if (res?.authError) {
         setLoggingIn(false);
         return form.setError("password", {

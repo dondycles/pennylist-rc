@@ -20,5 +20,6 @@ export const config = {
     "/login",
     "/signup",
     "/money",
+    "/",
   ],
 };

@@ -5,6 +5,7 @@ import {
   CalendarCheck,
   Eye,
   EyeOff,
+  FileCog,
   Gem,
   Home,
   ListFilter,
@@ -29,6 +30,7 @@ import {
 } from "./ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { useState } from "react";
+import { btnTap } from "@/lib/animations";
 
 export default function Nav() {
   const queryClient = useQueryClient();
@@ -39,18 +41,16 @@ export default function Nav() {
   return (
     <motion.nav
       layout
-      transition={{ type: "spring", duration: 0.5, bounce: 0.5 }}
+      transition={btnTap.transition}
       animate={
         pathname !== "/list" ? { width: 36 * 3 + 10 } : { width: 36 * 2 + 10 }
       }
       className={`fixed bottom-4 left-1/2 -translate-x-1/2 rounded-lg shadow-lg border bg-background p-1 flex justify-end`}
     >
-      <motion.div
-        transition={{ type: "spring", duration: 0.5, bounce: 0.5 }}
-        whileTap={{ scale: 0.8 }}
-      >
-        <AnimatePresence initial={false}>
-          {pathname !== "/list" && (
+      {/* Home button, only appears when not in list page */}
+      <AnimatePresence initial={false}>
+        {pathname !== "/list" && (
+          <motion.div transition={btnTap.transition} whileTap={btnTap.whileTap}>
             <motion.div
               initial={{ opacity: 0, scale: 0, x: 0 }}
               animate={{ opacity: 1, scale: 1, x: 0 }}
@@ -63,14 +63,12 @@ export default function Nav() {
                 </Link>
               </Button>
             </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      <motion.div
-        transition={{ type: "spring", duration: 0.5, bounce: 0.5 }}
-        whileTap={{ scale: 0.8 }}
-      >
+      {/* Settings */}
+      <motion.div transition={btnTap.transition} whileTap={btnTap.whileTap}>
         <Popover open={showSettings} onOpenChange={setShowSettings}>
           <PopoverTrigger asChild>
             <Button variant={"ghost"} size={"icon"}>
@@ -83,32 +81,19 @@ export default function Nav() {
           </PopoverTrigger>
           <PopoverContent sideOffset={10} className="p-1 flex flex-col w-fit">
             <motion.div
-              transition={{ type: "spring", duration: 0.5, bounce: 0.5 }}
-              whileTap={{ scale: 0.8 }}
+              whileTap={btnTap.whileTap}
+              transition={btnTap.transition}
             >
-              <Button
-                onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-                variant="ghost"
-                size="icon"
-              >
-                <motion.div
-                  initial={false}
-                  key={"theme"}
-                  transition={{ type: "spring", duration: 0.5, bounce: 0.5 }}
-                  animate={theme === "light" ? { rotate: 180 } : { rotate: 0 }}
-                >
-                  <Sun size={20} className="dark:hidden block" />
-                  <Moon size={20} className="hidden dark:block" />
-                </motion.div>
+              <Button asChild variant={"ghost"} size={"icon"}>
+                <Link href={"/list/settings"}>
+                  <FileCog size={20} />
+                </Link>
               </Button>
             </motion.div>
+            {/* sort */}
             <motion.div
-              transition={{
-                type: "spring",
-                duration: 0.5,
-                bounce: 0.5,
-              }}
-              whileTap={{ scale: 0.8 }}
+              transition={btnTap.transition}
+              whileTap={btnTap.whileTap}
             >
               <DropdownMenu
                 onOpenChange={(state) => {
@@ -171,9 +156,31 @@ export default function Nav() {
                 </DropdownMenuContent>
               </DropdownMenu>
             </motion.div>
+            {/* theme */}
             <motion.div
-              transition={{ type: "spring", duration: 0.5, bounce: 0.5 }}
-              whileTap={{ scale: 0.8 }}
+              transition={btnTap.transition}
+              whileTap={btnTap.whileTap}
+            >
+              <Button
+                onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+                variant="ghost"
+                size="icon"
+              >
+                <motion.div
+                  initial={false}
+                  key={"theme"}
+                  transition={btnTap.transition}
+                  animate={theme === "light" ? { rotate: 180 } : { rotate: 0 }}
+                >
+                  <Sun size={20} className="dark:hidden block" />
+                  <Moon size={20} className="hidden dark:block" />
+                </motion.div>
+              </Button>
+            </motion.div>
+            {/* hide show money */}
+            <motion.div
+              transition={btnTap.transition}
+              whileTap={btnTap.whileTap}
             >
               <Button
                 variant={"ghost"}
@@ -190,17 +197,16 @@ export default function Nav() {
           </PopoverContent>
         </Popover>
       </motion.div>
-      <motion.div
-        transition={{ type: "spring", duration: 0.5, bounce: 0.5 }}
-        whileTap={{ scale: 0.8 }}
-      >
+
+      {/* log out */}
+      <motion.div transition={btnTap.transition} whileTap={btnTap.whileTap}>
         <Button
           variant={"ghost"}
           onClick={async (e) => {
             e.currentTarget.classList.add(`opacity-50`);
             e.currentTarget.classList.add(`pointer-events-none`);
-            queryClient.clear();
             await logout();
+            queryClient.clear();
           }}
           size={"icon"}
         >
