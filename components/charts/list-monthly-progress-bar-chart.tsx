@@ -40,7 +40,7 @@ export default function MonthlyProgressBarChart({
         className={`flex-1 w-full aspect-square flex flex-col px-2 pb-2`}
       >
         <ResponsiveContainer className={"flex-1"} width="100%" height="100%">
-          <ComposedChart data={monthlyProgress}>
+          <ComposedChart accessibilityLayer data={monthlyProgress}>
             <CartesianGrid vertical={false} stroke="hsl(var(--muted))" />
             <XAxis
               stroke="hsl(var(--muted-foreground))"

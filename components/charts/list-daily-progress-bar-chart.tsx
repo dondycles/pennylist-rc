@@ -210,8 +210,7 @@ export default function DailyProgressBarChart({
                     : new Date(value).getDate().toString()
               }
             />
-
-            <Tooltip offset={51} cursor={true} content={ChartTooltip} />
+            <Tooltip content={ChartTooltip} />
             <defs>
               <linearGradient id="dailyTotalColor" x1="0" y1="0" x2="0" y2="1">
                 <stop
