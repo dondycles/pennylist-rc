@@ -50,7 +50,6 @@ import { logsColumns } from "./charts/log-columns";
 import MonthlyProgressBarChart from "./charts/list-monthly-progress-bar-chart";
 
 export default function List({ list }: { list: User }) {
-  let _ = require("lodash");
   const listState = useListState();
   const [animated, setAnimated] = useState(false);
   const [showAddMoneyForm, setShowAddMoneyForm] = useState(false);
@@ -292,7 +291,7 @@ export default function List({ list }: { list: User }) {
                     edit={() => {
                       setEditMoneyForm({ money: money, open: true });
                     }}
-                    done={(_delete) => {
+                    done={() => {
                       refetch();
                     }}
                     money={money}

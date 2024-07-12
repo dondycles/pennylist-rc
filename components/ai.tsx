@@ -1,7 +1,7 @@
 "use client";
 
 import { type CoreMessage } from "ai";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   continueConversation,
   getLastStream,

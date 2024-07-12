@@ -33,7 +33,7 @@ export default function Money({
   currentTotal,
 }: {
   money: Omit<Database["public"]["Tables"]["moneys"]["Row"], "list">;
-  done: (_delete?: boolean) => void;
+  done: () => void;
   edit: () => void;
   hideAmounts: boolean;
   currentTotal: string;
@@ -52,7 +52,7 @@ export default function Money({
     setIsPending(true);
     const { error } = await deleteMoney(money, currentTotal);
     if (error) return setIsPending(false);
-    done(true);
+    done();
   };
 
   return (

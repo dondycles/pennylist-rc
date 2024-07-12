@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { persist } from "zustand/middleware";
 import { create } from "zustand";
 

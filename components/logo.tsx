@@ -16,7 +16,7 @@ export default function Logo({
   className?: React.HTMLAttributes<SVGElement>["className"];
   strokeWidth?: React.SVGAttributes<SVGElement>["strokeWidth"];
   zoom: number;
-}) {
+}): JSX.Element {
   const minX = 0 + (zoom * 100) / 2;
   const minY = 0 + (zoom * 100) / 2;
   const width = 3000 - zoom * 100;
