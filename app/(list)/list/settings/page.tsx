@@ -1,5 +1,5 @@
 "use client";
-import { getList } from "@/app/_actions/auth";
+import { deleteList, getList } from "@/app/_actions/auth";
 import Scrollable from "@/components/scrollable";
 import SkeletonLoading from "@/components/skeleton";
 import { Button } from "@/components/ui/button";
@@ -48,10 +48,17 @@ export default function ListSettings() {
             <p></p>
           </CardContent>
           <CardFooter className="p-2 flex-col gap-2">
-            <Button className="w-full" variant={"ghost"}>
+            <Button className="w-full" variant={"secondary"}>
+              Change listname
+            </Button>
+            <Button className="w-full" variant={"secondary"}>
               Change password
             </Button>
-            <Button className="w-full" variant={"destructive"}>
+            <Button
+              onClick={() => deleteList(listData.data.id)}
+              className="w-full"
+              variant={"destructive"}
+            >
               Delete list
             </Button>
           </CardFooter>

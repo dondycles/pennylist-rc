@@ -101,7 +101,7 @@ export default function Money({
             transition={{ type: "spring", duration: 0.5, bounce: 0.5 }}
           >
             <p className="truncate">{money.name}</p>
-            <div className="font-semibold font-anton flex items-center">
+            <div className="font-semibold font-readex flex items-center">
               <TbCurrencyPeso />
               {UseAmountFormat(money.amount ?? 0, {
                 hide: hideAmounts,
@@ -175,7 +175,7 @@ export default function Money({
             } ease-in-out transition-all`}
           >
             <p className="truncate">{money.name}</p>
-            <div className="font-semibold font-anton flex items-center">
+            <div className="font-semibold font-readex flex items-center">
               <TbCurrencyPeso />
 
               {UseAmountFormat(money.amount ?? 0, {

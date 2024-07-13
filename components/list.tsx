@@ -159,7 +159,7 @@ export default function List({ list }: { list: User | null }) {
               <p className="text-muted-foreground text-xs flex items-center gap-1 w-fit">
                 Total Money of {listData.data.listname}
               </p>
-              <div className="text-2xl sm:text-4xl font-anton flex flex-row items-center truncate -ml-1 sm:-ml-2">
+              <div className="text-2xl sm:text-4xl font-readex flex flex-row items-center truncate -ml-1 sm:-ml-2">
                 <TbCurrencyPeso className="shrink-0" />
                 <p className="truncate  font-bold">
                   {UseAmountFormat(total, {

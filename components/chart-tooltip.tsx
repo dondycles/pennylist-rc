@@ -17,7 +17,7 @@ export default function ChartTooltip({ active, payload }: any) {
             <div className="flex items-center gap-1">
               <div className="bg-green-500/50 w-3 h-1" /> Gain
             </div>
-            <div className="font-anton font-black">
+            <div className="font-readex font-black">
               {UseAmountFormat(Number(gainSum ?? 0), {
                 hide: listState.hideAmounts,
                 sign: true,
@@ -29,7 +29,7 @@ export default function ChartTooltip({ active, payload }: any) {
               <div className="bg-red-500/50 w-3 h-1" />
               Loss
             </div>
-            <div className="font-anton font-black">
+            <div className="font-readex font-black">
               {UseAmountFormat(Number(expensesSum ?? 0), {
                 hide: listState.hideAmounts,
                 sign: true,
@@ -41,7 +41,7 @@ export default function ChartTooltip({ active, payload }: any) {
               <div className="bg-gradient-to-b from-green-500 to-red-400 size-3 rounded" />
               Difference
             </div>
-            <div className="font-anton font-black">
+            <div className="font-readex font-black">
               {UseAmountFormat(Number(gainOrLoss ?? 0), {
                 hide: listState.hideAmounts,
                 sign: true,
@@ -53,7 +53,7 @@ export default function ChartTooltip({ active, payload }: any) {
               <div className="bg-gradient-to-b from-primary to-transparent size-3 rounded" />
               Current Total
             </div>
-            <div className="font-anton font-black">
+            <div className="font-readex font-black">
               {UseAmountFormat(Number(total ?? 0), {
                 hide: listState.hideAmounts,
                 sign: true,

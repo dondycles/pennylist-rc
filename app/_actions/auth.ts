@@ -29,6 +29,10 @@ export const changeListPassword = async (password: string, id: string) => {
 };
 export const deleteList = async (id: string) => {
   const supabase = createClient(process.env.SUPABASE_SECRET);
+  const listId = (await supabase.auth.getUser()).data.user?.id;
+  if (!listId || !id) return { error: { message: "List id not found!" } };
+  if (listId !== id) return { error: { message: "List id did not match!" } };
+
   const { error: dbError } = await supabase.from("lists").delete().eq("id", id);
   if (dbError) return { error: dbError.message };
   const { error: authError } = await supabase.auth.admin.deleteUser(id);

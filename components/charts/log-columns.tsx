@@ -90,7 +90,7 @@ export const logsColumns: ColumnDef<LogCols>[] = [
       return (
         <div className="flex flex-col gap-2 text-xs">
           <div
-            className="font-anton font-black truncate"
+            className="font-readex font-black truncate"
             hidden={past.rawAmount === current.rawAmount}
           >
             {past.formattedAmount}{" "}
@@ -101,7 +101,7 @@ export const logsColumns: ColumnDef<LogCols>[] = [
             {past.name} to {current.name}
           </div>
           <div
-            className={`font-anton font-black truncate ${difference.rawAmount < 0 ? "text-green-500" : "text-red-400"}`}
+            className={`font-readex font-black truncate ${difference.rawAmount < 0 ? "text-green-500" : "text-red-400"}`}
             hidden={past.rawAmount === current.rawAmount}
           >
             {difference.rawAmount < 0
@@ -124,7 +124,7 @@ export const logsColumns: ColumnDef<LogCols>[] = [
     header: "Overall Total",
     cell: ({ row }) => {
       return (
-        <span className="font-anton font-black">
+        <span className="font-readex font-black">
           {UseAmountFormat(row.original.total ?? 0, {
             hide: useListState.getState().hideAmounts,
             sign: true,

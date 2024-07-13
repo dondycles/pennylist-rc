@@ -271,7 +271,7 @@ export default function Money({
             <p className="text-xs flex items-center gap-1 w-fit">
               {money?.data?.name}
             </p>
-            <div className="text-2xl sm:text-4xl font-anton flex flex-row items-center truncate -ml-1 sm:-ml-2">
+            <div className="text-2xl sm:text-4xl font-readex flex flex-row items-center truncate -ml-1 sm:-ml-2">
               <TbCurrencyPeso className="shrink-0" />
               <p className="truncate font-bold ">
                 {UseAmountFormat(Number(money?.data?.amount ?? 0), {
@@ -355,7 +355,7 @@ export default function Money({
                     } ease-in-out transition-all`}
                   >
                     <p className="truncate">{money.data.name}</p>
-                    <div className="font-semibold font-anton flex items-center">
+                    <div className="font-semibold font-readex flex items-center">
                       <TbCurrencyPeso />
                       {UseAmountFormat(Number(money.data.amount ?? 0), {
                         hide: listState.hideAmounts,

@@ -12,7 +12,7 @@ const raleway = Raleway({
   variable: "--font-raleway",
 });
 const readex = Readex_Pro({
-  weight: ["400"],
+  weight: ["700"],
   subsets: ["latin"],
   variable: "--font-readex",
 });
