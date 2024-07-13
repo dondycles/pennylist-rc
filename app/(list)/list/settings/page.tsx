@@ -1,4 +1,5 @@
 "use client";
+<<<<<<< HEAD
 import { getList } from "@/app/_actions/auth";
 import Scrollable from "@/components/scrollable";
 import SkeletonLoading from "@/components/skeleton";
@@ -25,4 +26,20 @@ export default function ListSettings() {
         <p>Listname: {listData.listname}</p>
       </Scrollable>
     );
+=======
+import { useListDataContext } from "@/components/auth-provider";
+import Scrollable from "@/components/scrollable";
+import SkeletonLoading from "@/components/skeleton";
+
+export default function ListSettings() {
+  const { list, isLoading } = useListDataContext();
+
+  if (isLoading) return <SkeletonLoading />;
+  return (
+    <Scrollable>
+      {list?.listname}
+      {list?.created_at}
+    </Scrollable>
+  );
+>>>>>>> 0d41b68b72bd9866a8cda0db5b200b4284e95961
 }
