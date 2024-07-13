@@ -59,10 +59,7 @@ export const signup = async (
   });
   if (authError)
     return {
-      authError:
-        authError.status === 422
-          ? "Unfortunately, the chosen listname is already taken."
-          : authError.message,
+      authError: authError.message,
     };
 
   const { error: dbError } = await supabase
@@ -86,10 +83,7 @@ export const login = async (
     });
   if (authError)
     return {
-      authError:
-        authError.status === 400
-          ? "Invalid list credentials"
-          : authError.message,
+      authError: authError.message as string,
     };
 
   const { error: dbError } = await supabase
@@ -97,7 +91,7 @@ export const login = async (
     .select("*")
     .eq("id", authData.user.id)
     .single();
-  if (dbError) return { dbError: dbError.message };
+  if (dbError) return { dbError: dbError.message as string };
 };
 export const changeListName = async (listname: string) => {
   const supabase = createClient();
