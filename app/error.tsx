@@ -1,6 +1,5 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { logout } from "./_actions/auth";
 import { useQueryClient } from "@tanstack/react-query";
 // Error components must be Client Components
@@ -21,7 +20,7 @@ export default function Error({
       </p>
       <div className="flex gap-2 mt-4">
         <Button
-          variant={"ghost"}
+          variant={"secondary"}
           onClick={async () => {
             queryClient.clear();
             await logout();
@@ -29,8 +28,13 @@ export default function Error({
         >
           Log out
         </Button>
-        <Button asChild>
-          <Link href={"/list"}>Home</Link>
+        <Button
+          onClick={() => {
+            if (!window) return;
+            window.location.reload();
+          }}
+        >
+          Reload
         </Button>
       </div>
     </div>

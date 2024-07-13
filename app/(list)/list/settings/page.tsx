@@ -1,5 +1,10 @@
 "use client";
-import { changeListName, deleteList, getList } from "@/app/_actions/auth";
+import {
+  changeListName,
+  changeListPassword,
+  deleteList,
+  getList,
+} from "@/app/_actions/auth";
 import Scrollable from "@/components/scrollable";
 import SkeletonLoading from "@/components/skeleton";
 import { Button } from "@/components/ui/button";
@@ -7,17 +12,10 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+
 import {
   Form,
   FormControl,
@@ -27,6 +25,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -39,12 +38,19 @@ const changeListNameSchema = z.object({
     .min(6, { message: "Listname must be at least 6 characters." }),
 });
 
+const changePasswordSchema = z.object({
+  password: z
+    .string()
+    .min(6, { message: "Password must be at least 6 characters." }),
+});
+
 export default function ListSettings() {
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [changeListnameMode, setChangeListnameMode] = useState(false);
-  const [changingListname, setChangingListname] = useState(false);
-  const [confirmListName, setConfirmListname] = useState<string>();
-  const [deletingList, setDeletingList] = useState(false);
+  const { toast } = useToast();
+  const [settingsMode, setSettingsMode] = useState<{
+    mode: "pass" | "listname" | "del" | null;
+    isLoading: boolean;
+    confirmListname: string;
+  }>({ mode: null, isLoading: false, confirmListname: "" });
 
   const {
     data: listData,
@@ -67,16 +73,62 @@ export default function ListSettings() {
     values: z.infer<typeof changeListNameSchema>,
   ) => {
     if (!listData?.data) return;
-    setChangingListname(true);
+    setSettingsMode((prev) => ({ ...prev, isLoading: true }));
     const res = await changeListName(values, listData.data.id);
-    setChangingListname(false);
+    setSettingsMode((prev) => ({ ...prev, isLoading: false }));
+
     if (res.error)
       return changeListNameForm.setError("listname", {
-        message: "Error changing listname. Spaces are not allowed.",
+        message: res.error.replace("email address", "listname"),
       });
     changeListNameForm.reset();
     refetchListData();
-    setChangeListnameMode(false);
+    setSettingsMode((prev) => ({ ...prev, mode: null }));
+    toast({
+      title: "Listname changed",
+      duration: 2000,
+    });
+  };
+
+  const changePasswordForm = useForm<z.infer<typeof changePasswordSchema>>({
+    resolver: zodResolver(changePasswordSchema),
+    defaultValues: {
+      password: "",
+    },
+  });
+
+  const handleChangePassword = async (
+    values: z.infer<typeof changePasswordSchema>,
+  ) => {
+    if (!listData?.data) return;
+    setSettingsMode((prev) => ({ ...prev, isLoading: true }));
+    const res = await changeListPassword(values, listData.data.id);
+    setSettingsMode((prev) => ({ ...prev, isLoading: false }));
+
+    if (res.error) {
+      return changePasswordForm.setError("password", {
+        message: res.error,
+      });
+    }
+    changePasswordForm.reset();
+    refetchListData();
+    setSettingsMode((prev) => ({ ...prev, mode: null }));
+    toast({
+      title: "Password changed",
+      duration: 2000,
+    });
+  };
+
+  const handleDeleteList = async () => {
+    if (!listData?.data) return;
+    setSettingsMode((prev) => ({ ...prev, isLoading: true }));
+    if (settingsMode.confirmListname !== listData.data.listname)
+      return setSettingsMode((prev) => ({ ...prev, isLoading: false }));
+    await deleteList(listData.data.id);
+    setSettingsMode((prev) => ({
+      ...prev,
+      confirmListname: "",
+    }));
   };
 
   if (listDataLoading) return <SkeletonLoading />;
@@ -93,132 +145,193 @@ export default function ListSettings() {
               {listData.data.listname}
             </CardTitle>
             <CardDescription>
-              List created at{" "}
-              {new Date(listData.data.created_at).toLocaleDateString()}
-              {listData.data.last_pass_changed
-                ? "Password changed last: " + listData.data.last_pass_changed
-                : null}
+              <span>
+                List created at{" "}
+                {new Date(listData.data.created_at).toLocaleString()}
+              </span>
+              <span hidden={!listData.data.last_pass_changed}>
+                {"Password changed last: " +
+                  new Date(listData.data.last_pass_changed!).toLocaleString()}
+              </span>
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <p></p>
-          </CardContent>
-          <CardFooter className="p-2 flex-col gap-2">
-            {changeListnameMode ? (
-              <Form {...changeListNameForm}>
-                <form
-                  onSubmit={changeListNameForm.handleSubmit(
-                    handleChangeListName,
-                  )}
-                  className="flex flex-col gap-2 w-full"
-                >
-                  <p className="text-sm text-muted-foreground">
-                    Change listname
-                  </p>
-                  <FormField
-                    control={changeListNameForm.control}
-                    name="listname"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input placeholder="New listname" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <div className="flex gap-2">
-                    <Button
-                      disabled={changingListname}
-                      type="submit"
-                      className="flex-1"
-                      variant={"secondary"}
-                    >
-                      Confirm
-                    </Button>
-                    <Button
-                      disabled={changingListname}
-                      type="button"
-                      onClick={() => {
-                        setChangeListnameMode(false);
-                      }}
-                      className="flex-1"
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                  <Separator />
-                </form>
-              </Form>
-            ) : (
-              <Button
-                onClick={() => {
-                  setChangeListnameMode(true);
-                }}
-                className="w-full"
-                variant={"secondary"}
-              >
-                Change listname
-              </Button>
-            )}
-
-            <Button className="w-full" variant={"secondary"}>
-              Change password
-            </Button>
-            <Button
-              onClick={() => {
-                setOpenDeleteDialog(true);
-              }}
-              className="w-full"
-              variant={"destructive"}
-            >
-              Delete list
-            </Button>
-          </CardFooter>
-        </Card>
-        <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
-          <DialogContent className="w-fit p-2">
-            <DialogHeader>
-              <DialogTitle className="text-xl text-center">
-                Are you sure to delete?
-              </DialogTitle>
-              <DialogDescription className="text-center">
-                Please type your listname{" "}
-                <span className="font-black">{listData.data.listname}</span> for
-                confirmation
-              </DialogDescription>
-              <Input
-                value={confirmListName}
-                onChange={(e) => setConfirmListname(e.target.value)}
-                placeholder="Listname"
-              />
-              <div className="flex gap-2 ">
+          <CardContent className="p-2 flex flex-col gap-2">
+            {!settingsMode?.mode ? (
+              <>
                 <Button
-                  disabled={deletingList}
-                  onClick={async () => {
-                    setDeletingList(true);
-                    if (confirmListName !== listData.data.listname)
-                      return setDeletingList(false);
-                    await deleteList(listData.data.id);
+                  onClick={() => {
+                    setSettingsMode((prev) => ({ ...prev, mode: "listname" }));
                   }}
-                  className="flex-1"
+                  className="w-full"
                   variant={"secondary"}
                 >
-                  Yes
+                  Change listname
                 </Button>
                 <Button
-                  disabled={deletingList}
                   onClick={() => {
-                    setOpenDeleteDialog(false);
+                    setSettingsMode((prev) => ({ ...prev, mode: "pass" }));
                   }}
-                  className="flex-1"
+                  className="w-full"
+                  variant={"secondary"}
                 >
-                  No
+                  Change password
                 </Button>
-              </div>
-            </DialogHeader>
-          </DialogContent>
-        </Dialog>
+                <Button
+                  onClick={() => {
+                    setSettingsMode((prev) => ({ ...prev, mode: "del" }));
+                  }}
+                  className="w-full"
+                  variant={"destructive"}
+                >
+                  Delete list
+                </Button>
+              </>
+            ) : (
+              <>
+                {settingsMode.mode === "listname" && (
+                  <Form {...changeListNameForm}>
+                    <form
+                      onSubmit={changeListNameForm.handleSubmit(
+                        handleChangeListName,
+                      )}
+                      className="flex flex-col gap-2 w-full"
+                    >
+                      <FormField
+                        control={changeListNameForm.control}
+                        name="listname"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input placeholder="New listname" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Please don&apos;t put spaces.
+                      </p>
+                      <div className="flex gap-2">
+                        <Button
+                          disabled={settingsMode.isLoading}
+                          type="submit"
+                          className="flex-1"
+                          variant={"secondary"}
+                        >
+                          Confirm
+                        </Button>
+                        <Button
+                          disabled={settingsMode.isLoading}
+                          type="button"
+                          onClick={() => {
+                            setSettingsMode((prev) => ({
+                              ...prev,
+                              mode: null,
+                            }));
+                            changeListNameForm.reset();
+                          }}
+                          className="flex-1"
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                      <Separator />
+                    </form>
+                  </Form>
+                )}
+                {settingsMode.mode === "pass" && (
+                  <Form {...changePasswordForm}>
+                    <form
+                      onSubmit={changePasswordForm.handleSubmit(
+                        handleChangePassword,
+                      )}
+                      className="flex flex-col gap-2 w-full"
+                    >
+                      <FormField
+                        control={changePasswordForm.control}
+                        name="password"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input
+                                type="password"
+                                placeholder="New password"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <div className="flex gap-2">
+                        <Button
+                          disabled={settingsMode.isLoading}
+                          type="submit"
+                          className="flex-1"
+                          variant={"secondary"}
+                        >
+                          Confirm
+                        </Button>
+                        <Button
+                          disabled={settingsMode.isLoading}
+                          type="button"
+                          onClick={() => {
+                            setSettingsMode((prev) => ({
+                              ...prev,
+                              mode: null,
+                            }));
+                            changeListNameForm.reset();
+                          }}
+                          className="flex-1"
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                      <Separator />
+                    </form>
+                  </Form>
+                )}
+                {settingsMode.mode === "del" && (
+                  <div className="flex flex-col gap-2">
+                    <Input
+                      value={settingsMode.confirmListname as string}
+                      onChange={(e) =>
+                        setSettingsMode((prev) => ({
+                          ...prev,
+                          confirmListname: e.target.value,
+                        }))
+                      }
+                      placeholder="Listname"
+                    />
+                    <div className="flex gap-2 ">
+                      <Button
+                        disabled={settingsMode.isLoading}
+                        onClick={handleDeleteList}
+                        className="flex-1"
+                        variant={"destructive"}
+                      >
+                        Confirm Delete
+                      </Button>
+                      <Button
+                        disabled={settingsMode.isLoading}
+                        onClick={() => {
+                          setSettingsMode((prev) => ({
+                            ...prev,
+                            confirmListname: "",
+                            mode: null,
+                          }));
+                        }}
+                        className="flex-1"
+                      >
+                        No
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </CardContent>
+        </Card>
       </Scrollable>
     );
 }

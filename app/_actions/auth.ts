@@ -9,16 +9,25 @@ const changeListNameSchema = z.object({
     .string()
     .min(6, { message: "Listname must be at least 6 characters." }),
 });
-export const changeListPassword = async (password: string, id: string) => {
+const changePasswordSchema = z.object({
+  password: z
+    .string()
+    .min(6, { message: "Password must be at least 6 characters." }),
+});
+
+export const changeListPassword = async (
+  values: z.infer<typeof changePasswordSchema>,
+  id: string,
+) => {
   const supabase = createClient();
   const listId = (await supabase.auth.getUser()).data.user?.id;
-  if (!listId || !id) return { error: { message: "List id not found!" } };
-  if (listId !== id) return { error: { message: "List id did not match!" } };
+  if (!listId || !id) return { error: "List id not found!" };
+  if (listId !== id) return { error: "List id did not match!" };
 
   const { error } = await supabase.auth.updateUser({
-    password: password,
+    password: values.password,
   });
-  if (error) return { error: error };
+  if (error) return { error: error.message };
 
   const { error: dbError } = await supabase
     .from("lists")
@@ -31,25 +40,26 @@ export const changeListPassword = async (password: string, id: string) => {
 
   return { success: "Password changed" };
 };
-export const deleteList = async (id: string) => {
-  const supabase = createClient(process.env.SUPABASE_SECRET);
-  const listId = (await supabase.auth.getUser()).data.user?.id;
-  if (!listId || !id) return { error: { message: "List id not found!" } };
-  if (listId !== id) return { error: { message: "List id did not match!" } };
 
-  const { error: dbError } = await supabase.from("lists").delete().eq("id", id);
-  if (dbError) return { error: dbError.message };
-  const { error: authError } = await supabase.auth.admin.deleteUser(id);
-  if (authError) return { error: authError.message };
-
-  redirect("/login");
-};
 export const logout = async () => {
   const supabase = createClient();
   const { error } = await supabase.auth.signOut();
   if (error) return { error: error.message };
 
   redirect("/login");
+};
+
+export const deleteList = async (id: string) => {
+  const supabase = createClient(process.env.SUPABASE_SECRET);
+  const listId = (await supabase.auth.getUser()).data.user?.id;
+  if (!listId || !id) return { error: "List id not found!" };
+  if (listId !== id) return { error: "List id did not match!" };
+
+  const { error: dbError } = await supabase.from("lists").delete().eq("id", id);
+  if (dbError) return { error: dbError.message };
+  const { error: authError } = await supabase.auth.admin.deleteUser(id);
+  if (authError) return { error: authError.message };
+  await logout();
 };
 
 export const signup = async (
