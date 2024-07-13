@@ -1,7 +1,6 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import url("https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&family=Readex+Pro:wght@160..700&display=swap");
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -73,34 +72,6 @@
   body {
     @apply bg-background text-foreground;
   }
-}
-
-.raleway-normal {
-  font-family: "Raleway", sans-serif;
-  font-weight: 500;
-  font-style: normal;
-  font-optical-sizing: auto;
-}
-
-.raleway-bold {
-  font-family: "Raleway", sans-serif;
-  font-weight: 700;
-  font-style: normal;
-  font-optical-sizing: auto;
-}
-
-.raleway-black {
-  font-family: "Raleway", sans-serif;
-  font-weight: 900;
-  font-style: normal;
-  font-optical-sizing: auto;
-}
-
-.raleway-black {
-  font-family: "Raleway", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 900;
-  font-style: normal;
 }
 
 .screen-x-padding {

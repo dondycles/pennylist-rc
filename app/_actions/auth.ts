@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { logInSchema } from "../(auth)/login/form";
 import { signUpSchema } from "../(auth)/signup/form";
 import { z } from "zod";
+import { changeListNameSchema } from "../(list)/list/settings/page";
 
 export const changeListPassword = async (password: string, id: string) => {
   const supabase = createClient();
@@ -97,17 +98,23 @@ export const login = async (
     .single();
   if (dbError) return { dbError: dbError.message as string };
 };
-export const changeListName = async (listname: string) => {
+export const changeListName = async (
+  values: z.infer<typeof changeListNameSchema>,
+  listId: string,
+) => {
   const supabase = createClient();
   const { error: authError } = await supabase.auth.updateUser({
-    email: listname + "@pennylist.com",
+    email: values.listname + "@pennylist.com",
   });
 
   if (authError) return { error: authError?.message };
 
-  const { error: dbError } = await supabase.from("lists").update({
-    listname,
-  });
+  const { error: dbError } = await supabase
+    .from("lists")
+    .update({
+      listname: values.listname,
+    })
+    .eq("id", listId);
   if (dbError) return { error: dbError?.message };
   return { success: "List name changed!" };
 };

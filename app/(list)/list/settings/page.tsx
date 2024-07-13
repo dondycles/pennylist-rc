@@ -1,5 +1,5 @@
 "use client";
-import { deleteList, getList } from "@/app/_actions/auth";
+import { changeListName, deleteList, getList } from "@/app/_actions/auth";
 import Scrollable from "@/components/scrollable";
 import SkeletonLoading from "@/components/skeleton";
 import { Button } from "@/components/ui/button";
@@ -11,17 +11,73 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
+export const changeListNameSchema = z.object({
+  listname: z
+    .string()
+    .min(6, { message: "Listname must be at least 6 characters." }),
+});
 
 export default function ListSettings() {
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [changeListnameMode, setChangeListnameMode] = useState(false);
+  const [changingListname, setChangingListname] = useState(false);
+  const [confirmListName, setConfirmListname] = useState<string>();
+  const [deletingList, setDeletingList] = useState(false);
+
   const {
     data: listData,
     error: listDataError,
     isLoading: listDataLoading,
+    refetch: refetchListData,
   } = useQuery({
     queryKey: ["list"],
     queryFn: async () => getList(),
   });
+
+  const changeListNameForm = useForm<z.infer<typeof changeListNameSchema>>({
+    resolver: zodResolver(changeListNameSchema),
+    defaultValues: {
+      listname: "",
+    },
+  });
+
+  const handleChangeListName = async (
+    values: z.infer<typeof changeListNameSchema>,
+  ) => {
+    if (!listData?.data) return;
+    setChangingListname(true);
+    const res = await changeListName(values, listData.data.id);
+    setChangingListname(false);
+    if (res.error)
+      return changeListNameForm.setError("listname", {
+        message: "Error changing listname. Spaces are not allowed.",
+      });
+    changeListNameForm.reset();
+    refetchListData();
+    setChangeListnameMode(false);
+  };
 
   if (listDataLoading) return <SkeletonLoading />;
 
@@ -48,14 +104,71 @@ export default function ListSettings() {
             <p></p>
           </CardContent>
           <CardFooter className="p-2 flex-col gap-2">
-            <Button className="w-full" variant={"secondary"}>
-              Change listname
-            </Button>
+            {changeListnameMode ? (
+              <Form {...changeListNameForm}>
+                <form
+                  onSubmit={changeListNameForm.handleSubmit(
+                    handleChangeListName,
+                  )}
+                  className="flex flex-col gap-2 w-full"
+                >
+                  <p className="text-sm text-muted-foreground">
+                    Change listname
+                  </p>
+                  <FormField
+                    control={changeListNameForm.control}
+                    name="listname"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input placeholder="New listname" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      disabled={changingListname}
+                      type="submit"
+                      className="flex-1"
+                      variant={"secondary"}
+                    >
+                      Confirm
+                    </Button>
+                    <Button
+                      disabled={changingListname}
+                      type="button"
+                      onClick={() => {
+                        setChangeListnameMode(false);
+                      }}
+                      className="flex-1"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                  <Separator />
+                </form>
+              </Form>
+            ) : (
+              <Button
+                onClick={() => {
+                  setChangeListnameMode(true);
+                }}
+                className="w-full"
+                variant={"secondary"}
+              >
+                Change listname
+              </Button>
+            )}
+
             <Button className="w-full" variant={"secondary"}>
               Change password
             </Button>
             <Button
-              onClick={() => deleteList(listData.data.id)}
+              onClick={() => {
+                setOpenDeleteDialog(true);
+              }}
               className="w-full"
               variant={"destructive"}
             >
@@ -63,6 +176,49 @@ export default function ListSettings() {
             </Button>
           </CardFooter>
         </Card>
+        <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+          <DialogContent className="w-fit p-2">
+            <DialogHeader>
+              <DialogTitle className="text-xl text-center">
+                Are you sure to delete?
+              </DialogTitle>
+              <DialogDescription className="text-center">
+                Please type your listname{" "}
+                <span className="font-black">{listData.data.listname}</span> for
+                confirmation
+              </DialogDescription>
+              <Input
+                value={confirmListName}
+                onChange={(e) => setConfirmListname(e.target.value)}
+                placeholder="Listname"
+              />
+              <div className="flex gap-2 ">
+                <Button
+                  disabled={deletingList}
+                  onClick={async () => {
+                    setDeletingList(true);
+                    if (confirmListName !== listData.data.listname)
+                      return setDeletingList(false);
+                    await deleteList(listData.data.id);
+                  }}
+                  className="flex-1"
+                  variant={"secondary"}
+                >
+                  Yes
+                </Button>
+                <Button
+                  disabled={deletingList}
+                  onClick={() => {
+                    setOpenDeleteDialog(false);
+                  }}
+                  className="flex-1"
+                >
+                  No
+                </Button>
+              </div>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
       </Scrollable>
     );
 }
