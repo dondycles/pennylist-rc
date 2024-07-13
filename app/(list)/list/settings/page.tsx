@@ -33,7 +33,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-export const changeListNameSchema = z.object({
+const changeListNameSchema = z.object({
   listname: z
     .string()
     .min(6, { message: "Listname must be at least 6 characters." }),

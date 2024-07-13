@@ -4,8 +4,11 @@ import { redirect } from "next/navigation";
 import { logInSchema } from "../(auth)/login/form";
 import { signUpSchema } from "../(auth)/signup/form";
 import { z } from "zod";
-import { changeListNameSchema } from "../(list)/list/settings/page";
-
+const changeListNameSchema = z.object({
+  listname: z
+    .string()
+    .min(6, { message: "Listname must be at least 6 characters." }),
+});
 export const changeListPassword = async (password: string, id: string) => {
   const supabase = createClient();
   const listId = (await supabase.auth.getUser()).data.user?.id;
