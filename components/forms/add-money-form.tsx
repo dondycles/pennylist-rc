@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 
 // Icons
 import { Plus, X } from "lucide-react";
+import { useToast } from "../ui/use-toast";
 
 const moneySchema = z.object({
   name: z.string().min(1, { message: "Please your state reason" }),
@@ -32,6 +33,7 @@ export default function AddMoneyForm({
   close: () => void;
   currentTotal: number;
 }) {
+  const { toast } = useToast();
   const form = useForm<z.infer<typeof moneySchema>>({
     resolver: zodResolver(moneySchema),
     defaultValues: {
@@ -48,7 +50,12 @@ export default function AddMoneyForm({
       };
       const { error } = await addMoney(newMoneyData, currentTotal);
       if (error) {
-        return error;
+        return toast({
+          title: "Error Adding Money",
+          description: error,
+          variant: "destructive",
+          duration: 2000,
+        });
       }
       close();
     },

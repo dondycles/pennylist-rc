@@ -25,6 +25,7 @@ import { DialogDescription } from "@radix-ui/react-dialog";
 import { colors } from "@/lib/constants/colors";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useToast } from "./ui/use-toast";
 export default function Money({
   money,
   done,
@@ -38,20 +39,40 @@ export default function Money({
   hideAmounts: boolean;
   currentTotal: string;
 }) {
+  const { toast } = useToast();
   const [showWarning, setShowWarning] = useState(false);
   const [isPending, setIsPending] = useState(false);
   const [elevate, setElevate] = useState(false);
 
   const handleSetColor = async (color: string) => {
+    if (!money) return;
     const { error } = await setColor(money, color);
-    if (error) console.log(error);
+    if (error) {
+      toast({
+        title: "Error Editing Color",
+        description: error,
+        variant: "destructive",
+        duration: 2000,
+      });
+      return;
+    }
     done();
   };
 
   const handleDelete = async () => {
+    if (!money) return;
     setIsPending(true);
     const { error } = await deleteMoney(money, currentTotal);
-    if (error) return setIsPending(false);
+    if (error) {
+      toast({
+        title: "Error Deleting Money",
+        description: error,
+        variant: "destructive",
+        duration: 2000,
+      });
+      setIsPending(false);
+      return;
+    }
     done();
   };
 

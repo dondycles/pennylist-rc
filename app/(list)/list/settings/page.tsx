@@ -1,16 +1,28 @@
 "use client";
-import { useListDataContext } from "@/components/auth-provider";
+import { getList } from "@/app/_actions/auth";
 import Scrollable from "@/components/scrollable";
 import SkeletonLoading from "@/components/skeleton";
+import { useQuery } from "@tanstack/react-query";
 
 export default function ListSettings() {
-  const { list, isLoading } = useListDataContext();
+  const {
+    data: listData,
+    error: listDataError,
+    isLoading: listDataLoading,
+  } = useQuery({
+    queryKey: ["list"],
+    queryFn: async () => getList(),
+  });
 
-  if (isLoading) return <SkeletonLoading />;
-  return (
-    <Scrollable>
-      {list?.listname}
-      {list?.created_at}
-    </Scrollable>
-  );
+  if (listDataLoading) return <SkeletonLoading />;
+
+  if (listDataError)
+    throw new Error((listDataError && listDataError.message) || "Error");
+
+  if (listData)
+    return (
+      <Scrollable>
+        <p>Listname: {listData.listname}</p>
+      </Scrollable>
+    );
 }

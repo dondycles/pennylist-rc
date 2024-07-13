@@ -24,12 +24,10 @@ export async function log(
 
 export async function getLogs() {
   const supabase = createClient();
-  const { error, data } = await supabase
+  const logs = await supabase
     .from("logs")
     .select("*, moneys(name,color,id)")
     .order("created_at", { ascending: false })
     .limit(100);
-
-  if (error) return { error: error.message };
-  return { data };
+  return logs;
 }

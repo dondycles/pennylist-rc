@@ -115,8 +115,6 @@ export const changeListName = async (listname: string) => {
 };
 export const getList = async () => {
   const supabase = createClient();
-  const { data, error } = await supabase.from("lists").select("*").single();
-  if (error) return { error: error.message };
-  if (!data) return { list: null };
-  return { list: data };
+  const list = await supabase.from("lists").select("*").single();
+  return list;
 };

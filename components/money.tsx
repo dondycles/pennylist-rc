@@ -6,7 +6,6 @@ import {
   setColor,
 } from "@/app/_actions/moneys";
 import Scrollable from "@/components/scrollable";
-import { Skeleton } from "@/components/ui/skeleton";
 import { UseAmountFormat } from "@/lib/utils";
 import { User } from "@supabase/supabase-js";
 import { useQuery } from "@tanstack/react-query";
@@ -35,29 +34,44 @@ import FormsDrawer from "./forms/forms-drawer";
 import { ModifiedLogs, Progress } from "@/lib/hooks";
 import LogsDataTable from "./charts/log-data-table";
 import { logsColumns } from "./charts/log-columns";
+import { useToast } from "./ui/use-toast";
+import { getList } from "@/app/_actions/auth";
+import SkeletonLoading from "./skeleton";
 
 export default function Money({
   list,
   moneyId,
 }: {
-  list: User;
+  list: User | null;
   moneyId: string;
 }) {
+  const { toast } = useToast();
   let _ = require("lodash");
   const [openPalette, setOpenPalette] = useState(false);
   const [openEditForm, setOpenEditForm] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
   const [isPending, setIsPending] = useState(false);
   const listState = useListState();
+
+  const {
+    data: listData,
+    error: listDataError,
+    isLoading: listDataLoading,
+  } = useQuery({
+    queryKey: ["list"],
+    queryFn: async () => getList(),
+    enabled: list !== null,
+  });
+
   const {
     data: money,
     isLoading: moneyLoading,
     error: moneyError,
     refetch: refetchMoney,
   } = useQuery({
-    queryKey: ["money", moneyId, list.id],
+    queryKey: ["money", moneyId, listData?.data?.id],
     queryFn: async () => await getMoney(moneyId),
-    enabled: list !== undefined,
+    enabled: listData?.data !== null && listData?.data !== undefined,
   });
 
   const {
@@ -66,16 +80,17 @@ export default function Money({
     refetch: refetchTotal,
     error: totalError,
   } = useQuery({
-    queryKey: ["total", list.id],
+    queryKey: ["total", listData?.data?.id],
     queryFn: async () => await getTotal(),
-    enabled: list !== undefined,
+    enabled: listData?.data !== null && listData?.data !== undefined,
   });
 
   const total = totalData?.data ?? 0;
   const getModifiedLogs = () => {
+    if (!money?.data) return [];
     // this is just for adding the "total"
     const modifiedLogs: ModifiedLogs[] = [];
-    money?.data?.logs?.forEach((log) => {
+    money?.data?.logs.forEach((log) => {
       modifiedLogs.push({
         ...log,
         total: Number(log.changes?.to.total ?? 0),
@@ -88,17 +103,35 @@ export default function Money({
   const lastUpdate = logs?.toReversed().findLast((log) => log)?.created_at;
 
   const handleSetColor = async (color: string) => {
-    setOpenPalette(false);
     if (!money?.data) return;
+    setOpenPalette(false);
     const { error } = await setColor(money.data, color);
-    if (error) console.log(error);
+    if (error) {
+      toast({
+        title: "Error Editing Color",
+        description: error,
+        variant: "destructive",
+        duration: 2000,
+      });
+      return;
+    }
     refetchMoney();
   };
 
   const handleDelete = async () => {
+    if (!money?.data) return;
     setIsPending(true);
-    const { error } = await deleteMoney(money?.data!, String(total));
-    if (error) return setIsPending(false);
+    const { error } = await deleteMoney(money.data, String(total));
+    if (error) {
+      toast({
+        title: "Error Deleting Money",
+        description: error,
+        variant: "destructive",
+        duration: 2000,
+      });
+      setIsPending(false);
+      return;
+    }
     refetchMoney();
   };
 
@@ -208,194 +241,182 @@ export default function Money({
   };
 
   const progress = getProgress();
+  if (moneyError || totalError || listDataError)
+    throw new Error(
+      (moneyError && moneyError?.message) ||
+        (totalError && totalError?.message) ||
+        (listDataError && listDataError?.message) ||
+        (money?.error && money?.error?.message) ||
+        (totalData?.error && totalData?.error?.message) ||
+        (listData?.error && listData?.error?.message) ||
+        "Error",
+    );
+  if (moneyLoading || totalLoading || listDataLoading)
+    return <SkeletonLoading />;
 
-  if (moneyError || money?.error || totalError || totalData?.error)
+  if (money?.data && listData?.data) {
     return (
-      <main className="w-full h-full p-2 ">
-        <div className="flex items-center text-sm text-destructive gap-2 justify-center">
-          {money?.error && money?.error?.message}
-          {moneyError && moneyError?.message}
-          {totalData?.error && totalData?.error?.message}
-          {totalError && totalError?.message}
-        </div>
-      </main>
-    );
-  if (moneyLoading || totalLoading)
-    return (
-      <main className="w-full h-full">
-        <div className=" max-w-[800px] mx-auto px-2 flex flex-col justify-start gap-2 mb-[5.5rem]">
-          <Skeleton className="w-full h-24  max-w-[800px] mt-2" />
-          <Skeleton className="w-full max-w-[800px] h-10 mt-8" />
-          <Skeleton className="w-full max-w-[800px] h-10" />
-          <Skeleton className="w-full max-w-[800px] h-10" />
-        </div>
-      </main>
-    );
-  if (!money?.data)
-    return (
-      <main className="w-full h-full p-2">
-        <p className="text-xs text-muted-foreground text-center">
-          Money not found.
-        </p>
-      </main>
-    );
-
-  return (
-    <Scrollable>
-      <div
-        style={{
-          borderColor: money.data.color ?? "",
-          color: money.data.color ?? "",
-          backgroundColor: money.data.color ? money.data.color + 20 : "",
-        }}
-        className={
-          "p-4 shadow-lg border rounded-lg flex flex-row justify-between items-center ease-in-out transition-all mt-2 relative overflow-hidden"
-        }
-      >
-        <div className="flex flex-col min-w-0 z-10">
-          <p className="text-xs flex items-center gap-1 w-fit">
-            {money.data.name}
-          </p>
-          <div className="text-2xl sm:text-4xl font-anton flex flex-row items-center truncate -ml-1 sm:-ml-2">
-            <TbCurrencyPeso className="shrink-0" />
-            <p className="truncate font-bold ">
-              {UseAmountFormat(Number(money.data.amount ?? 0), {
-                hide: listState.hideAmounts,
-                sign: false,
-              })}
+      <Scrollable>
+        <div
+          style={{
+            borderColor: money.data.color ?? "",
+            color: money.data.color ?? "",
+            backgroundColor: money.data.color ? money.data.color + 20 : "",
+          }}
+          className={
+            "p-4 shadow-lg border rounded-lg flex flex-row justify-between items-center ease-in-out transition-all mt-2 relative overflow-hidden"
+          }
+        >
+          <div className="flex flex-col min-w-0 z-10">
+            <p className="text-xs flex items-center gap-1 w-fit">
+              {money?.data?.name}
             </p>
+            <div className="text-2xl sm:text-4xl font-anton flex flex-row items-center truncate -ml-1 sm:-ml-2">
+              <TbCurrencyPeso className="shrink-0" />
+              <p className="truncate font-bold ">
+                {UseAmountFormat(Number(money?.data?.amount ?? 0), {
+                  hide: listState.hideAmounts,
+                  sign: false,
+                })}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-4 w-fit shrink-0 z-10">
+            <FormsDrawer
+              open={openEditForm}
+              onOpenChange={setOpenEditForm}
+              title="Edit money"
+              desc="Any changes made are recorded to keep track of its progress."
+              trigger={
+                <button>
+                  <Pencil size={20} />
+                </button>
+              }
+              form={
+                <EditMoneyForm
+                  close={() => {
+                    setOpenEditForm(false);
+                    refetchTotal();
+                    refetchMoney();
+                  }}
+                  currentTotal={String(total)}
+                  money={money.data}
+                />
+              }
+            />
+
+            <Popover onOpenChange={setOpenPalette} open={openPalette}>
+              <PopoverTrigger asChild>
+                <button>
+                  <Palette size={20} />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent
+                align="end"
+                className="flex flex-row flex-wrap gap-1 p-1 max-w-[186px]  bg-neutral-950  "
+              >
+                {Object.values(colors).map((color, i) => {
+                  return (
+                    <div className="flex flex-col gap-1" key={i}>
+                      {Object.values(color).map((c) => {
+                        return (
+                          <button
+                            onClick={() => handleSetColor(c)}
+                            className="rounded size-4  hover:scale-125 scale-100 ease-in-out duration-150 transition-all"
+                            style={{ backgroundColor: c }}
+                            key={c}
+                          />
+                        );
+                      })}
+                    </div>
+                  );
+                })}
+              </PopoverContent>
+            </Popover>
+            <Dialog open={showWarning} onOpenChange={setShowWarning}>
+              <DialogTrigger asChild>
+                <button>
+                  <Trash size={20} />
+                </button>
+              </DialogTrigger>
+              <DialogContent className="p-2 w-fit">
+                <DialogHeader>
+                  <DialogTitle className="text-destructive text-center font-black">
+                    Warning!
+                  </DialogTitle>
+                  <DialogDescription className="text-center text-sm">
+                    Are you sure to delete? <br /> This will also delete its log
+                    history.
+                  </DialogDescription>
+                  <div
+                    className={`p-2 border rounded-lg flex flex-row justify-between items-center font-bold ${
+                      isPending && "opacity-50 pointer-events-none "
+                    } ease-in-out transition-all`}
+                  >
+                    <p className="truncate">{money.data.name}</p>
+                    <div className="font-semibold font-anton flex items-center">
+                      <TbCurrencyPeso />
+                      {UseAmountFormat(Number(money.data.amount ?? 0), {
+                        hide: listState.hideAmounts,
+                        sign: false,
+                      })}
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      disabled={isPending}
+                      onClick={handleDelete}
+                      className="flex-1"
+                      variant={"destructive"}
+                    >
+                      <Check className="size-4" />
+                    </Button>
+                    <Button
+                      disabled={isPending}
+                      onClick={() => setShowWarning(false)}
+                      className="flex-1"
+                      variant={"outline"}
+                    >
+                      <X className="size-4" />
+                    </Button>
+                  </div>
+                </DialogHeader>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
 
-        <div className="flex gap-4 w-fit shrink-0 z-10">
-          <FormsDrawer
-            open={openEditForm}
-            onOpenChange={setOpenEditForm}
-            title="Edit money"
-            desc="Any changes made are recorded to keep track of its progress."
-            trigger={
-              <button>
-                <Pencil size={20} />
-              </button>
-            }
-            form={
-              <EditMoneyForm
-                close={() => {
-                  setOpenEditForm(false);
-                  refetchTotal();
-                  refetchMoney();
-                }}
-                currentTotal={String(total)}
-                money={money.data}
-              />
-            }
-          />
-
-          <Popover onOpenChange={setOpenPalette} open={openPalette}>
-            <PopoverTrigger asChild>
-              <button>
-                <Palette size={20} />
-              </button>
-            </PopoverTrigger>
-            <PopoverContent
-              align="end"
-              className="flex flex-row flex-wrap gap-1 p-1 max-w-[186px]  bg-neutral-950  "
-            >
-              {Object.values(colors).map((color, i) => {
-                return (
-                  <div className="flex flex-col gap-1" key={i}>
-                    {Object.values(color).map((c) => {
-                      return (
-                        <button
-                          onClick={() => handleSetColor(c)}
-                          className="rounded size-4  hover:scale-125 scale-100 ease-in-out duration-150 transition-all"
-                          style={{ backgroundColor: c }}
-                          key={c}
-                        />
-                      );
-                    })}
-                  </div>
-                );
-              })}
-            </PopoverContent>
-          </Popover>
-          <Dialog open={showWarning} onOpenChange={setShowWarning}>
-            <DialogTrigger asChild>
-              <button>
-                <Trash size={20} />
-              </button>
-            </DialogTrigger>
-            <DialogContent className="p-2 w-fit">
-              <DialogHeader>
-                <DialogTitle className="text-destructive text-center font-black">
-                  Warning!
-                </DialogTitle>
-                <DialogDescription className="text-center text-sm">
-                  Are you sure to delete? <br /> This will also delete its log
-                  history.
-                </DialogDescription>
-                <div
-                  className={`p-2 border rounded-lg flex flex-row justify-between items-center font-bold ${
-                    isPending && "opacity-50 pointer-events-none "
-                  } ease-in-out transition-all`}
-                >
-                  <p className="truncate">{money.data.name}</p>
-                  <div className="font-semibold font-anton flex items-center">
-                    <TbCurrencyPeso />
-                    {UseAmountFormat(Number(money.data.amount ?? 0), {
-                      hide: listState.hideAmounts,
-                      sign: false,
-                    })}
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    disabled={isPending}
-                    onClick={handleDelete}
-                    className="flex-1"
-                    variant={"destructive"}
-                  >
-                    <Check className="size-4" />
-                  </Button>
-                  <Button
-                    disabled={isPending}
-                    onClick={() => setShowWarning(false)}
-                    className="flex-1"
-                    variant={"outline"}
-                  >
-                    <X className="size-4" />
-                  </Button>
-                </div>
-              </DialogHeader>
-            </DialogContent>
-          </Dialog>
+        <div className="text-xs text-muted-foreground mt-8">
+          <p>Created at: {new Date(money.data.created_at).toLocaleString()}</p>
+          {lastUpdate && (
+            <p>Last update at: {new Date(lastUpdate).toLocaleString()}</p>
+          )}
+          <p>
+            {((money.data.amount ?? 0 / total) * 100).toFixed(2)}% of your total
+            money (
+            {UseAmountFormat(total, {
+              sign: true,
+              hide: listState.hideAmounts,
+            })}
+            )
+          </p>
         </div>
-      </div>
 
-      <div className="text-xs text-muted-foreground mt-8">
-        <p>Created at: {new Date(money.data.created_at).toLocaleString()}</p>
-        {lastUpdate && (
-          <p>Last update at: {new Date(lastUpdate).toLocaleString()}</p>
-        )}
-        <p>
-          {((Number(money.data.amount) / total) * 100).toFixed(2)}% of your
-          total money (
-          {UseAmountFormat(Number(total ?? 0), {
-            sign: true,
-            hide: listState.hideAmounts,
-          })}
-          )
-        </p>
-      </div>
-
-      {logs?.length !== 0 ? (
-        <>
-          {progress.length !== 0 ? (
-            <ProgressBarChart progress={progress} />
-          ) : null}
-          {logs && <LogsDataTable data={logs} columns={logsColumns} />}
-        </>
-      ) : null}
-    </Scrollable>
-  );
+        {logs?.length !== 0 ? (
+          <>
+            {progress.length !== 0 ? (
+              <ProgressBarChart progress={progress} />
+            ) : null}
+            {logs && <LogsDataTable data={logs} columns={logsColumns} />}
+          </>
+        ) : null}
+      </Scrollable>
+    );
+  } else
+    throw new Error(
+      "Error finding " + (!money?.data && "moneys") ||
+        (!listData?.data && "list") ||
+        "data",
+    );
 }

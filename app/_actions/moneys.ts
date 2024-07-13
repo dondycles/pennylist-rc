@@ -20,12 +20,13 @@ export async function getMoneys(sort: {
     .from("moneys")
     .select("id,amount,name,created_at,color,updated_at")
     .order(sort.by, { ascending: sort.asc });
+
   return moneys;
 }
 
 export async function getMoney(id: string) {
   const supabase = createClient();
-  const moneys = await supabase
+  const money = await supabase
     .from("moneys")
     .select(
       "id,amount,name,created_at,color,updated_at, logs(*, moneys(id,name,color))",
@@ -34,7 +35,7 @@ export async function getMoney(id: string) {
     .order("created_at", { ascending: false, referencedTable: "logs" })
     .limit(100, { referencedTable: "logs" })
     .single();
-  return moneys;
+  return money;
 }
 
 export async function addMoney(
@@ -149,7 +150,7 @@ export async function setColor(money: Pick<money, "id">, color: string) {
   const { error } = await supabase
     .from("moneys")
     .update({ color })
-    .eq("id", money.id);
+    .eq("idd", money.id);
 
   if (error) return { error: error.message };
   return { success: "colored!" };
