@@ -80,7 +80,7 @@ export async function editMoney(
     updatedMoney.amount === lastMoney.amount &&
     updatedMoney.name === lastMoney.name
   )
-    return { success: "edited!" };
+    return { error: "No changes made!" };
 
   const supabase = createClient();
 
@@ -150,7 +150,7 @@ export async function setColor(money: Pick<money, "id">, color: string) {
   const { error } = await supabase
     .from("moneys")
     .update({ color })
-    .eq("idd", money.id);
+    .eq("id", money.id);
 
   if (error) return { error: error.message };
   return { success: "colored!" };

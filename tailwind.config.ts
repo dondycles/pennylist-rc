@@ -76,7 +76,7 @@ const config = {
         xs: "420px",
       },
       fontFamily: {
-        anton: ["var(--font-anton)"],
+        readex: ["var(--font-readex)"],
         raleway: ["var(--font-raleway)"],
       },
     },

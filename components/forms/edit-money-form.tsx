@@ -16,7 +16,6 @@ import { Pencil, X } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useToast } from "../ui/use-toast";
 
 const moneySchema = z.object({
   name: z.string().min(1, { message: "Name can't be empty" }),
@@ -42,7 +41,6 @@ export default function EditMoneyForm({
   money: Omit<Database["public"]["Tables"]["moneys"]["Row"], "list">;
   currentTotal: string;
 }) {
-  const { toast } = useToast();
   const form = useForm<z.infer<typeof moneySchema>>({
     resolver: zodResolver(moneySchema),
     defaultValues: {
@@ -77,12 +75,7 @@ export default function EditMoneyForm({
         values.id,
       );
       if (error) {
-        return toast({
-          title: "Error Editing Money",
-          description: error,
-          variant: "destructive",
-          duration: 2000,
-        });
+        return form.setError("reason", { message: error });
       }
       close();
     },

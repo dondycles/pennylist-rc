@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { logout } from "./_actions/auth";
+import { useQueryClient } from "@tanstack/react-query";
 // Error components must be Client Components
 
 export default function Error({
@@ -9,6 +10,7 @@ export default function Error({
 }: {
   error: Error & { digest?: string };
 }) {
+  const queryClient = useQueryClient();
   return (
     <div className="flex flex-col justify-center items-center w-full h-full p-4">
       <h2 className="text-destructive font-black text-2xl">
@@ -18,7 +20,13 @@ export default function Error({
         {error.message}
       </p>
       <div className="flex gap-2 mt-4">
-        <Button variant={"ghost"} onClick={async () => await logout()}>
+        <Button
+          variant={"ghost"}
+          onClick={async () => {
+            queryClient.clear();
+            await logout();
+          }}
+        >
           Log out
         </Button>
         <Button asChild>

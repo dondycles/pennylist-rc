@@ -11,10 +11,10 @@ const raleway = Raleway({
   weight: ["500", "600", "700", "900"],
   variable: "--font-raleway",
 });
-const anton = Readex_Pro({
+const readex = Readex_Pro({
   weight: ["400"],
   subsets: ["latin"],
-  variable: "--font-anton",
+  variable: "--font-readex",
 });
 const APP_NAME = "pennylist.";
 const APP_DEFAULT_TITLE = "pennylist.";
@@ -69,7 +69,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${raleway.variable} ${anton.variable} antialiased font-raleway h-screen w-full bg-background`}
+        className={`${raleway.variable} ${readex.variable} antialiased font-raleway h-screen w-full bg-background`}
       >
         <QueryProvider>
           <ThemeProvider
