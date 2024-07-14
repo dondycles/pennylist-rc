@@ -179,18 +179,6 @@ export default function EditMoneyForm({
             )}
           />
         </div>
-        {form.watch("ded") ||
-          (form.watch("add") && (
-            <p className="text-sm">
-              Final amount:{" "}
-              <span>
-                {Number(money.amount) -
-                  Number(form.watch("ded")) +
-                  Number(form.watch("add"))}
-              </span>
-            </p>
-          ))}
-
         <FormField
           control={form.control}
           name="reason"
