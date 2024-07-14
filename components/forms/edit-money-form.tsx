@@ -16,6 +16,14 @@ import { Pencil, X } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { Separator } from "../ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 const moneySchema = z.object({
   name: z.string().min(1, { message: "Name can't be empty" }),
@@ -30,6 +38,8 @@ const moneySchema = z.object({
     .max(55, { message: "Max of 55 characters only" }),
   add: z.string().optional(),
   ded: z.string().optional(),
+  transferAmount: z.string().optional(),
+  transferTo: z.string().uuid(),
 });
 
 export default function EditMoneyForm({
@@ -124,12 +134,12 @@ export default function EditMoneyForm({
             </FormItem>
           )}
         />
-        <div className="flex flex-row gap-2">
+        <div className="grid grid-cols-[2fr,1fr,1fr] gap-2">
           <FormField
             control={form.control}
             name="amount"
             render={({ field }) => (
-              <FormItem className="flex-grow-0">
+              <FormItem>
                 <FormControl>
                   <Input
                     data-vaul-no-drag
@@ -146,7 +156,7 @@ export default function EditMoneyForm({
             control={form.control}
             name="add"
             render={({ field }) => (
-              <FormItem className="flex-1">
+              <FormItem>
                 <FormControl>
                   <Input
                     className="border-green-500 placeholder:text-2xl placeholder:text-green-500"
@@ -164,7 +174,7 @@ export default function EditMoneyForm({
             control={form.control}
             name="ded"
             render={({ field }) => (
-              <FormItem className="flex-1">
+              <FormItem>
                 <FormControl>
                   <Input
                     className="border-destructive placeholder:text-2xl placeholder:text-destructive"
@@ -179,6 +189,38 @@ export default function EditMoneyForm({
             )}
           />
         </div>
+        <p className="text-xs text-muted-foreground text-center">or transfer</p>
+        <div className="grid grid-cols-[3fr,1fr] gap-2">
+          <FormField
+            control={form.control}
+            name="transferTo"
+            render={({ field }) => (
+              <FormItem>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Transfer to" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="GCash">GCash</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <Input
+            placeholder="amount"
+            type="number"
+            className="border-yellow-600 placeholder:text-yellow-600"
+          />
+        </div>
+        <Separator />
         <FormField
           control={form.control}
           name="reason"
