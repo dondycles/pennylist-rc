@@ -1,7 +1,14 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUp, ArrowDown, Plus, Trash, PencilLine } from "lucide-react";
+import {
+  ArrowUp,
+  ArrowDown,
+  Plus,
+  Trash,
+  PencilLine,
+  ArrowRightLeft,
+} from "lucide-react";
 import { toMonthWord, UseAmountFormat } from "@/lib/utils";
 import { ModifiedLogs } from "@/lib/hooks";
 import { useListState } from "@/store";
@@ -24,6 +31,9 @@ export const logsColumns: ColumnDef<LogCols>[] = [
         )) ||
         (action === "delete" && (
           <Trash size={16} className="m-auto text-red-400" />
+        )) ||
+        (action === "transfer" && (
+          <ArrowRightLeft size={16} className="m-auto text-blue-400" />
         )) ||
         null
       );

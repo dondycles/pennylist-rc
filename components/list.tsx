@@ -48,12 +48,14 @@ import { logsColumns } from "./charts/log-columns";
 import MonthlyProgressBarChart from "./charts/list-monthly-progress-bar-chart";
 import { getList } from "@/app/_actions/auth";
 import SkeletonLoading from "./skeleton";
+import TransferMoneyForm from "./forms/transfer-money-form";
 
 export default function List({ list }: { list: User | null }) {
   const queryClient = useQueryClient();
   const listState = useListState();
   const [animated, setAnimated] = useState(false);
   const [showAddMoneyForm, setShowAddMoneyForm] = useState(false);
+  const [transferMode, setTransferMode] = useState(true);
   const [showEditMoneyForm, setEditMoneyForm] = useState<{
     open: boolean;
     money: Omit<Database["public"]["Tables"]["moneys"]["Row"], "list"> | null;
@@ -234,7 +236,7 @@ export default function List({ list }: { list: User | null }) {
             />
           </div>
         </motion.div>
-        {/* edit money form */}
+        {/* edit/transfe money form */}
         <FormsDrawer
           open={showEditMoneyForm.open}
           onOpenChange={(e) => {
@@ -243,23 +245,59 @@ export default function List({ list }: { list: User | null }) {
               open: e,
             }));
           }}
-          title="Edit money"
+          title={`${transferMode ? "Transfer" : "Edit"} money`}
           desc="Any changes made are recorded to keep track of its progress."
           form={
-            <EditMoneyForm
-              currentTotal={String(total)}
-              money={showEditMoneyForm.money!}
-              close={() => {
-                setEditMoneyForm((prev) => ({
-                  ...prev,
-                  open: false,
-                }));
-                refetch();
-                queryClient.removeQueries({
-                  queryKey: ["money", showEditMoneyForm.money?.id, list?.id],
-                });
-              }}
-            />
+            <>
+              {transferMode ? (
+                <TransferMoneyForm
+                  currentTotal={String(total)}
+                  money={showEditMoneyForm.money!}
+                  allMoneys={moneys.data}
+                  close={() => {
+                    setEditMoneyForm((prev) => ({
+                      ...prev,
+                      open: false,
+                    }));
+                    refetch();
+                    queryClient.removeQueries({
+                      queryKey: [
+                        "money",
+                        showEditMoneyForm.money?.id,
+                        list?.id,
+                      ],
+                    });
+                  }}
+                />
+              ) : (
+                <EditMoneyForm
+                  currentTotal={String(total)}
+                  money={showEditMoneyForm.money!}
+                  close={() => {
+                    setEditMoneyForm((prev) => ({
+                      ...prev,
+                      open: false,
+                    }));
+                    refetch();
+                    queryClient.removeQueries({
+                      queryKey: [
+                        "money",
+                        showEditMoneyForm.money?.id,
+                        list?.id,
+                      ],
+                    });
+                  }}
+                />
+              )}
+
+              <Button
+                className="mx-auto w-[320px]"
+                variant={"ghost"}
+                onClick={() => setTransferMode((prev) => !prev)}
+              >
+                Switch to {transferMode ? "edit" : "transfer"}
+              </Button>
+            </>
           }
         />
 

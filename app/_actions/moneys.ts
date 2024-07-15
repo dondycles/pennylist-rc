@@ -68,15 +68,52 @@ export async function addMoney(
 
   return { success: "added!" };
 }
-
+export async function transferMoney(
+  from: {
+    updatedMoney: Omit<money, "list">;
+    lastMoney: Omit<money, "list">;
+    currentTotal: string;
+    moneyId: string;
+  },
+  to: {
+    updatedMoney: Omit<money, "list">;
+    lastMoney: Omit<money, "list">;
+    currentTotal: string;
+    moneyId: string;
+  },
+) {
+  const { error: fromError, logError: fromLogError } = await editMoney(
+    from.updatedMoney,
+    from.lastMoney,
+    from.currentTotal,
+    "transfer",
+    from.moneyId,
+    "transfer",
+  );
+  if (fromError) return { error: fromError };
+  if (fromLogError) return { error: fromLogError };
+  const { error: toError, logError: toLogError } = await editMoney(
+    to.updatedMoney,
+    to.lastMoney,
+    to.currentTotal,
+    "transfer",
+    to.moneyId,
+    "transfer",
+  );
+  if (toError) return { error: toError };
+  if (toLogError) return { error: fromLogError };
+  return { success: "transfered!" };
+}
 export async function editMoney(
   updatedMoney: Omit<money, "list">,
   lastMoney: Omit<money, "list">,
   currentTotal: string,
   reason: string,
-  money: string,
+  moneyId: string,
+  type: string,
 ) {
   if (
+    type !== "transfer" &&
     updatedMoney.amount === lastMoney.amount &&
     updatedMoney.name === lastMoney.name
   )
@@ -90,7 +127,7 @@ export async function editMoney(
     .eq("id", updatedMoney.id);
   if (error) return { error: error.message };
 
-  const { error: logError } = await log("update", reason, money, {
+  const { error: logError } = await log(type, reason, moneyId, {
     from: {
       amount: String(lastMoney.amount),
       name: lastMoney.name,
@@ -99,10 +136,13 @@ export async function editMoney(
     to: {
       amount: String(updatedMoney.amount),
       name: updatedMoney.name,
-      total: String(
-        Number(currentTotal) +
-          (Number(updatedMoney.amount) - Number(lastMoney.amount)),
-      ),
+      total:
+        type === "transfer"
+          ? currentTotal
+          : String(
+              Number(currentTotal) +
+                (Number(updatedMoney.amount) - Number(lastMoney.amount)),
+            ),
     },
   });
 
