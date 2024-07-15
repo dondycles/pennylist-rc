@@ -9,7 +9,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Database } from "@/database.types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { Pencil, X } from "lucide-react";
@@ -25,12 +24,10 @@ import {
 import { UseAmountFormat } from "@/lib/utils";
 import { useListState } from "@/store";
 
-const moneySchema = z.object({
+const TansferMoneySchema = z.object({
   transferAmount: z.string().optional(),
   transferTo: z.string(),
 });
-
-type MoneyTypes = Database["public"]["Tables"]["moneys"]["Row"];
 
 export default function TransferMoneyForm({
   close,
@@ -44,8 +41,8 @@ export default function TransferMoneyForm({
   allMoneys: Omit<MoneyTypes, "list">[];
 }) {
   const listState = useListState();
-  const form = useForm<z.infer<typeof moneySchema>>({
-    resolver: zodResolver(moneySchema),
+  const form = useForm<z.infer<typeof TansferMoneySchema>>({
+    resolver: zodResolver(TansferMoneySchema),
     defaultValues: {
       transferAmount: "",
       transferTo: "",
@@ -53,31 +50,29 @@ export default function TransferMoneyForm({
   });
 
   const { mutate: mutateMoney, isPending } = useMutation({
-    mutationFn: async (values: z.infer<typeof moneySchema>) => {
+    mutationFn: async (values: z.infer<typeof TansferMoneySchema>) => {
       const oldToMoneyData = allMoneys.filter(
         (m) => m.id === values.transferTo,
       )[0];
 
       const from = {
-        updatedMoney: {
+        updatedMoneyData: {
           ...money,
           amount:
             Number(money.amount ?? 0) - Number(values.transferAmount ?? 0),
         },
-        lastMoney: money,
+        oldMoneyData: money,
         currentTotal: currentTotal,
-        moneyId: money.id,
       };
       const to = {
-        updatedMoney: {
+        updatedMoneyData: {
           ...oldToMoneyData,
           amount:
             Number(oldToMoneyData.amount ?? 0) +
             Number(values.transferAmount ?? 0),
         },
-        lastMoney: oldToMoneyData,
+        oldMoneyData: oldToMoneyData,
         currentTotal: currentTotal,
-        moneyId: oldToMoneyData.id,
       };
 
       const { error } = await transferMoney({ ...from }, { ...to });
@@ -92,8 +87,8 @@ export default function TransferMoneyForm({
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit((values: z.infer<typeof moneySchema>) =>
-          mutateMoney(values),
+        onSubmit={form.handleSubmit(
+          (values: z.infer<typeof TansferMoneySchema>) => mutateMoney(values),
         )}
         className="flex flex-col gap-2 w-[320px] mx-auto"
       >

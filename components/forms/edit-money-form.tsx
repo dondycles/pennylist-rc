@@ -9,7 +9,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Database } from "@/database.types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { Pencil, X } from "lucide-react";
@@ -17,10 +16,9 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-const moneySchema = z.object({
+const EditMoneySchema = z.object({
   name: z.string().min(1, { message: "Name can't be empty" }),
   amount: z.string(),
-  id: z.string().uuid(),
   created_at: z.string(),
   color: z.string().nullable(),
   updated_at: z.string().nullable(),
@@ -34,8 +32,6 @@ const moneySchema = z.object({
   transferTo: z.string(),
 });
 
-type MoneyTypes = Database["public"]["Tables"]["moneys"]["Row"];
-
 export default function EditMoneyForm({
   close,
   money,
@@ -45,12 +41,11 @@ export default function EditMoneyForm({
   money: Omit<MoneyTypes, "list">;
   currentTotal: string;
 }) {
-  const form = useForm<z.infer<typeof moneySchema>>({
-    resolver: zodResolver(moneySchema),
+  const form = useForm<z.infer<typeof EditMoneySchema>>({
+    resolver: zodResolver(EditMoneySchema),
     defaultValues: {
       name: money.name,
       amount: String(money.amount),
-      id: money.id,
       created_at: money.created_at,
       color: money.color,
       updated_at: String(new Date()),
@@ -63,7 +58,7 @@ export default function EditMoneyForm({
   });
 
   const { mutate: mutateMoney, isPending } = useMutation({
-    mutationFn: async (values: z.infer<typeof moneySchema>) => {
+    mutationFn: async (values: z.infer<typeof EditMoneySchema>) => {
       const newMoneyData = {
         name: values.name,
         amount: Number(values.amount),
@@ -78,7 +73,6 @@ export default function EditMoneyForm({
         money,
         currentTotal,
         values.reason,
-        values.id,
         "update",
       );
       if (error) {
@@ -114,7 +108,7 @@ export default function EditMoneyForm({
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit((values: z.infer<typeof moneySchema>) =>
+        onSubmit={form.handleSubmit((values: z.infer<typeof EditMoneySchema>) =>
           mutateMoney(values),
         )}
         className="flex flex-col gap-2 w-[320px] mx-auto"

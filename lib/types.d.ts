@@ -13,3 +13,10 @@ declare type Progress = {
   gainOrLoss: number;
   currentTotal: number;
 };
+
+declare type MoneyTypes = Database["public"]["Tables"]["moneys"]["Row"];
+declare type TransferTypes = {
+  updatedMoneyData: Omit<MoneyTypes, "list">;
+  oldMoneyData: Omit<MoneyTypes, "list">;
+  currentTotal: string;
+};

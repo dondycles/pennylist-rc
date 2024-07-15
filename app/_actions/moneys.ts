@@ -1,9 +1,6 @@
 "use server";
-import { Database } from "@/database.types";
 import { createClient } from "@/lib/supabase/server";
 import { log } from "./logs";
-
-type money = Database["public"]["Tables"]["moneys"]["Row"];
 
 export async function getTotal() {
   const supabase = createClient();
@@ -39,7 +36,7 @@ export async function getMoney(id: string) {
 }
 
 export async function addMoney(
-  money: Pick<money, "amount" | "name">,
+  money: Pick<MoneyTypes, "amount" | "name">,
   currentTotal: number,
 ) {
   const supabase = createClient();
@@ -68,36 +65,21 @@ export async function addMoney(
 
   return { success: "added!" };
 }
-export async function transferMoney(
-  from: {
-    updatedMoney: Omit<money, "list">;
-    lastMoney: Omit<money, "list">;
-    currentTotal: string;
-    moneyId: string;
-  },
-  to: {
-    updatedMoney: Omit<money, "list">;
-    lastMoney: Omit<money, "list">;
-    currentTotal: string;
-    moneyId: string;
-  },
-) {
+export async function transferMoney(from: TransferTypes, to: TransferTypes) {
   const { error: fromError, logError: fromLogError } = await editMoney(
-    from.updatedMoney,
-    from.lastMoney,
+    from.updatedMoneyData,
+    from.oldMoneyData,
     from.currentTotal,
     "transfer",
-    from.moneyId,
     "transfer",
   );
   if (fromError) return { error: fromError };
   if (fromLogError) return { error: fromLogError };
   const { error: toError, logError: toLogError } = await editMoney(
-    to.updatedMoney,
-    to.lastMoney,
+    to.updatedMoneyData,
+    to.oldMoneyData,
     to.currentTotal,
     "transfer",
-    to.moneyId,
     "transfer",
   );
   if (toError) return { error: toError };
@@ -105,43 +87,45 @@ export async function transferMoney(
   return { success: "transfered!" };
 }
 export async function editMoney(
-  updatedMoney: Omit<money, "list">,
-  lastMoney: Omit<money, "list">,
+  oldMoneyData: Omit<MoneyTypes, "list">,
+  newMoneyData: Omit<MoneyTypes, "list">,
   currentTotal: string,
   reason: string,
-  moneyId: string,
   type: string,
 ) {
   if (
     type !== "transfer" &&
-    updatedMoney.amount === lastMoney.amount &&
-    updatedMoney.name === lastMoney.name
+    oldMoneyData.amount === newMoneyData.amount &&
+    oldMoneyData.name === newMoneyData.name
   )
     return { error: "No changes made!" };
+
+  if (oldMoneyData.id !== newMoneyData.id)
+    return { error: "Ids did not match!" };
 
   const supabase = createClient();
 
   const { error } = await supabase
     .from("moneys")
-    .update(updatedMoney)
-    .eq("id", updatedMoney.id);
+    .update(oldMoneyData)
+    .eq("id", oldMoneyData.id);
   if (error) return { error: error.message };
 
-  const { error: logError } = await log(type, reason, moneyId, {
+  const { error: logError } = await log(type, reason, oldMoneyData.id, {
     from: {
-      amount: String(lastMoney.amount),
-      name: lastMoney.name,
+      amount: String(newMoneyData.amount),
+      name: newMoneyData.name,
       total: String(currentTotal),
     },
     to: {
-      amount: String(updatedMoney.amount),
-      name: updatedMoney.name,
+      amount: String(oldMoneyData.amount),
+      name: oldMoneyData.name,
       total:
         type === "transfer"
           ? currentTotal
           : String(
               Number(currentTotal) +
-                (Number(updatedMoney.amount) - Number(lastMoney.amount)),
+                (Number(oldMoneyData.amount) - Number(newMoneyData.amount)),
             ),
     },
   });
@@ -152,7 +136,7 @@ export async function editMoney(
 }
 
 export async function deleteMoney(
-  money: Pick<money, "id" | "amount" | "name">,
+  money: Pick<MoneyTypes, "id" | "amount" | "name">,
   currentTotal: string,
 ) {
   const supabase = createClient();
@@ -185,7 +169,7 @@ export async function deleteMoney(
   return { success: "deleted!" };
 }
 
-export async function setColor(money: Pick<money, "id">, color: string) {
+export async function setColor(money: Pick<MoneyTypes, "id">, color: string) {
   const supabase = createClient();
   const { error } = await supabase
     .from("moneys")

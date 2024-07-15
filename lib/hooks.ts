@@ -45,58 +45,61 @@ export const calculateListChartsData = ({
       date: string;
     }[] = [];
 
-    logs.toReversed().forEach((log) => {
-      //each log has a record of changes in a money, so it will be stored here for later use
-      const changesInAmount =
-        Number(log.changes?.to.amount) - Number(log.changes?.from.amount);
+    logs
+      .filter((l) => l.reason !== "transfer")
+      .toReversed()
+      .forEach((log) => {
+        //each log has a record of changes in a money, so it will be stored here for later use
+        const changesInAmount =
+          Number(log.changes?.to.amount) - Number(log.changes?.from.amount);
 
-      const date = new Date(log.created_at).toDateString();
+        const date = new Date(log.created_at).toDateString();
 
-      // checks if this date has no data
-      // if false, this means that this date is different from the previous iteration
-      if (!groupedByDate[date]) {
-        // clears the temporary array so that it can be filled up again by this date
-        arrayOfLogsInASingleDate = [];
-      }
-      // then, pushes the data of the current log
-      // if the previous iteration's date is similar to current, it just adds the data so it will become multiple logs for a single date
-      arrayOfLogsInASingleDate.push({
-        amount: changesInAmount ?? 0,
-        reason: log.reason!,
-        date: new Date(log.created_at).toDateString(),
+        // checks if this date has no data
+        // if false, this means that this date is different from the previous iteration
+        if (!groupedByDate[date]) {
+          // clears the temporary array so that it can be filled up again by this date
+          arrayOfLogsInASingleDate = [];
+        }
+        // then, pushes the data of the current log
+        // if the previous iteration's date is similar to current, it just adds the data so it will become multiple logs for a single date
+        arrayOfLogsInASingleDate.push({
+          amount: changesInAmount ?? 0,
+          reason: log.reason!,
+          date: new Date(log.created_at).toDateString(),
+        });
+
+        // gets all the expenses by filtering only the negative values
+        const expenses = arrayOfLogsInASingleDate.filter(
+          (t) => t.amount !== 0 && t.amount < 0,
+        );
+        // gets all the expenses by filtering only the positive values
+        const gains = arrayOfLogsInASingleDate.filter(
+          (t) => t.amount !== 0 && t.amount > 0,
+        );
+
+        const expensesSum = _.sum(expenses.map((t) => t.amount));
+        const gainsSum = _.sum(gains.map((t) => t.amount));
+
+        // this sums up the changes happened in this date. ex. (100 + -100 + -25)
+        // summing up all the positive and negative values
+        // if negative, then there is a loss since loss are more than gains
+        // if positive, then there is a gain since gains are more than loss
+        const gainOrLoss = _.sum(arrayOfLogsInASingleDate.map((a) => a.amount));
+
+        // saves the current date single/multiple logs.
+        // if current date has an existing data, it just gets the current data of the tempory array
+        groupedByDate[date] = {
+          expenses,
+          gains,
+          date: date,
+          expensesSum,
+          gainsSum,
+          gainOrLoss,
+          // currentTotal will always get the very last record in each day
+          currentTotal: Number(log.changes?.to.total),
+        };
       });
-
-      // gets all the expenses by filtering only the negative values
-      const expenses = arrayOfLogsInASingleDate.filter(
-        (t) => t.amount !== 0 && t.amount < 0,
-      );
-      // gets all the expenses by filtering only the positive values
-      const gains = arrayOfLogsInASingleDate.filter(
-        (t) => t.amount !== 0 && t.amount > 0,
-      );
-
-      const expensesSum = _.sum(expenses.map((t) => t.amount));
-      const gainsSum = _.sum(gains.map((t) => t.amount));
-
-      // this sums up the changes happened in this date. ex. (100 + -100 + -25)
-      // summing up all the positive and negative values
-      // if negative, then there is a loss since loss are more than gains
-      // if positive, then there is a gain since gains are more than loss
-      const gainOrLoss = _.sum(arrayOfLogsInASingleDate.map((a) => a.amount));
-
-      // saves the current date single/multiple logs.
-      // if current date has an existing data, it just gets the current data of the tempory array
-      groupedByDate[date] = {
-        expenses,
-        gains,
-        date: date,
-        expensesSum,
-        gainsSum,
-        gainOrLoss,
-        // currentTotal will always get the very last record in each day
-        currentTotal: Number(log.changes?.to.total),
-      };
-    });
 
     const currentDate = new Date();
     currentDate.setDate(currentDate.getDate() - 365);
