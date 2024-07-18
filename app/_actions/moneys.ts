@@ -3,7 +3,6 @@ import { createClient } from "@/lib/supabase/server";
 import { log } from "./logs";
 import { z } from "zod";
 import {
-  Moneys,
   TransferTypes,
   AddMoneySchema,
   Reason,
