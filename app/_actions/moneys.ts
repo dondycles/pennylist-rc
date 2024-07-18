@@ -10,6 +10,7 @@ import {
   UUIDType,
   EditMoneyType,
   Amount,
+  DeleteMoneyType,
 } from "@/lib/types";
 
 export async function getTotal() {
@@ -119,7 +120,7 @@ export async function transferMoney(
     };
   }
 
-  const { error: fromError, logError: fromLogError } = await editMoney(
+  const { error: fromError } = await editMoney(
     from.oldMoneyData,
     from.newMoneyData,
     from.currentTotal,
@@ -127,8 +128,7 @@ export async function transferMoney(
     "transfer",
   );
   if (fromError) return { error: fromError };
-  if (fromLogError) return { error: fromLogError };
-  const { error: toError, logError: toLogError } = await editMoney(
+  const { error: toError } = await editMoney(
     to.oldMoneyData,
     to.newMoneyData,
     to.currentTotal,
@@ -136,7 +136,6 @@ export async function transferMoney(
     "transfer",
   );
   if (toError) return { error: toError };
-  if (toLogError) return { error: fromLogError };
   return { success: "transfered!" };
 }
 export async function editMoney(
@@ -182,13 +181,13 @@ export async function editMoney(
 
   const { error: logError } = await log(type, reason, oldMoneyData.id, {
     from: {
-      amount: newMoneyData.amount,
-      name: newMoneyData.name,
+      amount: oldMoneyData.amount,
+      name: oldMoneyData.name,
       total: currentTotal,
     },
     to: {
-      amount: oldMoneyData.amount,
-      name: oldMoneyData.name,
+      amount: newMoneyData.amount,
+      name: newMoneyData.name,
       total:
         type === "transfer"
           ? currentTotal
@@ -197,15 +196,23 @@ export async function editMoney(
     },
   });
 
-  if (logError) return { logError };
+  if (logError) return { error: logError };
 
   return { success: "edited!" };
 }
 
 export async function deleteMoney(
-  money: Pick<Moneys, "id" | "amount" | "name">,
+  money: z.infer<typeof DeleteMoneyType>,
   currentTotal: number,
 ) {
+  const moneyParse = DeleteMoneyType.safeParse(money);
+
+  if (!moneyParse.success) {
+    return {
+      error: moneyParse.error.issues[0].message,
+    };
+  }
+
   const supabase = createClient();
 
   const { error: logError, success: logId } = await log(
@@ -225,7 +232,7 @@ export async function deleteMoney(
       },
     },
   );
-  if (logError) return { logError };
+  if (logError) return { error: logError };
 
   const { error } = await supabase.from("moneys").delete().eq("id", money.id);
   if (error) {
@@ -240,6 +247,14 @@ export async function setColor(
   moneyId: z.infer<typeof UUIDType>,
   color: string,
 ) {
+  const moneyIdParse = UUIDType.safeParse(moneyId);
+
+  if (!moneyIdParse.success) {
+    return {
+      error: moneyIdParse.error.issues[0].message,
+    };
+  }
+
   const supabase = createClient();
   const { error } = await supabase
     .from("moneys")

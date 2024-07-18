@@ -66,10 +66,16 @@ export const EditMoneyType = z.object({
   updated_at: z.string().nullable(),
 });
 
-export type LogChangesTypes = {
-  from: { name: string; amount: number; total: number };
-  to: { name: string; amount: number; total: number };
-};
+export const DeleteMoneyType = z.object({
+  id: UUIDType,
+  name: Name,
+  amount: Amount,
+});
+
+export const LogChangesTypes = z.object({
+  from: z.object({ name: Name, amount: Amount, total: Amount }),
+  to: z.object({ name: Name, amount: Amount, total: Amount }),
+});
 
 export type Progress = {
   expenses: { amount: number; reason: string; date: string }[];

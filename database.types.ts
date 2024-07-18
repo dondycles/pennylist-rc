@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { LogChangesTypes } from "./lib/types";
 
 export type Json =
@@ -37,7 +38,7 @@ export type Database = {
       };
       logs: {
         Row: {
-          changes: LogChangesTypes;
+          changes: z.infer<typeof LogChangesTypes>;
           created_at: string;
           id: string;
           list: string | null;
@@ -46,7 +47,7 @@ export type Database = {
           type: string;
         };
         Insert: {
-          changes?: LogChangesTypes;
+          changes?: z.infer<typeof LogChangesTypes>;
           created_at?: string;
           id?: string;
           list?: string | null;
@@ -55,7 +56,7 @@ export type Database = {
           type: string;
         };
         Update: {
-          changes?: LogChangesTypes;
+          changes?: z.infer<typeof LogChangesTypes>;
           created_at?: string;
           id?: string;
           list?: string | null;

@@ -27,7 +27,6 @@ import TotalBreakdownPieChart from "./charts/list-total-breakdown-pie-chart";
 import DailyProgressBarChart from "./charts/list-daily-progress-bar-chart";
 
 // Importing types
-import type { Database } from "@/database.types";
 import type { User } from "@supabase/supabase-js";
 import { Separator } from "@/components/ui/separator";
 
@@ -66,7 +65,7 @@ export default function List({ list }: { list: User | null }) {
   });
   const [transferMoneyForm, setTransferMoneyForm] = useState<{
     open: boolean;
-    money: Omit<Database["public"]["Tables"]["moneys"]["Row"], "list"> | null;
+    money: z.infer<typeof EditMoneyType> | null;
   }>({
     open: false,
     money: null,
@@ -247,61 +246,73 @@ export default function List({ list }: { list: User | null }) {
         <FormsDrawer
           open={editMoneyForm.open}
           onOpenChange={(e) => {
-            setEditMoneyForm((prev) => ({
-              ...prev,
-              open: e,
-            }));
+            setEditMoneyForm((prev) =>
+              e
+                ? {
+                    ...prev,
+                    open: true,
+                  }
+                : { money: null, open: false },
+            );
           }}
           title={`Edit money`}
           desc="Any changes made are recorded to keep track of its progress."
           form={
-            <EditMoneyForm
-              currentTotal={total}
-              money={editMoneyForm.money!}
-              close={(willRefetch) => {
-                setEditMoneyForm((prev) => ({
-                  ...prev,
-                  open: false,
-                }));
-                if (!willRefetch) return;
-                refetch();
-                queryClient.removeQueries({
-                  queryKey: ["money", editMoneyForm.money?.id, list?.id],
-                });
-              }}
-            />
+            editMoneyForm.money ? (
+              <EditMoneyForm
+                currentTotal={total}
+                money={editMoneyForm.money!}
+                close={(willRefetch) => {
+                  setEditMoneyForm({
+                    money: null,
+                    open: false,
+                  });
+                  if (!willRefetch) return;
+                  refetch();
+                  queryClient.removeQueries({
+                    queryKey: ["money", editMoneyForm.money?.id, list?.id],
+                  });
+                }}
+              />
+            ) : null
           }
         />
         <FormsDrawer
           open={transferMoneyForm.open}
           onOpenChange={(e) => {
-            setTransferMoneyForm((prev) => ({
-              ...prev,
-              open: e,
-            }));
+            setTransferMoneyForm((prev) =>
+              e
+                ? {
+                    ...prev,
+                    open: true,
+                  }
+                : { money: null, open: false },
+            );
           }}
           title={`Transfer money`}
           desc="Any changes made are recorded to keep track of its progress."
           form={
-            <TransferMoneyForm
-              currentTotal={total}
-              money={transferMoneyForm.money!}
-              allMoneys={moneys.data}
-              close={(ids) => {
-                setTransferMoneyForm((prev) => ({
-                  ...prev,
-                  open: false,
-                }));
-                refetch();
-                if (!ids) return;
-                queryClient.removeQueries({
-                  queryKey: ["money", ids?.from, list?.id],
-                });
-                queryClient.removeQueries({
-                  queryKey: ["money", ids?.to, list?.id],
-                });
-              }}
-            />
+            transferMoneyForm.money ? (
+              <TransferMoneyForm
+                currentTotal={total}
+                money={transferMoneyForm.money!}
+                allMoneys={moneys.data}
+                close={(ids) => {
+                  setTransferMoneyForm({
+                    money: null,
+                    open: false,
+                  });
+                  refetch();
+                  if (!ids) return;
+                  queryClient.removeQueries({
+                    queryKey: ["money", ids?.from, list?.id],
+                  });
+                  queryClient.removeQueries({
+                    queryKey: ["money", ids?.to, list?.id],
+                  });
+                }}
+              />
+            ) : null
           }
         />
 
