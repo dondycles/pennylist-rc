@@ -12,7 +12,15 @@ import {
 import { deleteMoney, setColor } from "@/app/_actions/moneys";
 import { useState } from "react";
 import { TbCurrencyPeso } from "react-icons/tb";
-import { Check, Info, Palette, Pencil, Trash, X } from "lucide-react";
+import {
+  ArrowLeftRight,
+  Check,
+  Info,
+  Palette,
+  Pencil,
+  Trash,
+  X,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -30,14 +38,16 @@ export default function Money({
   money,
   done,
   edit,
+  transfer,
   hideAmounts,
   currentTotal,
 }: {
   money: Omit<Database["public"]["Tables"]["moneys"]["Row"], "list">;
   done: () => void;
   edit: () => void;
+  transfer: () => void;
   hideAmounts: boolean;
-  currentTotal: string;
+  currentTotal: number;
 }) {
   const { toast } = useToast();
   const [showWarning, setShowWarning] = useState(false);
@@ -46,7 +56,7 @@ export default function Money({
 
   const handleSetColor = async (color: string) => {
     if (!money) return;
-    const { error } = await setColor(money, color);
+    const { error } = await setColor(money.id, color);
     if (error) {
       toast({
         title: "Error Editing Color",
@@ -144,16 +154,20 @@ export default function Money({
             <Pencil className="size-4 mr-1" />
             Edit
           </ContextMenuItem>
-          <ContextMenuItem asChild>
-            <DialogTrigger className="w-full">
-              <Trash className="size-4 mr-1 text-destructive" />
-              <p className="text-destructive">Delete</p>
-            </DialogTrigger>
+          <ContextMenuItem onClick={() => transfer()}>
+            <ArrowLeftRight className="size-4 mr-1" />
+            Transfer
           </ContextMenuItem>
           <ContextMenuItem asChild>
             <Link href={"/money/" + money.id}>
               <Info className="size-4 mr-1 " /> Details
             </Link>
+          </ContextMenuItem>
+          <ContextMenuItem asChild>
+            <DialogTrigger className="w-full">
+              <Trash className="size-4 mr-1 text-destructive" />
+              <p className="text-destructive">Delete</p>
+            </DialogTrigger>
           </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>

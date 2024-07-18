@@ -19,11 +19,7 @@ import { Input } from "@/components/ui/input";
 
 // Icons
 import { Plus, X } from "lucide-react";
-
-const moneySchema = z.object({
-  name: z.string().min(1, { message: "Please your state reason" }),
-  amount: z.string(),
-});
+import { AddMoneySchema } from "@/lib/schemas";
 
 export default function AddMoneyForm({
   close,
@@ -32,16 +28,16 @@ export default function AddMoneyForm({
   close: () => void;
   currentTotal: number;
 }) {
-  const form = useForm<z.infer<typeof moneySchema>>({
-    resolver: zodResolver(moneySchema),
+  const form = useForm<z.infer<typeof AddMoneySchema>>({
+    resolver: zodResolver(AddMoneySchema),
     defaultValues: {
       name: "",
-      amount: "",
+      amount: undefined,
     },
   });
 
   const { mutate: mutateMoney, isPending } = useMutation({
-    mutationFn: async (values: z.infer<typeof moneySchema>) => {
+    mutationFn: async (values: z.infer<typeof AddMoneySchema>) => {
       const newMoneyData = {
         name: values.name,
         amount: Number(values.amount),
@@ -57,7 +53,7 @@ export default function AddMoneyForm({
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit((values: z.infer<typeof moneySchema>) =>
+        onSubmit={form.handleSubmit((values: z.infer<typeof AddMoneySchema>) =>
           mutateMoney(values),
         )}
         className="flex flex-col gap-2 w-[320px] mx-auto"

@@ -2,6 +2,7 @@
 import {
   deleteMoney,
   getMoney,
+  getMoneys,
   getTotal,
   setColor,
 } from "@/app/_actions/moneys";
@@ -10,7 +11,7 @@ import { UseAmountFormat } from "@/lib/utils";
 import { User } from "@supabase/supabase-js";
 import { useQuery } from "@tanstack/react-query";
 import { TbCurrencyPeso } from "react-icons/tb";
-import { Check, Palette, Pencil, Trash, X } from "lucide-react";
+import { ArrowLeftRight, Check, Palette, Pencil, Trash, X } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -37,6 +38,7 @@ import { logsColumns } from "./charts/log-columns";
 import { useToast } from "./ui/use-toast";
 import { getList } from "@/app/_actions/auth";
 import SkeletonLoading from "./skeleton";
+import TransferMoneyForm from "./forms/transfer-money-form";
 
 export default function Money({
   list,
@@ -49,6 +51,7 @@ export default function Money({
   let _ = require("lodash");
   const [openPalette, setOpenPalette] = useState(false);
   const [openEditForm, setOpenEditForm] = useState(false);
+  const [openTransferForm, setOpenTransferForm] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
   const [isPending, setIsPending] = useState(false);
   const listState = useListState();
@@ -61,6 +64,16 @@ export default function Money({
     queryKey: ["list"],
     queryFn: async () => getList(),
     enabled: list !== null,
+  });
+
+  const {
+    data: moneys,
+    error: moneysError,
+    isLoading: moneysLoading,
+  } = useQuery({
+    queryKey: ["moneys", listState.sort, listData?.data?.id],
+    queryFn: async () => await getMoneys(listState.sort),
+    enabled: listData?.data !== null && listData?.data !== undefined,
   });
 
   const {
@@ -105,7 +118,7 @@ export default function Money({
   const handleSetColor = async (color: string) => {
     if (!money?.data) return;
     setOpenPalette(false);
-    const { error } = await setColor(money.data, color);
+    const { error } = await setColor(money.data.id, color);
     if (error) {
       toast({
         title: "Error Editing Color",
@@ -121,7 +134,7 @@ export default function Money({
   const handleDelete = async () => {
     if (!money?.data) return;
     setIsPending(true);
-    const { error } = await deleteMoney(money.data, String(total));
+    const { error } = await deleteMoney(money.data, total);
     if (error) {
       toast({
         title: "Error Deleting Money",
@@ -241,20 +254,31 @@ export default function Money({
   };
 
   const progress = getProgress();
-  if (moneyError || totalError || listDataError)
+  if (
+    moneyError ||
+    totalError ||
+    listDataError ||
+    moneysError ||
+    money?.error ||
+    totalData?.error ||
+    listData?.error ||
+    moneys?.error
+  )
     throw new Error(
       (moneyError && moneyError?.message) ||
         (totalError && totalError?.message) ||
         (listDataError && listDataError?.message) ||
+        (moneysError && moneysError?.message) ||
         (money?.error && money?.error?.message) ||
         (totalData?.error && totalData?.error?.message) ||
         (listData?.error && listData?.error?.message) ||
+        (moneys?.error && moneys?.error?.message) ||
         "Error",
     );
-  if (moneyLoading || totalLoading || listDataLoading)
+  if (moneyLoading || totalLoading || listDataLoading || moneysLoading)
     return <SkeletonLoading />;
 
-  if (money?.data && listData?.data) {
+  if (money?.data && listData?.data && moneys?.data) {
     return (
       <Scrollable>
         <div
@@ -284,6 +308,29 @@ export default function Money({
 
           <div className="flex gap-4 w-fit shrink-0 z-10">
             <FormsDrawer
+              open={openTransferForm}
+              onOpenChange={setOpenTransferForm}
+              title="Transfer money"
+              desc="Any changes made are recorded to keep track of its progress."
+              trigger={
+                <button>
+                  <ArrowLeftRight size={20} />
+                </button>
+              }
+              form={
+                <TransferMoneyForm
+                  close={() => {
+                    setOpenTransferForm(false);
+                    refetchTotal();
+                    refetchMoney();
+                  }}
+                  allMoneys={moneys.data}
+                  currentTotal={total}
+                  money={money.data}
+                />
+              }
+            />
+            <FormsDrawer
               open={openEditForm}
               onOpenChange={setOpenEditForm}
               title="Edit money"
@@ -300,7 +347,7 @@ export default function Money({
                     refetchTotal();
                     refetchMoney();
                   }}
-                  currentTotal={String(total)}
+                  currentTotal={total}
                   money={money.data}
                 />
               }

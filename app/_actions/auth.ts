@@ -1,9 +1,8 @@
 "use server";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { logInSchema } from "../(auth)/login/form";
-import { signUpSchema } from "../(auth)/signup/form";
 import { z } from "zod";
+import { LogInSchema, SignUpSchema, UUIDType } from "@/lib/schemas";
 const changeListNameSchema = z.object({
   listname: z
     .string()
@@ -49,7 +48,7 @@ export const logout = async () => {
   redirect("/login");
 };
 
-export const deleteList = async (id: string) => {
+export const deleteList = async (id: z.infer<typeof UUIDType>) => {
   const supabase = createClient(process.env.SUPABASE_SECRET);
   const listId = (await supabase.auth.getUser()).data.user?.id;
   if (!listId || !id) return { error: "List id not found!" };
@@ -63,7 +62,7 @@ export const deleteList = async (id: string) => {
 };
 
 export const signup = async (
-  data: z.infer<typeof signUpSchema>,
+  data: z.infer<typeof SignUpSchema>,
   captchaToken: string,
 ) => {
   const supabase = createClient();
@@ -87,7 +86,7 @@ export const signup = async (
   if (dbError) return { dbError: dbError.message };
 };
 export const login = async (
-  data: z.infer<typeof logInSchema>,
+  data: z.infer<typeof LogInSchema>,
   captchaToken: string,
 ) => {
   const supabase = createClient();

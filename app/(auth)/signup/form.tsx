@@ -18,20 +18,7 @@ import { useRef, useState } from "react";
 import { AlertCircle } from "lucide-react";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { useTheme } from "next-themes";
-export const signUpSchema = z
-  .object({
-    listname: z
-      .string()
-      .min(6, { message: "Listname must be at least 6 characters." }),
-    password: z
-      .string()
-      .min(6, { message: "Password must be at least 6 characters." }),
-    cpassword: z.string().min(1, { message: "Please confirm your password." }),
-  })
-  .refine((data) => data.password === data.cpassword, {
-    path: ["cpassword"],
-    message: "Password did not match.",
-  });
+import { SignUpSchema } from "@/lib/schemas";
 
 export default function SignupForm() {
   const [signingUp, setSigningUp] = useState(false);
@@ -39,15 +26,15 @@ export default function SignupForm() {
   const captcha = useRef<HCaptcha>(null);
   const { theme } = useTheme();
 
-  const form = useForm<z.infer<typeof signUpSchema>>({
-    resolver: zodResolver(signUpSchema),
+  const form = useForm<z.infer<typeof SignUpSchema>>({
+    resolver: zodResolver(SignUpSchema),
     defaultValues: {
       listname: "",
       password: "",
       cpassword: "",
     },
   });
-  async function onSubmit(values: z.infer<typeof signUpSchema>) {
+  async function onSubmit(values: z.infer<typeof SignUpSchema>) {
     try {
       setSigningUp(true);
       const res = await signup(values, captchaToken!);

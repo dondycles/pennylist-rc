@@ -23,11 +23,7 @@ import {
 } from "../ui/select";
 import { UseAmountFormat } from "@/lib/utils";
 import { useListState } from "@/store";
-
-const TansferMoneySchema = z.object({
-  transferAmount: z.string().optional(),
-  transferTo: z.string(),
-});
+import { TansferMoneySchema } from "@/lib/schemas";
 
 export default function TransferMoneyForm({
   close,
@@ -35,17 +31,19 @@ export default function TransferMoneyForm({
   currentTotal,
   allMoneys,
 }: {
-  close: () => void;
+  // eslint-disable-next-line no-unused-vars
+  close: (ids?: { to: string; from: string }) => void;
   money: Omit<MoneyTypes, "list">;
-  currentTotal: string;
+  currentTotal: number;
   allMoneys: Omit<MoneyTypes, "list">[];
 }) {
   const listState = useListState();
   const form = useForm<z.infer<typeof TansferMoneySchema>>({
     resolver: zodResolver(TansferMoneySchema),
     defaultValues: {
-      transferAmount: "",
+      transferAmount: undefined,
       transferTo: "",
+      reason: "",
     },
   });
 
@@ -56,34 +54,37 @@ export default function TransferMoneyForm({
       )[0];
 
       const from = {
-        updatedMoneyData: {
+        oldMoneyData: money,
+        newMoneyData: {
           ...money,
           amount:
             Number(money.amount ?? 0) - Number(values.transferAmount ?? 0),
         },
-        oldMoneyData: money,
         currentTotal: currentTotal,
       };
       const to = {
-        updatedMoneyData: {
+        oldMoneyData: oldToMoneyData,
+        newMoneyData: {
           ...oldToMoneyData,
           amount:
             Number(oldToMoneyData.amount ?? 0) +
             Number(values.transferAmount ?? 0),
         },
-        oldMoneyData: oldToMoneyData,
         currentTotal: currentTotal,
       };
 
-      const { error } = await transferMoney({ ...from }, { ...to });
+      const { error } = await transferMoney(
+        { ...from },
+        { ...to },
+        values.reason,
+      );
 
       if (error) {
         return form.setError("transferTo", { message: error });
       }
-      close();
+      close({ to: to.oldMoneyData.id, from: from.oldMoneyData.id });
     },
   });
-
   return (
     <Form {...form}>
       <form
@@ -163,6 +164,7 @@ export default function TransferMoneyForm({
                       {...field}
                     />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -211,6 +213,24 @@ export default function TransferMoneyForm({
             </span>
           </div>
         )}
+        {form.watch("transferTo") && (
+          <FormField
+            control={form.control}
+            name="reason"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder="Reason for transferring"
+                    data-vaul-no-drag
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         <div className=" flex flex-row gap-2">
           <Button
@@ -223,7 +243,7 @@ export default function TransferMoneyForm({
             <Pencil className="size-4" />
           </Button>
           <Button
-            onClick={close}
+            onClick={() => close()}
             type="button"
             size={"sm"}
             disabled={isPending}

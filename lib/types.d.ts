@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 declare type LogChangesTypes = {
-  from: { name: string; amount: string; total: string };
-  to: { name: string; amount: string; total: string };
+  from: { name: string; amount: number; total: number };
+  to: { name: string; amount: number; total: number };
 };
 
 declare type Progress = {
@@ -16,7 +16,7 @@ declare type Progress = {
 
 declare type MoneyTypes = Database["public"]["Tables"]["moneys"]["Row"];
 declare type TransferTypes = {
-  updatedMoneyData: Omit<MoneyTypes, "list">;
+  newMoneyData: Omit<MoneyTypes, "list">;
   oldMoneyData: Omit<MoneyTypes, "list">;
-  currentTotal: string;
+  currentTotal: number;
 };

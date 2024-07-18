@@ -1,6 +1,8 @@
 "use server";
 import { createClient } from "@/lib/supabase/server";
 import { log } from "./logs";
+import { z } from "zod";
+import { AddMoneySchema, Reason, UUIDType } from "@/lib/schemas";
 
 export async function getTotal() {
   const supabase = createClient();
@@ -21,7 +23,7 @@ export async function getMoneys(sort: {
   return moneys;
 }
 
-export async function getMoney(id: string) {
+export async function getMoney(id: z.infer<typeof UUIDType>) {
   const supabase = createClient();
   const money = await supabase
     .from("moneys")
@@ -36,7 +38,7 @@ export async function getMoney(id: string) {
 }
 
 export async function addMoney(
-  money: Pick<MoneyTypes, "amount" | "name">,
+  money: z.infer<typeof AddMoneySchema>,
   currentTotal: number,
 ) {
   const supabase = createClient();
@@ -50,14 +52,14 @@ export async function addMoney(
 
   const { error: logError } = await log("add", "add", data.id, {
     from: {
-      amount: "",
+      amount: 0,
       name: "",
-      total: String(currentTotal),
+      total: currentTotal,
     },
     to: {
-      amount: String(money.amount),
+      amount: money.amount,
       name: money.name,
-      total: String(Number(currentTotal) + Number(money.amount)),
+      total: Number(currentTotal) + Number(money.amount),
     },
   });
 
@@ -65,21 +67,25 @@ export async function addMoney(
 
   return { success: "added!" };
 }
-export async function transferMoney(from: TransferTypes, to: TransferTypes) {
+export async function transferMoney(
+  from: TransferTypes,
+  to: TransferTypes,
+  reason: z.infer<typeof Reason>,
+) {
   const { error: fromError, logError: fromLogError } = await editMoney(
-    from.updatedMoneyData,
     from.oldMoneyData,
+    from.newMoneyData,
     from.currentTotal,
-    "transfer",
+    reason,
     "transfer",
   );
   if (fromError) return { error: fromError };
   if (fromLogError) return { error: fromLogError };
   const { error: toError, logError: toLogError } = await editMoney(
-    to.updatedMoneyData,
     to.oldMoneyData,
+    to.newMoneyData,
     to.currentTotal,
-    "transfer",
+    reason,
     "transfer",
   );
   if (toError) return { error: toError };
@@ -89,8 +95,8 @@ export async function transferMoney(from: TransferTypes, to: TransferTypes) {
 export async function editMoney(
   oldMoneyData: Omit<MoneyTypes, "list">,
   newMoneyData: Omit<MoneyTypes, "list">,
-  currentTotal: string,
-  reason: string,
+  currentTotal: number,
+  reason: z.infer<typeof Reason>,
   type: string,
 ) {
   if (
@@ -107,26 +113,24 @@ export async function editMoney(
 
   const { error } = await supabase
     .from("moneys")
-    .update(oldMoneyData)
+    .update(newMoneyData)
     .eq("id", oldMoneyData.id);
   if (error) return { error: error.message };
 
   const { error: logError } = await log(type, reason, oldMoneyData.id, {
     from: {
-      amount: String(newMoneyData.amount),
+      amount: newMoneyData.amount,
       name: newMoneyData.name,
-      total: String(currentTotal),
+      total: currentTotal,
     },
     to: {
-      amount: String(oldMoneyData.amount),
+      amount: oldMoneyData.amount,
       name: oldMoneyData.name,
       total:
         type === "transfer"
           ? currentTotal
-          : String(
-              Number(currentTotal) +
-                (Number(oldMoneyData.amount) - Number(newMoneyData.amount)),
-            ),
+          : Number(currentTotal) +
+            (Number(oldMoneyData.amount) - Number(newMoneyData.amount)),
     },
   });
 
@@ -137,7 +141,7 @@ export async function editMoney(
 
 export async function deleteMoney(
   money: Pick<MoneyTypes, "id" | "amount" | "name">,
-  currentTotal: string,
+  currentTotal: number,
 ) {
   const supabase = createClient();
 
@@ -147,14 +151,14 @@ export async function deleteMoney(
     money.id,
     {
       from: {
-        amount: String(money.amount),
+        amount: money.amount,
         name: money.name,
-        total: String(currentTotal),
+        total: currentTotal,
       },
       to: {
-        amount: "",
+        amount: 0,
         name: "",
-        total: String(Number(currentTotal) - Number(money.amount)),
+        total: Number(currentTotal) - Number(money.amount),
       },
     },
   );
@@ -169,12 +173,15 @@ export async function deleteMoney(
   return { success: "deleted!" };
 }
 
-export async function setColor(money: Pick<MoneyTypes, "id">, color: string) {
+export async function setColor(
+  moneyId: z.infer<typeof UUIDType>,
+  color: string,
+) {
   const supabase = createClient();
   const { error } = await supabase
     .from("moneys")
     .update({ color })
-    .eq("id", money.id);
+    .eq("id", moneyId);
 
   if (error) return { error: error.message };
   return { success: "colored!" };

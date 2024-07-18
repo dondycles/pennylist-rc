@@ -9,6 +9,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { EditMoneySchema } from "@/lib/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { Pencil, X } from "lucide-react";
@@ -16,44 +17,27 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-const EditMoneySchema = z.object({
-  name: z.string().min(1, { message: "Name can't be empty" }),
-  amount: z.string(),
-  created_at: z.string(),
-  color: z.string().nullable(),
-  updated_at: z.string().nullable(),
-  reason: z
-    .string()
-    .min(1, { message: "Please your state reason" })
-    .max(55, { message: "Max of 55 characters only" }),
-  add: z.string().optional(),
-  ded: z.string().optional(),
-  transferAmount: z.string().optional(),
-  transferTo: z.string(),
-});
-
 export default function EditMoneyForm({
   close,
   money,
   currentTotal,
 }: {
-  close: () => void;
+  // eslint-disable-next-line no-unused-vars
+  close: (refetch: boolean) => void;
   money: Omit<MoneyTypes, "list">;
-  currentTotal: string;
+  currentTotal: number;
 }) {
   const form = useForm<z.infer<typeof EditMoneySchema>>({
     resolver: zodResolver(EditMoneySchema),
     defaultValues: {
       name: money.name,
-      amount: String(money.amount),
+      amount: money.amount,
       created_at: money.created_at,
       color: money.color,
       updated_at: String(new Date()),
       reason: "",
-      ded: "",
-      add: "",
-      transferAmount: "",
-      transferTo: "",
+      ded: undefined,
+      add: undefined,
     },
   });
 
@@ -61,7 +45,7 @@ export default function EditMoneyForm({
     mutationFn: async (values: z.infer<typeof EditMoneySchema>) => {
       const newMoneyData = {
         name: values.name,
-        amount: Number(values.amount),
+        amount: values.amount,
         id: money.id,
         created_at: money.created_at,
         color: money.color,
@@ -69,8 +53,8 @@ export default function EditMoneyForm({
       };
 
       const { error } = await editMoney(
-        newMoneyData,
         money,
+        newMoneyData,
         currentTotal,
         values.reason,
         "update",
@@ -78,30 +62,28 @@ export default function EditMoneyForm({
       if (error) {
         return form.setError("reason", { message: error });
       }
-      close();
+      close(true);
     },
   });
 
   useEffect(() => {
     if (form.getValues("add")) {
-      form.setValue("ded", "");
-    } else form.setValue("amount", String(money.amount));
+      form.setValue("ded", 0);
+    } else form.setValue("amount", money.amount);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.watch("add")]);
   useEffect(() => {
     if (form.getValues("ded")) {
-      form.setValue("add", "");
-    } else form.setValue("amount", String(money.amount));
+      form.setValue("add", 0);
+    } else form.setValue("amount", money.amount);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.watch("ded")]);
   useEffect(() => {
     form.setValue(
       "amount",
-      String(
-        Number(money.amount) -
-          Number(form.watch("ded")) +
-          Number(form.watch("add")),
-      ),
+      Number(money.amount) -
+        Number(form.watch("ded") ?? 0) +
+        Number(form.watch("add") ?? 0),
     );
   }, [form.watch("add"), form.watch("ded")]);
 
@@ -204,7 +186,7 @@ export default function EditMoneyForm({
             <Pencil className="size-4" />
           </Button>
           <Button
-            onClick={close}
+            onClick={() => close(false)}
             type="button"
             size={"sm"}
             disabled={isPending}

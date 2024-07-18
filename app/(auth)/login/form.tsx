@@ -18,26 +18,22 @@ import { login } from "@/app/_actions/auth";
 import { useRef, useState } from "react";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { useTheme } from "next-themes";
-
-export const logInSchema = z.object({
-  listname: z.string().min(1, { message: "Please input listname" }),
-  password: z.string().min(1, { message: "Please input password" }),
-});
+import { LogInSchema } from "@/lib/schemas";
 
 export default function LoginForm() {
   const [captchaToken, setCaptchaToken] = useState<string>();
   const captcha = useRef<HCaptcha>(null);
   const { theme } = useTheme();
   const [loggingIn, setLoggingIn] = useState(false);
-  const form = useForm<z.infer<typeof logInSchema>>({
-    resolver: zodResolver(logInSchema),
+  const form = useForm<z.infer<typeof LogInSchema>>({
+    resolver: zodResolver(LogInSchema),
     defaultValues: {
       listname: "",
       password: "",
     },
   });
 
-  async function onSubmit(values: z.infer<typeof logInSchema>) {
+  async function onSubmit(values: z.infer<typeof LogInSchema>) {
     try {
       setLoggingIn(true);
       const res = await login(values, captchaToken!);

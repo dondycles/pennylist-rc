@@ -1,20 +1,22 @@
 "use server";
 
+import { Reason, UUIDType } from "@/lib/schemas";
 import { createClient } from "@/lib/supabase/server";
+import { z } from "zod";
 
 export async function log(
   type: string,
-  reason: string,
-  money: string,
+  reason: z.infer<typeof Reason>,
+  moneyId: z.infer<typeof UUIDType>,
   changes?: {
-    from: { name: string; amount: string; total: string };
-    to: { name: string; amount: string; total: string };
+    from: { name: string; amount: number; total: number };
+    to: { name: string; amount: number; total: number };
   },
 ) {
   const supabase = createClient();
   const { error, data } = await supabase
     .from("logs")
-    .insert({ type, changes, reason, money })
+    .insert({ type, changes, reason, money: moneyId })
     .select("id")
     .single();
 

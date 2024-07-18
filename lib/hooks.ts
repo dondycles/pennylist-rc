@@ -46,7 +46,7 @@ export const calculateListChartsData = ({
     }[] = [];
 
     logs
-      .filter((l) => l.reason !== "transfer")
+      .filter((l) => l.type !== "transfer")
       .toReversed()
       .forEach((log) => {
         //each log has a record of changes in a money, so it will be stored here for later use
