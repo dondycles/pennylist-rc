@@ -1,10 +1,15 @@
+import { Database } from "@/database.types";
+
+type Logs = Database["public"]["Tables"]["logs"]["Row"];
+type Moneys = Database["public"]["Tables"]["moneys"]["Row"];
+
 /* eslint-disable no-unused-vars */
-declare type LogChangesTypes = {
+export type LogChangesTypes = {
   from: { name: string; amount: number; total: number };
   to: { name: string; amount: number; total: number };
 };
 
-declare type Progress = {
+export type Progress = {
   expenses: { amount: number; reason: string; date: string }[];
   gains: { amount: number; reason: string; date: string }[];
   date: string;
@@ -14,9 +19,15 @@ declare type Progress = {
   currentTotal: number;
 };
 
-declare type MoneyTypes = Database["public"]["Tables"]["moneys"]["Row"];
-declare type TransferTypes = {
+export type MoneyTypes = Database["public"]["Tables"]["moneys"]["Row"];
+
+export type TransferTypes = {
   newMoneyData: Omit<MoneyTypes, "list">;
   oldMoneyData: Omit<MoneyTypes, "list">;
   currentTotal: number;
 };
+export interface ModifiedLogs extends Logs {
+  total?: number;
+  moneys?: Pick<Moneys, "name" | "color" | "id"> | null;
+  money_name?: string;
+}

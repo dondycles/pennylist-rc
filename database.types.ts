@@ -1,3 +1,5 @@
+import { LogChangesTypes } from "./lib/types";
+
 export type Json =
   | string
   | number

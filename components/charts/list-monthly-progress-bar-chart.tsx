@@ -15,6 +15,7 @@ import {
 } from "recharts";
 import ChartTooltip from "../chart-tooltip";
 import { CalendarRange } from "lucide-react";
+import { type Progress } from "@/lib/types";
 export default function MonthlyProgressBarChart({
   monthlyProgress,
 }: {

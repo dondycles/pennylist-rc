@@ -18,6 +18,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from "../ui/select";
 import { UseAmountFormat } from "@/lib/utils";
 import { useListState } from "@/store";
 import { TansferMoneySchema } from "@/lib/schemas";
+import { type MoneyTypes } from "@/lib/types";
 
 export default function TransferMoneyForm({
   close,
@@ -40,6 +41,10 @@ export default function TransferMoneyForm({
       reason: "",
     },
   });
+
+  const selectedMoneyDestination = allMoneys.findLast(
+    (money) => money.id === form.watch("transferTo"),
+  );
 
   const { mutate: mutateMoney, isPending } = useMutation({
     mutationFn: async (values: z.infer<typeof TansferMoneySchema>) => {
@@ -154,18 +159,10 @@ export default function TransferMoneyForm({
                 <FormControl>
                   <SelectTrigger
                     style={{
-                      color:
-                        allMoneys.findLast((money) => money.id === field.value)
-                          ?.color ?? "",
-                      borderColor:
-                        allMoneys.findLast((money) => money.id === field.value)
-                          ?.color ?? "",
-                      backgroundColor: allMoneys.findLast(
-                        (money) => money.id === field.value,
-                      )?.color
-                        ? allMoneys.findLast(
-                            (money) => money.id === field.value,
-                          )?.color + 20
+                      color: selectedMoneyDestination?.color ?? "",
+                      borderColor: selectedMoneyDestination?.color ?? "",
+                      backgroundColor: selectedMoneyDestination?.color
+                        ? selectedMoneyDestination?.color + 20
                         : "",
                     }}
                     className="grid grid-cols-[5fr,16px] gap-2"
@@ -173,17 +170,11 @@ export default function TransferMoneyForm({
                     {field.value && (
                       <div className="flex flex-row justify-between">
                         <p className="truncate">
-                          {
-                            allMoneys.findLast(
-                              (money) => money.id === field.value,
-                            )?.name
-                          }
+                          {selectedMoneyDestination?.name}
                         </p>
                         <p className="font-readex">
                           {UseAmountFormat(
-                            allMoneys.findLast(
-                              (money) => money.id === field.value,
-                            )?.amount ?? 0,
+                            selectedMoneyDestination?.amount ?? 0,
                             { hide: listState.hideAmounts, sign: true },
                           )}
                         </p>
@@ -219,49 +210,7 @@ export default function TransferMoneyForm({
             </FormItem>
           )}
         />
-        {/* {form.watch("transferAmount") && (
-          <>
-            <p>Result:</p>
-            <p style={{ color: money.color ?? "" }}>
-              {money.name} (
-              <span className="font-readex">
-                {UseAmountFormat(
-                  Number(money.amount ?? 0) -
-                    Number(form.watch("transferAmount")),
-                  { hide: listState.hideAmounts, sign: true },
-                )}
-              </span>
-              )
-            </p>{" "}
-            <p
-              style={{
-                color:
-                  allMoneys.filter(
-                    (m) => m.id === form.getValues("transferTo"),
-                  )[0].color ?? "",
-              }}
-            >
-              {
-                allMoneys.filter(
-                  (m) => m.id === form.getValues("transferTo"),
-                )[0].name
-              }{" "}
-              (
-              <span className="font-readex">
-                {UseAmountFormat(
-                  Number(form.watch("transferAmount") ?? 0) +
-                    Number(
-                      allMoneys.filter(
-                        (m) => m.id === form.getValues("transferTo"),
-                      )[0].amount,
-                    ),
-                  { hide: listState.hideAmounts, sign: true },
-                )}
-              </span>
-              )
-            </p>
-          </>
-        )} */}
+
         {form.watch("transferTo") && (
           <>
             <p>Result: </p>
@@ -287,20 +236,10 @@ export default function TransferMoneyForm({
             </div>
             <div
               style={{
-                color:
-                  allMoneys.findLast(
-                    (money) => money.id === form.watch("transferTo"),
-                  )?.color ?? "",
-                borderColor:
-                  allMoneys.findLast(
-                    (money) => money.id === form.watch("transferTo"),
-                  )?.color ?? "",
-                backgroundColor: allMoneys.findLast(
-                  (money) => money.id === form.watch("transferTo"),
-                )?.color
-                  ? allMoneys.findLast(
-                      (money) => money.id === form.watch("transferTo"),
-                    )?.color + 20
+                color: selectedMoneyDestination?.color ?? "",
+                borderColor: selectedMoneyDestination?.color ?? "",
+                backgroundColor: selectedMoneyDestination?.color
+                  ? selectedMoneyDestination?.color + 20
                   : "",
               }}
               className="flex flex-row justify-between p-2 rounded-md border"
@@ -314,11 +253,8 @@ export default function TransferMoneyForm({
               </p>
               <p className="font-readex">
                 {UseAmountFormat(
-                  Number(
-                    allMoneys.findLast(
-                      (money) => money.id === form.watch("transferTo"),
-                    )?.amount ?? 0,
-                  ) + Number(form.watch("transferAmount") ?? 0),
+                  Number(selectedMoneyDestination?.amount ?? 0) +
+                    Number(form.watch("transferAmount") ?? 0),
                   { hide: listState.hideAmounts, sign: true },
                 )}
               </p>

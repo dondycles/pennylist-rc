@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const UseDefaultURL = () => {
+export const UseDefaultURL = (): string => {
   const defaultUrl = process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}`
     : "http://localhost:3000";
@@ -43,7 +43,7 @@ export const toMonthWord = (date: string): string => {
 export const UseAmountFormat = (
   amount: number,
   settings: { hide: boolean; decimals?: number; sign: boolean },
-) => {
+): string => {
   const withSign = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "PHP",

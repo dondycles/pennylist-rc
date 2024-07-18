@@ -23,6 +23,7 @@ import {
 } from "recharts";
 import ChartTooltip from "../chart-tooltip";
 import { CalendarDays } from "lucide-react";
+import { type Progress } from "@/lib/types";
 
 export default function DailyProgressBarChart({
   dailyProgress,

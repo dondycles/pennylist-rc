@@ -1,24 +1,6 @@
-import { Database } from "@/database.types";
+import type { ModifiedLogs, Progress } from "./types";
 
 var _ = require("lodash");
-export type Progress = {
-  expenses: { amount: number; reason: string; date: string }[];
-  gains: { amount: number; reason: string; date: string }[];
-  date: string;
-  expensesSum: number;
-  gainsSum: number;
-  gainOrLoss: number;
-  currentTotal: number;
-};
-
-type Logs = Database["public"]["Tables"]["logs"]["Row"];
-type Moneys = Database["public"]["Tables"]["moneys"]["Row"];
-
-export interface ModifiedLogs extends Logs {
-  total?: number;
-  moneys?: Pick<Moneys, "name" | "color" | "id"> | null;
-  money_name?: string;
-}
 
 export const calculateListChartsData = ({
   logsLoading,

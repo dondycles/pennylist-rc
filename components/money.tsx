@@ -32,13 +32,13 @@ import {
 import { Button } from "@/components/ui/button";
 import ProgressBarChart from "./charts/money-progress-bar-chart";
 import FormsDrawer from "./forms/forms-drawer";
-import { ModifiedLogs, Progress } from "@/lib/hooks";
 import LogsDataTable from "./charts/log-data-table";
 import { logsColumns } from "./charts/log-columns";
 import { useToast } from "./ui/use-toast";
 import { getList } from "@/app/_actions/auth";
 import SkeletonLoading from "./skeleton";
 import TransferMoneyForm from "./forms/transfer-money-form";
+import type { ModifiedLogs, Progress } from "@/lib/types";
 
 export default function Money({
   list,

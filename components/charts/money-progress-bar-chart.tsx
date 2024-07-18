@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { gradientOffset, Progress } from "@/lib/hooks";
+import { gradientOffset } from "@/lib/hooks";
 import { toMonthWord } from "@/lib/utils";
 import {
   Area,
@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import ChartTooltip from "../chart-tooltip";
 import { CalendarDays } from "lucide-react";
+import { type Progress } from "@/lib/types";
 export default function ProgressBarChart({
   progress,
 }: {

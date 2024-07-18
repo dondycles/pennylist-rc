@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { EditMoneySchema } from "@/lib/schemas";
+import { type MoneyTypes } from "@/lib/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { Pencil, X } from "lucide-react";

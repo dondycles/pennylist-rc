@@ -10,9 +10,9 @@ import {
   ArrowRightLeft,
 } from "lucide-react";
 import { toMonthWord, UseAmountFormat } from "@/lib/utils";
-import { ModifiedLogs } from "@/lib/hooks";
 import { useListState } from "@/store";
 import { Badge } from "../ui/badge";
+import { type ModifiedLogs } from "@/lib/types";
 
 type LogCols = ModifiedLogs;
 

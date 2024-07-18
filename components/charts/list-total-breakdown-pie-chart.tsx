@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { Database } from "@/database.types";
+import { type Database } from "@/database.types";
 import { UseAmountFormat } from "@/lib/utils";
 import { useListState } from "@/store";
 import { PieChartIcon } from "lucide-react";
