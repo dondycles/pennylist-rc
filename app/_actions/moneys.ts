@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { log } from "./logs";
 import { z } from "zod";
 import { AddMoneySchema, Reason, UUIDType } from "@/lib/schemas";
+import { MoneyTypes, TransferTypes } from "@/lib/types";
 
 export async function getTotal() {
   const supabase = createClient();
