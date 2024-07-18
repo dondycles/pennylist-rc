@@ -53,6 +53,7 @@ export const metadata: Metadata = {
         alt: "Pennylist",
       },
     ],
+    url: new URL(UseDefaultURL()),
   },
   twitter: {
     card: "summary_large_image",
