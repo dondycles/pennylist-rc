@@ -9,8 +9,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { EditMoneySchema } from "@/lib/schemas";
-import { type MoneyTypes } from "@/lib/types";
+import { EditMoneySchema, EditMoneyType } from "@/lib/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { Pencil, X } from "lucide-react";
@@ -25,12 +24,13 @@ export default function EditMoneyForm({
 }: {
   // eslint-disable-next-line no-unused-vars
   close: (refetch: boolean) => void;
-  money: Omit<MoneyTypes, "list">;
+  money: z.infer<typeof EditMoneyType>;
   currentTotal: number;
 }) {
   const form = useForm<z.infer<typeof EditMoneySchema>>({
     resolver: zodResolver(EditMoneySchema),
     defaultValues: {
+      id: money.id,
       name: money.name,
       amount: money.amount,
       created_at: money.created_at,
@@ -44,7 +44,7 @@ export default function EditMoneyForm({
 
   const { mutate: mutateMoney, isPending } = useMutation({
     mutationFn: async (values: z.infer<typeof EditMoneySchema>) => {
-      const newMoneyData = {
+      const newMoneyData: z.infer<typeof EditMoneyType> = {
         name: values.name,
         amount: values.amount,
         id: money.id,

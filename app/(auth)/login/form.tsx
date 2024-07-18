@@ -18,7 +18,7 @@ import { login } from "@/app/_actions/auth";
 import { useRef, useState } from "react";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { useTheme } from "next-themes";
-import { LogInSchema } from "@/lib/schemas";
+import { LogInSchema } from "@/lib/types";
 
 export default function LoginForm() {
   const [captchaToken, setCaptchaToken] = useState<string>();

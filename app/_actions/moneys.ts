@@ -2,8 +2,15 @@
 import { createClient } from "@/lib/supabase/server";
 import { log } from "./logs";
 import { z } from "zod";
-import { AddMoneySchema, Reason, UUIDType } from "@/lib/schemas";
-import { MoneyTypes, TransferTypes } from "@/lib/types";
+import {
+  Moneys,
+  TransferTypes,
+  AddMoneySchema,
+  Reason,
+  UUIDType,
+  EditMoneyType,
+  Amount,
+} from "@/lib/types";
 
 export async function getTotal() {
   const supabase = createClient();
@@ -25,6 +32,12 @@ export async function getMoneys(sort: {
 }
 
 export async function getMoney(id: z.infer<typeof UUIDType>) {
+  const idParse = UUIDType.safeParse(id);
+  if (!idParse.success) {
+    return {
+      error: idParse.error.issues[0].message,
+    };
+  }
   const supabase = createClient();
   const money = await supabase
     .from("moneys")
@@ -35,13 +48,26 @@ export async function getMoney(id: z.infer<typeof UUIDType>) {
     .order("created_at", { ascending: false, referencedTable: "logs" })
     .limit(100, { referencedTable: "logs" })
     .single();
-  return money;
+  if (money.error) return { error: money.error.message };
+  return { data: money.data };
 }
 
 export async function addMoney(
   money: z.infer<typeof AddMoneySchema>,
-  currentTotal: number,
+  currentTotal: z.infer<typeof Amount>,
 ) {
+  const moneyParse = AddMoneySchema.safeParse(money);
+  const totalParse = Amount.safeParse(currentTotal);
+  if (!moneyParse.success) {
+    return {
+      error: moneyParse.error.issues[0].message,
+    };
+  }
+  if (!totalParse.success) {
+    return {
+      error: totalParse.error.issues[0].message,
+    };
+  }
   const supabase = createClient();
 
   const { error, data } = await supabase
@@ -64,15 +90,35 @@ export async function addMoney(
     },
   });
 
-  if (logError) return { logError };
+  if (logError) return { error: logError };
 
   return { success: "added!" };
 }
 export async function transferMoney(
-  from: TransferTypes,
-  to: TransferTypes,
+  from: z.infer<typeof TransferTypes>,
+  to: z.infer<typeof TransferTypes>,
   reason: z.infer<typeof Reason>,
 ) {
+  const fromParse = TransferTypes.safeParse(from);
+  const toParse = TransferTypes.safeParse(to);
+  const reasonParse = Reason.safeParse(reason);
+
+  if (!fromParse.success) {
+    return {
+      error: fromParse.error.issues[0].message,
+    };
+  }
+  if (!toParse.success) {
+    return {
+      error: toParse.error.issues[0].message,
+    };
+  }
+  if (!reasonParse.success) {
+    return {
+      error: reasonParse.error.issues[0].message,
+    };
+  }
+
   const { error: fromError, logError: fromLogError } = await editMoney(
     from.oldMoneyData,
     from.newMoneyData,
@@ -94,12 +140,28 @@ export async function transferMoney(
   return { success: "transfered!" };
 }
 export async function editMoney(
-  oldMoneyData: Omit<MoneyTypes, "list">,
-  newMoneyData: Omit<MoneyTypes, "list">,
+  oldMoneyData: z.infer<typeof EditMoneyType>,
+  newMoneyData: z.infer<typeof EditMoneyType>,
   currentTotal: number,
   reason: z.infer<typeof Reason>,
   type: string,
 ) {
+  const oldMoneyDataParse = EditMoneyType.safeParse(oldMoneyData);
+  const newMoneyDataParse = EditMoneyType.safeParse(newMoneyData);
+  const reasonParse = Reason.safeParse(reason);
+
+  if (!oldMoneyDataParse.success) {
+    return {
+      error: oldMoneyDataParse.error.issues[0].message,
+    };
+  }
+  if (!newMoneyDataParse.success) {
+    return { error: newMoneyDataParse.error.issues[0].message };
+  }
+  if (!reasonParse.success) {
+    return { error: reasonParse.error.issues[0].message };
+  }
+
   if (
     type !== "transfer" &&
     oldMoneyData.amount === newMoneyData.amount &&
@@ -141,7 +203,7 @@ export async function editMoney(
 }
 
 export async function deleteMoney(
-  money: Pick<MoneyTypes, "id" | "amount" | "name">,
+  money: Pick<Moneys, "id" | "amount" | "name">,
   currentTotal: number,
 ) {
   const supabase = createClient();

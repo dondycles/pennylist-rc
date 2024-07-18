@@ -17,8 +17,7 @@ import { z } from "zod";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "../ui/select";
 import { UseAmountFormat } from "@/lib/utils";
 import { useListState } from "@/store";
-import { TansferMoneySchema } from "@/lib/schemas";
-import { type MoneyTypes } from "@/lib/types";
+import { EditMoneyType, TansferMoneySchema } from "@/lib/types";
 
 export default function TransferMoneyForm({
   close,
@@ -28,9 +27,9 @@ export default function TransferMoneyForm({
 }: {
   // eslint-disable-next-line no-unused-vars
   close: (ids?: { to: string; from: string }) => void;
-  money: Omit<MoneyTypes, "list">;
+  money: z.infer<typeof EditMoneyType>;
   currentTotal: number;
-  allMoneys: Omit<MoneyTypes, "list">[];
+  allMoneys: z.infer<typeof EditMoneyType>[];
 }) {
   const listState = useListState();
   const form = useForm<z.infer<typeof TansferMoneySchema>>({

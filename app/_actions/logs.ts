@@ -1,6 +1,6 @@
 "use server";
 
-import { Reason, UUIDType } from "@/lib/schemas";
+import { Reason, UUIDType } from "@/lib/types";
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
 

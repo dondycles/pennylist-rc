@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input";
 
 // Icons
 import { Plus, X } from "lucide-react";
-import { AddMoneySchema } from "@/lib/schemas";
+import { AddMoneySchema } from "@/lib/types";
 
 export default function AddMoneyForm({
   close,

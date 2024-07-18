@@ -2,7 +2,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { LogInSchema, SignUpSchema, UUIDType } from "@/lib/schemas";
+import { LogInSchema, SignUpSchema, UUIDType } from "@/lib/types";
 const changeListNameSchema = z.object({
   listname: z
     .string()

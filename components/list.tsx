@@ -49,6 +49,8 @@ import MonthlyProgressBarChart from "./charts/list-monthly-progress-bar-chart";
 import { getList } from "@/app/_actions/auth";
 import SkeletonLoading from "./skeleton";
 import TransferMoneyForm from "./forms/transfer-money-form";
+import { z } from "zod";
+import { EditMoneyType } from "@/lib/types";
 
 export default function List({ list }: { list: User | null }) {
   const queryClient = useQueryClient();
@@ -57,7 +59,7 @@ export default function List({ list }: { list: User | null }) {
   const [showAddMoneyForm, setShowAddMoneyForm] = useState(false);
   const [editMoneyForm, setEditMoneyForm] = useState<{
     open: boolean;
-    money: Omit<Database["public"]["Tables"]["moneys"]["Row"], "list"> | null;
+    money: z.infer<typeof EditMoneyType> | null;
   }>({
     open: false,
     money: null,

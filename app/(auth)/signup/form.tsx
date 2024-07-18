@@ -18,7 +18,7 @@ import { useRef, useState } from "react";
 import { AlertCircle } from "lucide-react";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { useTheme } from "next-themes";
-import { SignUpSchema } from "@/lib/schemas";
+import { SignUpSchema } from "@/lib/types";
 
 export default function SignupForm() {
   const [signingUp, setSigningUp] = useState(false);

@@ -38,14 +38,15 @@ import { useToast } from "./ui/use-toast";
 import { getList } from "@/app/_actions/auth";
 import SkeletonLoading from "./skeleton";
 import TransferMoneyForm from "./forms/transfer-money-form";
-import type { ModifiedLogs, Progress } from "@/lib/types";
+import type { ModifiedLogs, Progress, UUIDType } from "@/lib/types";
+import { z } from "zod";
 
 export default function Money({
   list,
   moneyId,
 }: {
   list: User | null;
-  moneyId: string;
+  moneyId: z.infer<typeof UUIDType>;
 }) {
   const { toast } = useToast();
   let _ = require("lodash");
@@ -269,7 +270,7 @@ export default function Money({
         (totalError && totalError?.message) ||
         (listDataError && listDataError?.message) ||
         (moneysError && moneysError?.message) ||
-        (money?.error && money?.error?.message) ||
+        (money?.error && money?.error) ||
         (totalData?.error && totalData?.error?.message) ||
         (listData?.error && listData?.error?.message) ||
         (moneys?.error && moneys?.error?.message) ||
