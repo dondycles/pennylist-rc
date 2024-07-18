@@ -31,9 +31,8 @@ export const metadata: Metadata = {
   applicationName: APP_NAME,
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
     title: APP_DEFAULT_TITLE,
-    // startUpImage: [],
   },
   formatDetection: {
     telephone: false,
@@ -46,15 +45,36 @@ export const metadata: Metadata = {
       template: APP_TITLE_TEMPLATE,
     },
     description: APP_DESCRIPTION,
-    images: [],
+    images: [
+      {
+        url: new URL(UseDefaultURL() + "/summary.png"),
+        width: 1594,
+        height: 922,
+        alt: "Pennylist",
+      },
+    ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: {
       default: APP_DEFAULT_TITLE,
       template: APP_TITLE_TEMPLATE,
     },
     description: APP_DESCRIPTION,
+    images: [
+      {
+        url: new URL(UseDefaultURL() + "/summary.png"),
+        width: 1594,
+        height: 922,
+        alt: "Pennylist",
+      },
+    ],
+    creator: "@dondycles",
+  },
+  creator: "John Rod Dondoyano",
+  authors: {
+    name: "John Rod Dondoyano",
+    url: "https://johnroddondoyano.com",
   },
 };
 
