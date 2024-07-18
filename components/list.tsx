@@ -90,7 +90,6 @@ export default function List({ list }: { list: User | null }) {
     queryFn: async () => await getMoneys(listState.sort),
     enabled: listData?.data !== null && listData?.data !== undefined,
   });
-
   const {
     data: totalData,
     isLoading: totalLoading,

@@ -14,13 +14,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Pencil, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "../ui/select";
 import { UseAmountFormat } from "@/lib/utils";
 import { useListState } from "@/store";
 import { TansferMoneySchema } from "@/lib/schemas";
@@ -91,64 +85,26 @@ export default function TransferMoneyForm({
         onSubmit={form.handleSubmit(
           (values: z.infer<typeof TansferMoneySchema>) => mutateMoney(values),
         )}
-        className="flex flex-col gap-2 w-[320px] mx-auto"
+        className="flex flex-col gap-2 w-[320px] mx-auto text-muted-foreground  text-sm"
       >
-        <p className="text-sm text-muted-foreground">
-          Transfer{" "}
-          <span style={{ color: money.color ?? "" }}>
-            {money.name} (
-            <span className="font-readex">
-              {UseAmountFormat(money.amount ?? 0, {
-                hide: listState.hideAmounts,
-                sign: true,
-              })}
-            </span>
-            )
-          </span>
-        </p>
-        <div className="flex flex-row gap-2">
-          <FormField
-            control={form.control}
-            name="transferTo"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <Select onValueChange={field.onChange}>
-                  <FormControl>
-                    <SelectTrigger
-                      style={{
-                        color:
-                          allMoneys.findLast(
-                            (money) => money.id === field.value,
-                          )?.color ?? "",
-                      }}
-                    >
-                      <SelectValue placeholder="Transfer to" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {allMoneys
-                      .filter((m) => m.id !== money.id)
-                      .map((m) => {
-                        return (
-                          <SelectItem
-                            style={{ color: m.color ?? "" }}
-                            key={m.id}
-                            value={m.id}
-                          >
-                            {m.name}:{" "}
-                            {UseAmountFormat(m.amount ?? 0, {
-                              hide: listState.hideAmounts,
-                              sign: true,
-                            })}
-                          </SelectItem>
-                        );
-                      })}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <p>Transferring:</p>
+        <div
+          style={{
+            color: money.color ?? "",
+            borderColor: money.color ?? "",
+            backgroundColor: money.color ? money.color + 20 : "",
+          }}
+          className="flex p-2 rounded-md border justify-between"
+        >
+          <p className="truncate">{money.name}</p>
+          <p className="font-readex">
+            {UseAmountFormat(money.amount ?? 0, {
+              hide: listState.hideAmounts,
+              sign: true,
+            })}
+          </p>
+        </div>
+        <div className="flex flex-col gap-2 text-sm">
           {form.watch("transferTo") && (
             <FormField
               control={form.control}
@@ -157,10 +113,9 @@ export default function TransferMoneyForm({
                 <FormItem>
                   <FormControl>
                     <Input
-                      placeholder="->"
+                      placeholder="Amount to transfer"
                       type="number"
                       data-vaul-no-drag
-                      className="border-yellow-600 placeholder:text-yellow-600 shrink-0"
                       {...field}
                     />
                   </FormControl>
@@ -170,10 +125,104 @@ export default function TransferMoneyForm({
             />
           )}
         </div>
-        {form.watch("transferAmount") && (
-          <div className="text-sm text-muted-foreground flex flex-col">
-            <span>Final: </span>
-            <span style={{ color: money.color ?? "" }}>
+
+        {form.watch("transferTo") && (
+          <FormField
+            control={form.control}
+            name="reason"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder="Reason for transferring"
+                    data-vaul-no-drag
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+        <p>To:</p>
+        <FormField
+          control={form.control}
+          name="transferTo"
+          render={({ field }) => (
+            <FormItem className="w-full ">
+              <Select onValueChange={field.onChange}>
+                <FormControl>
+                  <SelectTrigger
+                    style={{
+                      color:
+                        allMoneys.findLast((money) => money.id === field.value)
+                          ?.color ?? "",
+                      borderColor:
+                        allMoneys.findLast((money) => money.id === field.value)
+                          ?.color ?? "",
+                      backgroundColor: allMoneys.findLast(
+                        (money) => money.id === field.value,
+                      )?.color
+                        ? allMoneys.findLast(
+                            (money) => money.id === field.value,
+                          )?.color + 20
+                        : "",
+                    }}
+                    className="grid grid-cols-[5fr,16px] gap-2"
+                  >
+                    {field.value && (
+                      <div className="flex flex-row justify-between">
+                        <p className="truncate">
+                          {
+                            allMoneys.findLast(
+                              (money) => money.id === field.value,
+                            )?.name
+                          }
+                        </p>
+                        <p className="font-readex">
+                          {UseAmountFormat(
+                            allMoneys.findLast(
+                              (money) => money.id === field.value,
+                            )?.amount ?? 0,
+                            { hide: listState.hideAmounts, sign: true },
+                          )}
+                        </p>
+                      </div>
+                    )}
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent className="w-full">
+                  {allMoneys
+                    .filter((m) => m.id !== money.id)
+                    .map((m) => {
+                      return (
+                        <SelectItem
+                          style={{ color: m.color ?? "" }}
+                          key={m.id}
+                          value={m.id}
+                        >
+                          <div className="flex gap-2">
+                            <p className="truncate">{m.name}</p>
+                            <p className="font-readex">
+                              {UseAmountFormat(m.amount ?? 0, {
+                                hide: listState.hideAmounts,
+                                sign: true,
+                              })}
+                            </p>
+                          </div>
+                        </SelectItem>
+                      );
+                    })}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {/* {form.watch("transferAmount") && (
+          <>
+            <p>Result:</p>
+            <p style={{ color: money.color ?? "" }}>
               {money.name} (
               <span className="font-readex">
                 {UseAmountFormat(
@@ -183,8 +232,8 @@ export default function TransferMoneyForm({
                 )}
               </span>
               )
-            </span>{" "}
-            <span
+            </p>{" "}
+            <p
               style={{
                 color:
                   allMoneys.filter(
@@ -210,28 +259,72 @@ export default function TransferMoneyForm({
                 )}
               </span>
               )
-            </span>
-          </div>
-        )}
+            </p>
+          </>
+        )} */}
         {form.watch("transferTo") && (
-          <FormField
-            control={form.control}
-            name="reason"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input
-                    {...field}
-                    placeholder="Reason for transferring"
-                    data-vaul-no-drag
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <>
+            <p>Result: </p>
+            <div
+              style={{
+                color: money.color ?? "",
+                borderColor: money.color ?? "",
+                backgroundColor: money.color ? money.color + 20 : "",
+              }}
+              className="flex p-2 rounded-md border justify-between"
+            >
+              <p className="truncate">{money.name}</p>
+              <p className="font-readex">
+                {UseAmountFormat(
+                  Number(money.amount ?? 0) -
+                    Number(form.watch("transferAmount") ?? 0),
+                  {
+                    hide: listState.hideAmounts,
+                    sign: true,
+                  },
+                )}
+              </p>
+            </div>
+            <div
+              style={{
+                color:
+                  allMoneys.findLast(
+                    (money) => money.id === form.watch("transferTo"),
+                  )?.color ?? "",
+                borderColor:
+                  allMoneys.findLast(
+                    (money) => money.id === form.watch("transferTo"),
+                  )?.color ?? "",
+                backgroundColor: allMoneys.findLast(
+                  (money) => money.id === form.watch("transferTo"),
+                )?.color
+                  ? allMoneys.findLast(
+                      (money) => money.id === form.watch("transferTo"),
+                    )?.color + 20
+                  : "",
+              }}
+              className="flex flex-row justify-between p-2 rounded-md border"
+            >
+              <p className="truncate">
+                {
+                  allMoneys.findLast(
+                    (money) => money.id === form.watch("transferTo"),
+                  )?.name
+                }
+              </p>
+              <p className="font-readex">
+                {UseAmountFormat(
+                  Number(
+                    allMoneys.findLast(
+                      (money) => money.id === form.watch("transferTo"),
+                    )?.amount ?? 0,
+                  ) + Number(form.watch("transferAmount") ?? 0),
+                  { hide: listState.hideAmounts, sign: true },
+                )}
+              </p>
+            </div>
+          </>
         )}
-
         <div className=" flex flex-row gap-2">
           <Button
             size={"sm"}
