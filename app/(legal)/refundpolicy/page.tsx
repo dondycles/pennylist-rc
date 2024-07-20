@@ -10,7 +10,7 @@ export default function RefundPolicy() {
       </p>
       <p>
         If you have any questions about our refund policy or need assistance,
-        please contact us at:
+        please contact us at: johnroddondoyano8@gmail.com
       </p>
       <p>Last Updated: July 20, 2024</p>
     </article>

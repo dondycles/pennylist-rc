@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import LoginForm from "./form";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { currentVersion } from "@/lib/constants/version";
+import Footer from "@/components/footer";
 
 export default async function Login() {
   const supabase = createClient();
@@ -27,13 +27,7 @@ export default async function Login() {
         </Link>
       </Button>
       <LoginForm />
-      <footer className="flex flex-row flex-wrap justify-between w-full gap-4 p-4 text-sm text-muted-foreground mb-0 mt-auto">
-        <Link href={"/"}>© pennylist. {currentVersion} | 2024 </Link>
-        <div className="flex flex-row gap-4">
-          <Link href={"/privacypolicy"}>Privacy Policy</Link>
-          <Link href={"/termsandconditions"}>Terms and Conditions</Link>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

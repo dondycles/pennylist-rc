@@ -1,5 +1,5 @@
+import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
-import { currentVersion } from "@/lib/constants/version";
 import Link from "next/link";
 
 export default function LegalPage({ children }: { children: React.ReactNode }) {
@@ -9,16 +9,12 @@ export default function LegalPage({ children }: { children: React.ReactNode }) {
         <Button asChild className="font-black text-md" variant={"ghost"}>
           <Link href={"/"}>pennylist.</Link>
         </Button>
-        <Button>Get Started</Button>
+        <Button asChild>
+          <Link href={"/login"}>Get Started</Link>
+        </Button>
       </nav>
       {children}
-      <footer className="flex flex-row flex-wrap justify-between w-full gap-4 p-4 text-sm text-muted-foreground mb-0 mt-auto">
-        <Link href={"/"}>© pennylist. {currentVersion} | 2024 </Link>
-        <div className="flex flex-row gap-4">
-          <Link href={"/privacypolicy"}>Privacy Policy</Link>
-          <Link href={"/termsandconditions"}>Terms and Conditions</Link>
-        </div>
-      </footer>
+      <Footer />
     </main>
   );
 }
