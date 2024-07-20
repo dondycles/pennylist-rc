@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-
 // Icons
 import { ArrowDown, ArrowUp, Equal, Plus } from "lucide-react";
 import { TbCurrencyPeso } from "react-icons/tb";
@@ -242,7 +241,7 @@ export default function List({ list }: { list: User | null }) {
             />
           </div>
         </motion.div>
-        {/* edit/transfe money form */}
+        {/* edit/transfer money form */}
         <FormsDrawer
           open={editMoneyForm.open}
           onOpenChange={(e) => {
@@ -357,7 +356,10 @@ export default function List({ list }: { list: User | null }) {
                         setEditMoneyForm({ money: money, open: true });
                       }}
                       transfer={() => {
-                        setTransferMoneyForm({ money: money, open: true });
+                        setTransferMoneyForm({
+                          money: money,
+                          open: true,
+                        });
                       }}
                       done={() => {
                         refetch();
