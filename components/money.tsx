@@ -73,7 +73,8 @@ export default function Money({
     isLoading: moneysLoading,
   } = useQuery({
     queryKey: ["moneys", listState.sort, listData?.data?.id],
-    queryFn: async () => await getMoneys(listState.sort),
+    queryFn: async () =>
+      await getMoneys(listState.sort, listData?.data?.id ?? ""),
     enabled: listData?.data !== null && listData?.data !== undefined,
   });
 
