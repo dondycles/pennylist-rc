@@ -36,18 +36,18 @@ export const Amount = z.coerce
   .number({ message: "Amount must be numeric" })
   .nonnegative({ message: "Amount must be positive" });
 
-export const Name = z.string().min(1, { message: "Please input money name" });
+export const Name = z.string();
 
 export const UUIDType = z.string().uuid({ message: "UUID only" });
 
 export const AddMoneySchema = z.object({
-  name: Name,
+  name: Name.min(1, { message: "Please input money name" }),
   amount: Amount,
 });
 
 export const EditMoneySchema = z.object({
   id: UUIDType,
-  name: Name,
+  name: Name.min(1, { message: "Please input money name" }),
   amount: Amount,
   created_at: z.string(),
   color: z.string().nullable(),
@@ -59,7 +59,7 @@ export const EditMoneySchema = z.object({
 
 export const EditMoneyType = z.object({
   id: UUIDType,
-  name: Name,
+  name: Name.min(1, { message: "Please input money name" }),
   amount: Amount,
   created_at: z.string(),
   color: z.string().nullable(),

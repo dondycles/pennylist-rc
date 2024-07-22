@@ -77,7 +77,7 @@ export async function addMoney(
     .single();
   if (error) return { error: error.message };
 
-  const { error: logError } = await log("add", "add", data.id, {
+  const { error: logError } = await log("add", "new added money", data.id, {
     from: {
       amount: 0,
       name: "",
@@ -191,7 +191,7 @@ export async function editMoney(
         type === "transfer"
           ? currentTotal
           : Number(currentTotal) +
-            (Number(oldMoneyData.amount) - Number(newMoneyData.amount)),
+            (Number(newMoneyData.amount) - Number(oldMoneyData.amount)),
     },
   });
 
@@ -204,14 +204,6 @@ export async function deleteMoney(
   money: z.infer<typeof DeleteMoneyType>,
   currentTotal: number,
 ) {
-  const moneyParse = DeleteMoneyType.safeParse(money);
-
-  if (!moneyParse.success) {
-    return {
-      error: moneyParse.error.issues[0].message,
-    };
-  }
-
   const supabase = createClient();
 
   const { error: logError, success: logId } = await log(
