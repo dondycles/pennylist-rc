@@ -41,11 +41,12 @@ export async function log(
   return { success: data.id };
 }
 
-export async function getLogs() {
+export async function getLogs(id: z.infer<typeof UUIDType>) {
   const supabase = createClient();
   const logs = await supabase
     .from("logs")
     .select("*, moneys(name,color,id)")
+    .eq("list", id)
     .order("created_at", { ascending: false })
     .limit(100);
   return logs;

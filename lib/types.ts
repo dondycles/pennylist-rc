@@ -36,18 +36,20 @@ export const Amount = z.coerce
   .number({ message: "Amount must be numeric" })
   .nonnegative({ message: "Amount must be positive" });
 
-export const Name = z.string();
+export const Name = z.string().min(1, { message: "Please input money name" });
 
-export const UUIDType = z.string().uuid({ message: "UUID only" });
+export const UUIDType = z
+  .string()
+  .uuid({ message: "Id is not in type of UUID" });
 
 export const AddMoneySchema = z.object({
-  name: Name.min(1, { message: "Please input money name" }),
+  name: Name,
   amount: Amount,
 });
 
 export const EditMoneySchema = z.object({
   id: UUIDType,
-  name: Name.min(1, { message: "Please input money name" }),
+  name: Name,
   amount: Amount,
   created_at: z.string(),
   color: z.string().nullable(),
@@ -59,8 +61,8 @@ export const EditMoneySchema = z.object({
 
 export const EditMoneyType = z.object({
   id: UUIDType,
-  name: Name.min(1, { message: "Please input money name" }),
-  amount: Amount,
+  name: z.string(),
+  amount: z.number(),
   created_at: z.string(),
   color: z.string().nullable(),
   updated_at: z.string().nullable(),
@@ -68,13 +70,21 @@ export const EditMoneyType = z.object({
 
 export const DeleteMoneyType = z.object({
   id: UUIDType,
-  name: Name,
-  amount: Amount,
+  name: z.string(),
+  amount: z.number(),
 });
 
 export const LogChangesTypes = z.object({
-  from: z.object({ name: Name, amount: Amount, total: Amount }),
-  to: z.object({ name: Name, amount: Amount, total: Amount }),
+  from: z.object({
+    name: z.string(),
+    amount: z.number(),
+    total: z.number(),
+  }),
+  to: z.object({
+    name: z.string(),
+    amount: z.number(),
+    total: z.number(),
+  }),
 });
 
 export type Progress = {
@@ -87,16 +97,15 @@ export type Progress = {
   currentTotal: number;
 };
 
-export const TransferTypes = z.object({
-  newMoneyData: EditMoneyType,
-  oldMoneyData: EditMoneyType,
-  currentTotal: Amount,
-});
-
 export const TansferMoneySchema = z.object({
   transferAmount: Amount,
   transferTo: UUIDType,
   reason: Reason,
+});
+export const TransferTypes = z.object({
+  newMoneyData: EditMoneyType,
+  oldMoneyData: EditMoneyType,
+  currentTotal: z.number({ message: "Current total is not a number" }),
 });
 
 export interface ModifiedLogs extends Logs {
@@ -104,5 +113,3 @@ export interface ModifiedLogs extends Logs {
   moneys?: Pick<Moneys, "name" | "color" | "id"> | null;
   money_name?: string;
 }
-
-export const useParser = () => {};

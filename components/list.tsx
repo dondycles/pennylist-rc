@@ -87,7 +87,8 @@ export default function List({ list }: { list: User | null }) {
     refetch: refetchMoneys,
   } = useQuery({
     queryKey: ["moneys", listState.sort, listData?.data?.id],
-    queryFn: async () => await getMoneys(listState.sort),
+    queryFn: async () =>
+      await getMoneys(listState.sort, listData?.data?.id ?? ""),
     enabled: listData?.data !== null && listData?.data !== undefined,
   });
   const {
@@ -110,7 +111,7 @@ export default function List({ list }: { list: User | null }) {
     refetch: refetchLogs,
   } = useQuery({
     queryKey: ["logs", listData?.data?.id],
-    queryFn: async () => await getLogs(),
+    queryFn: async () => await getLogs(listData?.data?.id ?? ""),
     enabled: listData?.data !== null && listData?.data !== undefined,
   });
 

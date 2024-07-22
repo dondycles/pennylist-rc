@@ -8,7 +8,6 @@ import {
   Reason,
   UUIDType,
   EditMoneyType,
-  Amount,
   DeleteMoneyType,
 } from "@/lib/types";
 
@@ -18,14 +17,18 @@ export async function getTotal() {
   return total;
 }
 
-export async function getMoneys(sort: {
-  asc: boolean;
-  by: "created_at" | "amount";
-}) {
+export async function getMoneys(
+  sort: {
+    asc: boolean;
+    by: "created_at" | "amount";
+  },
+  listId: z.infer<typeof UUIDType>,
+) {
   const supabase = createClient();
   const moneys = await supabase
     .from("moneys")
     .select("id,amount,name,created_at,color,updated_at")
+    .eq("list", listId)
     .order(sort.by, { ascending: sort.asc });
 
   return moneys;
@@ -54,20 +57,20 @@ export async function getMoney(id: z.infer<typeof UUIDType>) {
 
 export async function addMoney(
   money: z.infer<typeof AddMoneySchema>,
-  currentTotal: z.infer<typeof Amount>,
+  currentTotal: number,
 ) {
   const moneyParse = AddMoneySchema.safeParse(money);
-  const totalParse = Amount.safeParse(currentTotal);
   if (!moneyParse.success) {
     return {
       error: moneyParse.error.issues[0].message,
     };
   }
-  if (!totalParse.success) {
+  if (isNaN(currentTotal)) {
     return {
-      error: totalParse.error.issues[0].message,
+      error: "Current total is non a number",
     };
   }
+
   const supabase = createClient();
 
   const { error, data } = await supabase
@@ -94,6 +97,7 @@ export async function addMoney(
 
   return { success: "added!" };
 }
+
 export async function transferMoney(
   from: z.infer<typeof TransferTypes>,
   to: z.infer<typeof TransferTypes>,
@@ -137,6 +141,7 @@ export async function transferMoney(
   if (toError) return { error: toError };
   return { success: "transfered!" };
 }
+
 export async function editMoney(
   oldMoneyData: z.infer<typeof EditMoneyType>,
   newMoneyData: z.infer<typeof EditMoneyType>,
@@ -159,7 +164,7 @@ export async function editMoney(
   if (!reasonParse.success) {
     return { error: reasonParse.error.issues[0].message };
   }
-
+  if (isNaN(currentTotal)) return { error: "Current total is not a number" };
   if (
     type !== "transfer" &&
     oldMoneyData.amount === newMoneyData.amount &&
@@ -204,6 +209,10 @@ export async function deleteMoney(
   money: z.infer<typeof DeleteMoneyType>,
   currentTotal: number,
 ) {
+  const parseMoney = DeleteMoneyType.safeParse(money);
+  if (isNaN(currentTotal)) return { error: "Current total is not a number" };
+  if (!parseMoney.success) return { error: parseMoney.error.issues[0].message };
+
   const supabase = createClient();
 
   const { error: logError, success: logId } = await log(
