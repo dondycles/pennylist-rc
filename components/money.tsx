@@ -32,14 +32,13 @@ import {
 import { Button } from "@/components/ui/button";
 import ProgressBarChart from "./charts/money-progress-bar-chart";
 import FormsDrawer from "./forms/forms-drawer";
-import LogsDataTable from "./charts/log-data-table";
-import { logsColumns } from "./charts/log-columns";
 import { useToast } from "./ui/use-toast";
 import { getList } from "@/app/_actions/auth";
 import SkeletonLoading from "./skeleton";
 import TransferMoneyForm from "./forms/transfer-money-form";
 import type { ModifiedLogs, Progress, UUIDType } from "@/lib/types";
 import { z } from "zod";
+import LogsTable from "./charts/logs-table";
 
 export default function Money({
   list,
@@ -457,7 +456,7 @@ export default function Money({
             {progress.length !== 0 ? (
               <ProgressBarChart progress={progress} />
             ) : null}
-            {logs && <LogsDataTable data={logs} columns={logsColumns} />}
+            {logs && <LogsTable logs={logs} />}
           </>
         ) : null}
       </Scrollable>
