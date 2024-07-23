@@ -84,7 +84,6 @@ export const logsColumns: ColumnDef<LogCols>[] = [
         ),
         name: cell.row.original.changes?.to.name,
       };
-
       const difference = {
         formattedAmount: UseAmountFormat(
           Math.abs(

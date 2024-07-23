@@ -2,11 +2,20 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 // Icons
-import { ArrowDown, ArrowUp, Equal, Plus } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowRightLeft,
+  ArrowUp,
+  Equal,
+  PencilLine,
+  Plus,
+  ScrollText,
+  Trash,
+} from "lucide-react";
 import { TbCurrencyPeso } from "react-icons/tb";
 
 // Importing utility functions
-import { UseAmountFormat } from "@/lib/utils";
+import { toMonthWord, UseAmountFormat } from "@/lib/utils";
 
 // Importing actions
 import { getMoneys, getTotal } from "@/app/_actions/moneys";
@@ -49,6 +58,9 @@ import SkeletonLoading from "./skeleton";
 import TransferMoneyForm from "./forms/transfer-money-form";
 import { z } from "zod";
 import { EditMoneyType } from "@/lib/types";
+import { log } from "console";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { ScrollArea } from "./ui/scroll-area";
 
 export default function List({ list }: { list: User | null }) {
   const queryClient = useQueryClient();
@@ -406,6 +418,128 @@ export default function List({ list }: { list: User | null }) {
             {modifiedLogs && (
               <LogsDataTable columns={logsColumns} data={modifiedLogs} />
             )}
+            <Card className="shadow-none rounded-lg">
+              <CardHeader className="p-2 border-b">
+                <CardTitle className="flex items-center gap-1 py-1 text-muted-foreground font-normal text-sm">
+                  <ScrollText size={20} /> Logs (Last 100)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0 flex flex-col gap-2">
+                <ScrollArea className="h-[50dvh] px-2 py-0 ">
+                  {logs?.data?.map((log) => {
+                    return (
+                      <Card
+                        key={log.id}
+                        className="rounded-lg shadow-none text-sm first:mt-2 mb-2"
+                      >
+                        <CardContent className="p-2 flex flex-col gap-2">
+                          <div className="flex gap-2 items-center">
+                            <div>
+                              {(log.type === "add" && (
+                                <Plus size={16} className=" text-green-500" />
+                              )) ||
+                                (log.type === "update" && (
+                                  <PencilLine
+                                    size={16}
+                                    className=" text-yellow-500"
+                                  />
+                                )) ||
+                                (log.type === "delete" && (
+                                  <Trash size={16} className=" text-red-400" />
+                                )) ||
+                                (log.type === "transfer" && (
+                                  <ArrowRightLeft
+                                    size={16}
+                                    className=" text-blue-400"
+                                  />
+                                )) ||
+                                null}
+                            </div>
+                            <p className="text-muted-foreground truncate text-xs">
+                              {toMonthWord(log.created_at)}.{" "}
+                              {new Date(log.created_at).getDate()},{" "}
+                              {new Date(log.created_at).getFullYear()} at{" "}
+                              {new Date(log.created_at).toLocaleTimeString()}
+                            </p>
+                          </div>
+                          <div className="flex flex-row gap-2 justify-between">
+                            <p className="truncate">{log.reason}</p>
+                            <p className="font-readex">
+                              {Number(log.changes.from.amount) -
+                                Number(log.changes.to.amount) <=
+                              0
+                                ? "+"
+                                : "-"}
+                              {UseAmountFormat(
+                                Math.abs(
+                                  Number(log.changes.from.amount) -
+                                    Number(log.changes.to.amount),
+                                ),
+                                { sign: true, hide: listState.hideAmounts },
+                              )}
+                            </p>
+                          </div>
+                          <Separator />
+                          <div className="text-xs text-muted-foreground">
+                            <p>
+                              Money:{" "}
+                              {log.changes.to.name ?? log.changes.from.name}
+                            </p>
+                            <div
+                              hidden={
+                                (log.changes.from.name ===
+                                  log.changes.to.name &&
+                                  log.changes.from.amount) ===
+                                  log.changes.to.amount ||
+                                log.type === "add" ||
+                                log.type === "delete"
+                              }
+                            >
+                              <div className="flex flex-row gap-1">
+                                Changes:{" "}
+                                <p
+                                  hidden={
+                                    log.changes.from.name ===
+                                    log.changes.to.name
+                                  }
+                                >
+                                  {log.changes.from.name +
+                                    " to " +
+                                    log.changes.to.name}
+                                </p>
+                                <p
+                                  hidden={
+                                    log.changes.from.amount ===
+                                    log.changes.to.amount
+                                  }
+                                >
+                                  {UseAmountFormat(log.changes.from.amount, {
+                                    sign: true,
+                                    hide: listState.hideAmounts,
+                                  }) +
+                                    " to " +
+                                    UseAmountFormat(log.changes.to.amount, {
+                                      sign: true,
+                                      hide: listState.hideAmounts,
+                                    })}
+                                </p>
+                              </div>
+                            </div>
+                            <p>
+                              Total money:{" "}
+                              {UseAmountFormat(log.changes.to.total, {
+                                sign: true,
+                                hide: listState.hideAmounts,
+                              })}
+                            </p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </ScrollArea>
+              </CardContent>
+            </Card>
           </motion.div>
         ) : null}
       </Scrollable>
