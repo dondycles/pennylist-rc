@@ -23,9 +23,9 @@ import { ModifiedLogs } from "@/lib/types";
 import { Button } from "../ui/button";
 
 export default function LogsTable({ logs }: { logs: ModifiedLogs[] }) {
-  const [filterBy, setFilterBy] = useState<
-    "type" | "created_at" | "name" | "reason"
-  >("name");
+  const [filterBy, setFilterBy] = useState<"created_at" | "name" | "reason">(
+    "name",
+  );
   const [filterValue, setFilterValue] = useState("");
   const [actionFilter, setActionFilter] = useState<
     "" | "Delete" | "Add" | "Update" | "Transfer"
@@ -43,7 +43,8 @@ export default function LogsTable({ logs }: { logs: ModifiedLogs[] }) {
         <div className="p-2 flex gap-2">
           <div className="flex items-center flex-1 border rounded-md h-8">
             <Input
-              placeholder={`Filter by ` + filterBy}
+              placeholder={`Filter by  ${filterBy === "created_at" ? "date" : filterBy}
+              `}
               className="rounded-r-none border-none py-1 h-8 z-10"
               value={filterValue}
               onChange={(e) => setFilterValue(e.target.value)}
