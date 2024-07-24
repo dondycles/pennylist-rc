@@ -172,7 +172,6 @@ export default function TransferMoneyForm({
             />
           )}
         </div>
-        <Separator />
         <div className="flex flex-col gap-2 p-2 border shadow-sm rounded-lg">
           <FormField
             control={form.control}
@@ -236,66 +235,62 @@ export default function TransferMoneyForm({
             )}
           />
         </div>
-        <Separator />
-        <div className="flex flex-col gap-2 p-2 border shadow-sm rounded-lg">
-          {form.watch("transferTo") && (
-            <>
-              <p>Result: </p>
-              <div
-                style={{
-                  color: money.color ?? "",
-                  borderColor: money.color ?? "",
-                  backgroundColor: money.color ? money.color + 20 : "",
-                }}
-                className="flex p-2 rounded-md border justify-between"
-              >
-                <p className="truncate">{money.name}</p>
-                <p className="font-readex">
-                  {UseAmountFormat(
-                    Number(money.amount ?? 0) -
-                      Number(form.watch("transferAmount") ?? 0) -
-                      Number(form.watch("fee") ?? 0),
-                    {
-                      hide: listState.hideAmounts,
-                      sign: true,
-                    },
-                  )}
-                </p>
-              </div>
-              <div
-                style={{
-                  color: selectedMoneyDestination?.color ?? "",
-                  borderColor: selectedMoneyDestination?.color ?? "",
-                  backgroundColor: selectedMoneyDestination?.color
-                    ? selectedMoneyDestination?.color + 20
-                    : "",
-                }}
-                className="flex flex-row justify-between p-2 rounded-md border"
-              >
-                <p className="truncate">
+        {form.watch("transferTo") && (
+          <div className="flex flex-col gap-2 p-2 border shadow-sm rounded-lg">
+            <p>Result: </p>
+            <div
+              style={{
+                color: money.color ?? "",
+                borderColor: money.color ?? "",
+                backgroundColor: money.color ? money.color + 20 : "",
+              }}
+              className="flex p-2 rounded-md border justify-between"
+            >
+              <p className="truncate">{money.name}</p>
+              <p className="font-readex">
+                {UseAmountFormat(
+                  Number(money.amount ?? 0) -
+                    Number(form.watch("transferAmount") ?? 0) -
+                    Number(form.watch("fee") ?? 0),
                   {
-                    allMoneys.findLast(
-                      (money) => money.id === form.watch("transferTo"),
-                    )?.name
-                  }
-                </p>
-                <p className="font-readex">
-                  {UseAmountFormat(
-                    Number(selectedMoneyDestination?.amount ?? 0) +
-                      Number(form.watch("transferAmount") ?? 0),
-                    { hide: listState.hideAmounts, sign: true },
-                  )}
-                </p>
-              </div>
-            </>
-          )}
-          {form.formState.errors.root && (
-            <p className="text-destructive">
-              {form.formState.errors.root?.message}
-            </p>
-          )}
-        </div>
-
+                    hide: listState.hideAmounts,
+                    sign: true,
+                  },
+                )}
+              </p>
+            </div>
+            <div
+              style={{
+                color: selectedMoneyDestination?.color ?? "",
+                borderColor: selectedMoneyDestination?.color ?? "",
+                backgroundColor: selectedMoneyDestination?.color
+                  ? selectedMoneyDestination?.color + 20
+                  : "",
+              }}
+              className="flex flex-row justify-between p-2 rounded-md border"
+            >
+              <p className="truncate">
+                {
+                  allMoneys.findLast(
+                    (money) => money.id === form.watch("transferTo"),
+                  )?.name
+                }
+              </p>
+              <p className="font-readex">
+                {UseAmountFormat(
+                  Number(selectedMoneyDestination?.amount ?? 0) +
+                    Number(form.watch("transferAmount") ?? 0),
+                  { hide: listState.hideAmounts, sign: true },
+                )}
+              </p>
+            </div>
+          </div>
+        )}
+        {form.formState.errors.root && (
+          <p className="text-destructive">
+            {form.formState.errors.root?.message}
+          </p>
+        )}
         <div className=" flex flex-row gap-2">
           <Button
             size={"sm"}
