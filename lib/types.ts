@@ -61,7 +61,8 @@ export const EditMoneySchema = z.object({
   reason: z
     .string()
     .min(4, { message: "Reason must be at least 4 characters" })
-    .max(55, { message: "Reason must be at most 55 characters" }),
+    .max(55, { message: "Reason must be at most 55 characters" })
+    .optional(),
   add: z.coerce
     .number({ message: "Amount must only be number" })
     .nonnegative({ message: "Add money must be positive only" })

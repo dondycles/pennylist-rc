@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { editMoney } from "@/app/_actions/moneys";
+import { editMoney, editMoneyWithoutLog } from "@/app/_actions/moneys";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -14,9 +14,10 @@ import { EditMoneySchema, EditMoneyType } from "@/lib/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { Pencil, X } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { Checkbox } from "../ui/checkbox";
 
 export default function EditMoneyForm({
   close,
@@ -28,6 +29,7 @@ export default function EditMoneyForm({
   money: z.infer<typeof EditMoneyType>;
   currentTotal: number;
 }) {
+  const [skipLog, setSkipLog] = useState(false);
   const form = useForm<z.infer<typeof EditMoneySchema>>({
     resolver: zodResolver(EditMoneySchema),
     defaultValues: {
@@ -53,17 +55,29 @@ export default function EditMoneyForm({
         color: money.color,
         updated_at: money.updated_at,
       };
-
-      const { error } = await editMoney(
-        money,
-        newMoneyData,
-        currentTotal,
-        values.reason,
-        "update",
-      );
-      if (error) {
-        return form.setError("reason", { message: error });
+      if (skipLog) {
+        const { error } = await editMoneyWithoutLog(
+          money,
+          newMoneyData,
+          currentTotal,
+          "update",
+        );
+        if (error) {
+          return form.setError("root", { message: error });
+        }
+      } else {
+        const { error } = await editMoney(
+          money,
+          newMoneyData,
+          currentTotal,
+          values.reason!,
+          "update",
+        );
+        if (error) {
+          return form.setError("root", { message: error });
+        }
       }
+
       close(true);
     },
   });
@@ -95,7 +109,7 @@ export default function EditMoneyForm({
         onSubmit={form.handleSubmit((values: z.infer<typeof EditMoneySchema>) =>
           mutateMoney(values),
         )}
-        className="flex flex-col gap-2 w-[320px] mx-auto"
+        className="flex flex-col gap-2 w-[320px] mx-auto text-sm"
       >
         <FormField
           control={form.control}
@@ -173,7 +187,9 @@ export default function EditMoneyForm({
             )}
           />
         </div>
+
         <FormField
+          disabled={skipLog}
           control={form.control}
           name="reason"
           render={({ field }) => (
@@ -192,6 +208,22 @@ export default function EditMoneyForm({
             </FormItem>
           )}
         />
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            checked={skipLog}
+            onCheckedChange={() => setSkipLog((prev) => !prev)}
+            id="skipLog"
+            className=" border shadow-none"
+          />
+          <label htmlFor="skipLog" className=" text-muted-foreground">
+            Skip logging?
+          </label>
+        </div>
+        {form.formState.errors.root && (
+          <p className="text-destructive">
+            {form.formState.errors.root?.message}
+          </p>
+        )}
         <div className=" flex flex-row gap-2">
           <Button
             size={"sm"}

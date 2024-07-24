@@ -204,6 +204,45 @@ export async function editMoney(
 
   return { success: "edited!" };
 }
+export async function editMoneyWithoutLog(
+  oldMoneyData: z.infer<typeof EditMoneyType>,
+  newMoneyData: z.infer<typeof EditMoneyType>,
+  currentTotal: number,
+  type: string,
+) {
+  const oldMoneyDataParse = EditMoneyType.safeParse(oldMoneyData);
+  const newMoneyDataParse = EditMoneyType.safeParse(newMoneyData);
+
+  if (!oldMoneyDataParse.success) {
+    return {
+      error: oldMoneyDataParse.error.issues[0].message,
+    };
+  }
+  if (!newMoneyDataParse.success) {
+    return { error: newMoneyDataParse.error.issues[0].message };
+  }
+
+  if (isNaN(currentTotal)) return { error: "Current total is not a number" };
+  if (
+    type !== "transfer" &&
+    oldMoneyData.amount === newMoneyData.amount &&
+    oldMoneyData.name === newMoneyData.name
+  )
+    return { error: "No changes made!" };
+
+  if (oldMoneyData.id !== newMoneyData.id)
+    return { error: "Ids did not match!" };
+
+  const supabase = createClient();
+
+  const { error } = await supabase
+    .from("moneys")
+    .update(newMoneyData)
+    .eq("id", oldMoneyData.id);
+  if (error) return { error: error.message };
+
+  return { success: "edited!" };
+}
 
 export async function deleteMoney(
   money: z.infer<typeof DeleteMoneyType>,
