@@ -6,6 +6,7 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -38,6 +39,7 @@ export default function TransferMoneyForm({
       transferAmount: undefined,
       transferTo: "",
       reason: "",
+      fee: undefined,
     },
   });
 
@@ -56,7 +58,9 @@ export default function TransferMoneyForm({
         newMoneyData: {
           ...money,
           amount:
-            Number(money.amount ?? 0) - Number(values.transferAmount ?? 0),
+            Number(money.amount ?? 0) -
+            Number(values.transferAmount ?? 0) -
+            Number(values.fee ?? 0),
         },
         currentTotal: currentTotal,
       };
@@ -78,7 +82,7 @@ export default function TransferMoneyForm({
       );
 
       if (error) {
-        return form.setError("transferTo", { message: error });
+        return form.setError("root", { message: error });
       }
       close({ to: to.oldMoneyData.id, from: from.oldMoneyData.id });
     },
@@ -108,16 +112,17 @@ export default function TransferMoneyForm({
             })}
           </p>
         </div>
-        <div className="flex flex-col gap-2 text-sm">
-          {form.watch("transferTo") && (
+        {form.watch("transferTo") && (
+          <div className="grid grid-cols-[2fr,1fr] gap-2">
             <FormField
               control={form.control}
               name="transferAmount"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel>Amount to transfer w/o fee:</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Amount to transfer"
+                      placeholder="Amount to transfer w/o fee"
                       type="number"
                       data-vaul-no-drag
                       {...field}
@@ -127,8 +132,26 @@ export default function TransferMoneyForm({
                 </FormItem>
               )}
             />
-          )}
-        </div>
+            <FormField
+              control={form.control}
+              name="fee"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Transfer fee:</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Fee"
+                      type="number"
+                      data-vaul-no-drag
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        )}
 
         {form.watch("transferTo") && (
           <FormField
@@ -136,6 +159,7 @@ export default function TransferMoneyForm({
             name="reason"
             render={({ field }) => (
               <FormItem>
+                <FormLabel>Reason of transfer:</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
@@ -148,12 +172,12 @@ export default function TransferMoneyForm({
             )}
           />
         )}
-        <p>To:</p>
         <FormField
           control={form.control}
           name="transferTo"
           render={({ field }) => (
             <FormItem className="w-full ">
+              <FormLabel>Transfer to:</FormLabel>
               <Select onValueChange={field.onChange}>
                 <FormControl>
                   <SelectTrigger
@@ -164,7 +188,7 @@ export default function TransferMoneyForm({
                         ? selectedMoneyDestination?.color + 20
                         : "",
                     }}
-                    className="grid grid-cols-[5fr,16px] gap-2"
+                    className="grid grid-cols-[5fr,16px] gap-2 shadow-none"
                   >
                     {field.value && (
                       <div className="flex flex-row justify-between">
@@ -225,7 +249,8 @@ export default function TransferMoneyForm({
               <p className="font-readex">
                 {UseAmountFormat(
                   Number(money.amount ?? 0) -
-                    Number(form.watch("transferAmount") ?? 0),
+                    Number(form.watch("transferAmount") ?? 0) -
+                    Number(form.watch("fee") ?? 0),
                   {
                     hide: listState.hideAmounts,
                     sign: true,
@@ -259,6 +284,11 @@ export default function TransferMoneyForm({
               </p>
             </div>
           </>
+        )}
+        {form.formState.errors.root && (
+          <p className="text-destructive">
+            {form.formState.errors.root?.message}
+          </p>
         )}
         <div className=" flex flex-row gap-2">
           <Button

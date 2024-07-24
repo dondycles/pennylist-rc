@@ -6,6 +6,7 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -101,6 +102,9 @@ export default function EditMoneyForm({
           name="name"
           render={({ field }) => (
             <FormItem>
+              <FormLabel className="text-muted-foreground">
+                Money name
+              </FormLabel>
               <FormControl>
                 <Input data-vaul-no-drag placeholder="name" {...field} />
               </FormControl>
@@ -109,12 +113,15 @@ export default function EditMoneyForm({
           )}
         />
 
-        <div className="grid grid-cols-[1fr,1fr,1fr] gap-2">
+        <div className="grid grid-cols-[2fr,1fr,1fr] gap-2">
           <FormField
             control={form.control}
             name="amount"
             render={({ field }) => (
               <FormItem>
+                <FormLabel className="text-muted-foreground">
+                  Money amount
+                </FormLabel>
                 <FormControl>
                   <Input
                     data-vaul-no-drag
@@ -132,6 +139,7 @@ export default function EditMoneyForm({
             name="add"
             render={({ field }) => (
               <FormItem>
+                <FormLabel className="text-muted-foreground">Add</FormLabel>
                 <FormControl>
                   <Input
                     className="border-green-500 placeholder:text-2xl placeholder:text-green-500"
@@ -150,6 +158,7 @@ export default function EditMoneyForm({
             name="ded"
             render={({ field }) => (
               <FormItem>
+                <FormLabel className="text-muted-foreground">Deduct</FormLabel>
                 <FormControl>
                   <Input
                     className="border-destructive placeholder:text-2xl placeholder:text-destructive"
@@ -169,8 +178,15 @@ export default function EditMoneyForm({
           name="reason"
           render={({ field }) => (
             <FormItem>
+              <FormLabel className="text-muted-foreground">
+                Reason for editing
+              </FormLabel>
               <FormControl>
-                <Input data-vaul-no-drag placeholder="reason" {...field} />
+                <Input
+                  data-vaul-no-drag
+                  placeholder="e.g. bought a pc"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

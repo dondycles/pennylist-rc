@@ -41,9 +41,9 @@ export default function LogsTable({ logs }: { logs: ModifiedLogs[] }) {
       </CardHeader>
       <CardContent className="p-0 flex flex-col">
         <div className="p-2 flex gap-2">
-          <div className="flex items-center flex-1 border rounded-md h-8">
+          <div className="flex items-center flex-1 border rounded-md h-8 shadow-sm">
             <Input
-              placeholder={`Filter by  ${filterBy === "created_at" ? "date" : filterBy}
+              placeholder={`Filter by ${filterBy === "created_at" ? "date" : filterBy}
               `}
               className="rounded-r-none border-none py-1 h-8 z-10"
               value={filterValue}
@@ -86,7 +86,11 @@ export default function LogsTable({ logs }: { logs: ModifiedLogs[] }) {
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button size={"sm"} variant={"outline"} className="shadow-none">
+              <Button
+                size={"sm"}
+                variant={"outline"}
+                className="shadow-sm text-sm text-muted-foreground font-normal"
+              >
                 Action
               </Button>
             </DropdownMenuTrigger>
@@ -133,7 +137,7 @@ export default function LogsTable({ logs }: { logs: ModifiedLogs[] }) {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <ScrollArea className="h-[50dvh] px-2 py-0 ">
+        <ScrollArea className="h-[50dvh] px-2 py-0 border-t">
           {logs
             .filter(
               (log) =>
@@ -147,7 +151,7 @@ export default function LogsTable({ logs }: { logs: ModifiedLogs[] }) {
               return (
                 <Card
                   key={log.id}
-                  className="rounded-lg shadow-none text-sm mb-2"
+                  className="rounded-lg shadow-sm text-sm mb-2 first:mt-2"
                 >
                   <CardContent className="p-2 flex flex-col gap-2">
                     <div className="flex gap-2 items-center">

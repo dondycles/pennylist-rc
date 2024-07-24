@@ -13,6 +13,7 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -63,8 +64,11 @@ export default function AddMoneyForm({
           name="name"
           render={({ field }) => (
             <FormItem>
+              <FormLabel className="text-muted-foreground">
+                Money name
+              </FormLabel>
               <FormControl>
-                <Input data-vaul-no-drag placeholder="name" {...field} />
+                <Input data-vaul-no-drag placeholder="e.g. PayPal" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -75,10 +79,13 @@ export default function AddMoneyForm({
           name="amount"
           render={({ field }) => (
             <FormItem>
+              <FormLabel className="text-muted-foreground">
+                Money amount
+              </FormLabel>
               <FormControl>
                 <Input
                   data-vaul-no-drag
-                  placeholder="amount"
+                  placeholder="Amount"
                   type="number"
                   {...field}
                 />

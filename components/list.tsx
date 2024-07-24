@@ -2,20 +2,11 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 // Icons
-import {
-  ArrowDown,
-  ArrowRightLeft,
-  ArrowUp,
-  Equal,
-  PencilLine,
-  Plus,
-  ScrollText,
-  Trash,
-} from "lucide-react";
+import { ArrowDown, ArrowUp, Equal, Plus } from "lucide-react";
 import { TbCurrencyPeso } from "react-icons/tb";
 
 // Importing utility functions
-import { toMonthWord, UseAmountFormat } from "@/lib/utils";
+import { UseAmountFormat } from "@/lib/utils";
 
 // Importing actions
 import { getMoneys, getTotal } from "@/app/_actions/moneys";

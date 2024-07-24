@@ -32,37 +32,52 @@ export const Reason = z
   .min(4, { message: "Please state your reason at least 4 characters" })
   .max(55, { message: "Reason must be at max of 55 characters only" });
 
-export const Amount = z.coerce
-  .number({ message: "Amount must be numeric" })
-  .nonnegative({ message: "Amount must be positive" });
+// export const Amount = z.coerce
+//   .number({ message: "Amount must be numeric" })
+//   .nonnegative({ message: "Amount must be positive" });
 
-export const Name = z.string().min(1, { message: "Please input money name" });
+// export const Name = z.string().min(1, { message: "Please input money name" });
 
 export const UUIDType = z
   .string()
   .uuid({ message: "Id is not in type of UUID" });
 
 export const AddMoneySchema = z.object({
-  name: Name,
-  amount: Amount,
+  name: z.string().min(1, { message: "Name can't be empty" }),
+  amount: z.coerce
+    .number({ message: "Amount must only be number" })
+    .nonnegative({ message: "Amount must be positive number" }),
 });
 
 export const EditMoneySchema = z.object({
   id: UUIDType,
-  name: Name,
-  amount: Amount,
+  name: z.string().min(1, { message: "Name can't be empty" }),
+  amount: z.coerce
+    .number({ message: "Amount must only be number" })
+    .nonnegative({ message: "Amount must be positive number" }),
   created_at: z.string(),
   color: z.string().nullable(),
   updated_at: z.string().nullable(),
-  reason: Reason,
-  add: Amount.optional(),
-  ded: Amount.optional(),
+  reason: z
+    .string()
+    .min(4, { message: "Reason must be at least 4 characters" })
+    .max(55, { message: "Reason must be at most 55 characters" }),
+  add: z.coerce
+    .number({ message: "Amount must only be number" })
+    .nonnegative({ message: "Add money must be positive only" })
+    .optional(),
+  ded: z.coerce
+    .number({ message: "Amount must only be number" })
+    .nonnegative({ message: "Deducted money must be positive only" })
+    .optional(),
 });
 
 export const EditMoneyType = z.object({
   id: UUIDType,
-  name: z.string(),
-  amount: z.number(),
+  name: z.string().min(1, { message: "Name can't be empty" }),
+  amount: z
+    .number({ message: "Amount must only be number" })
+    .nonnegative({ message: "Amount must be positive only" }),
   created_at: z.string(),
   color: z.string().nullable(),
   updated_at: z.string().nullable(),
@@ -98,9 +113,21 @@ export type Progress = {
 };
 
 export const TansferMoneySchema = z.object({
-  transferAmount: Amount,
+  transferAmount: z.coerce
+    .number({ message: "Transfer amount must only be number" })
+    .nonnegative({ message: "Transfer amount must be positive number" }),
   transferTo: UUIDType,
-  reason: Reason,
+  reason: z
+    .string()
+    .min(4, {
+      message: "Reason for transferring must be at least 4 characters",
+    })
+    .max(55, {
+      message: "Reason for transferring must be at most 55 characters",
+    }),
+  fee: z.coerce
+    .number({ message: "Fee must only be number" })
+    .nonnegative({ message: "Fee must not be negative" }),
 });
 export const TransferTypes = z.object({
   newMoneyData: EditMoneyType,
