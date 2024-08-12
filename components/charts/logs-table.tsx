@@ -36,7 +36,7 @@ export default function LogsTable({ logs }: { logs: ModifiedLogs[] }) {
     <Card className="shadow-none rounded-lg">
       <CardHeader className="p-2 border-b">
         <CardTitle className="flex items-center gap-1 py-1 text-muted-foreground font-normal text-sm">
-          <ScrollText size={20} /> Logs (Last 100)
+          <ScrollText size={20} /> Logs{" "}
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0 flex flex-col">

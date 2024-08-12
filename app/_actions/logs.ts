@@ -47,7 +47,6 @@ export async function getLogs(id: z.infer<typeof UUIDType>) {
     .from("logs")
     .select("*, moneys(name,color,id)")
     .eq("list", id)
-    .order("created_at", { ascending: false })
-    .limit(100);
+    .order("created_at", { ascending: false });
   return logs;
 }

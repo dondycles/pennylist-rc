@@ -92,7 +92,7 @@ export default function LoginForm() {
         <Button disabled={loggingIn} type="submit" className="w-full">
           Log in
         </Button>
-        <Button asChild type="submit" className="w-full" variant={"link"}>
+        <Button asChild className="w-full" variant={"link"}>
           <Link href={"/signup"}>or Sign up</Link>
         </Button>
       </form>
