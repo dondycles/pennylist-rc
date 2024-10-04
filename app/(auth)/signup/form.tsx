@@ -17,14 +17,14 @@ import { signup } from "@/app/_actions/auth";
 import { useRef, useState } from "react";
 import { AlertCircle } from "lucide-react";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
-import { useTheme } from "next-themes";
+// import { useTheme } from "next-themes";
 import { SignUpSchema } from "@/lib/types";
 
 export default function SignupForm() {
   const [signingUp, setSigningUp] = useState(false);
-  const [captchaToken, setCaptchaToken] = useState<string>();
+  // const [captchaToken, setCaptchaToken] = useState<string>();
   const captcha = useRef<HCaptcha>(null);
-  const { theme } = useTheme();
+  // const { theme } = useTheme();
 
   const form = useForm<z.infer<typeof SignUpSchema>>({
     resolver: zodResolver(SignUpSchema),
@@ -37,7 +37,7 @@ export default function SignupForm() {
   async function onSubmit(values: z.infer<typeof SignUpSchema>) {
     try {
       setSigningUp(true);
-      const res = await signup(values, captchaToken!);
+      const res = await signup(values);
       if (res?.authError) {
         setSigningUp(false);
         return form.setError("cpassword", {
@@ -128,16 +128,6 @@ export default function SignupForm() {
           .
         </p>
       </form>
-      <div className="mx-auto">
-        <HCaptcha
-          ref={captcha}
-          sitekey="faaacf4c-dea6-41ac-a842-6d460c2478de"
-          onVerify={(token) => {
-            setCaptchaToken(token);
-          }}
-          theme={theme}
-        />
-      </div>
     </Form>
   );
 }

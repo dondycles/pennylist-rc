@@ -61,10 +61,7 @@ export const deleteList = async (id: z.infer<typeof UUIDType>) => {
   await logout();
 };
 
-export const signup = async (
-  data: z.infer<typeof SignUpSchema>,
-  captchaToken: string,
-) => {
+export const signup = async (data: z.infer<typeof SignUpSchema>) => {
   const supabase = createClient();
   const email = `${data.listname}@pennylist.com`;
   const password = data.password;
@@ -72,7 +69,6 @@ export const signup = async (
   const { error: authError } = await supabase.auth.signUp({
     email,
     password,
-    options: { captchaToken },
   });
   if (authError)
     return {
@@ -85,10 +81,7 @@ export const signup = async (
 
   if (dbError) return { dbError: dbError.message };
 };
-export const login = async (
-  data: z.infer<typeof LogInSchema>,
-  captchaToken: string,
-) => {
+export const login = async (data: z.infer<typeof LogInSchema>) => {
   const supabase = createClient();
   const list = `${data.listname}@pennylist.com`;
   const password = data.password;
@@ -96,7 +89,6 @@ export const login = async (
     await supabase.auth.signInWithPassword({
       email: list,
       password,
-      options: { captchaToken },
     });
   if (authError)
     return {

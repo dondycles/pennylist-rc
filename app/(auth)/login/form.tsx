@@ -15,15 +15,15 @@ import {
 import { Input } from "@/components/ui/input";
 import Logo from "@/components/logo";
 import { login } from "@/app/_actions/auth";
-import { useRef, useState } from "react";
-import HCaptcha from "@hcaptcha/react-hcaptcha";
-import { useTheme } from "next-themes";
+import { useState } from "react";
+// import HCaptcha from "@hcaptcha/react-hcaptcha";
+// import { useTheme } from "next-themes";
 import { LogInSchema } from "@/lib/types";
 
 export default function LoginForm() {
-  const [captchaToken, setCaptchaToken] = useState<string>();
-  const captcha = useRef<HCaptcha>(null);
-  const { theme } = useTheme();
+  // const [captchaToken, setCaptchaToken] = useState<string>();
+  // const captcha = useRef<HCaptcha>(null);
+  // const { theme } = useTheme();
   const [loggingIn, setLoggingIn] = useState(false);
   const form = useForm<z.infer<typeof LogInSchema>>({
     resolver: zodResolver(LogInSchema),
@@ -36,7 +36,7 @@ export default function LoginForm() {
   async function onSubmit(values: z.infer<typeof LogInSchema>) {
     try {
       setLoggingIn(true);
-      const res = await login(values, captchaToken!);
+      const res = await login(values);
 
       if (res?.authError) {
         setLoggingIn(false);
@@ -96,7 +96,7 @@ export default function LoginForm() {
           <Link href={"/signup"}>or Sign up</Link>
         </Button>
       </form>
-      <div className="mx-auto">
+      {/* <div className="mx-auto">
         <HCaptcha
           ref={captcha}
           sitekey="faaacf4c-dea6-41ac-a842-6d460c2478de"
@@ -105,7 +105,7 @@ export default function LoginForm() {
           }}
           theme={theme}
         />
-      </div>
+      </div> */}
     </Form>
   );
 }
